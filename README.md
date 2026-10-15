@@ -127,6 +127,10 @@ pnpm build
 
 用户可见变更需要执行 `pnpm changeset`。合并到 `main` 后，GitHub Actions 自动维护版本 PR；版本 PR 合并且仓库已配置 `NPM_TOKEN` 时发布 npm provenance。文档独立部署到 GitHub Pages。
 
+## 参与贡献
+
+欢迎[报告缺陷或提出功能建议](https://github.com/bubblesplant/antv-next-pro/issues/new/choose)，也欢迎从个人 Fork 向 `main` 提交 PR。请阅读[贡献指南](./CONTRIBUTING.md)，了解本地开发、PR 标题规范、测试与 changeset 要求。PR 会自动运行标题检查、代码检查、测试和构建验证。
+
 ## Compatibility
 
 The API follows the main workflows of Ant Design Pro Components while remaining idiomatic Vue. ReactNode and React refs map to Vue slots, events, models, and component refs. This project does not ship a React compatibility runtime.

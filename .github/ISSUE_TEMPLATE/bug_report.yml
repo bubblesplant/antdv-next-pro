@@ -1,0 +1,92 @@
+name: 缺陷反馈 / Bug report
+description: 报告 Antdv Next Pro 的组件、类型或文档问题。
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢帮助改进 Antdv Next Pro！欢迎使用中文或英文反馈。
+        请先搜索已有 Issue，并提供能够独立运行的最小复现，方便维护者定位问题。
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述 / Describe the bug
+      description: 描述使用场景、期望结果和实际结果。如果计划提交修复 PR，也可以在这里说明。
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: 相关组件 / Affected components
+      multiple: true
+      options:
+        - ProTable
+        - EditableProTable
+        - SchemaForm
+        - ProFormFields
+        - 类型 / Types
+        - 文档 / Documentation
+        - 其他 / Other
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: 最小复现 / Reproduction
+      description: 提供可访问的 GitHub 仓库、StackBlitz 或 CodeSandbox 链接。文档问题可以提供对应文档链接。
+      placeholder: https://github.com/your-name/reproduction
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 列出启动命令、操作步骤以及触发问题的条件。
+      placeholder: |
+        1. 安装依赖并启动复现项目
+        2. 打开页面并执行……
+        3. 期望……，实际……
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息 / Environment
+      description: 填写实际使用的版本及浏览器信息。
+      render: text
+      placeholder: |
+        @bubblesjs/antv-next-pro:
+        antdv-next:
+        Vue:
+        Node.js:
+        操作系统 / OS:
+        浏览器 / Browser:
+    validations:
+      required: true
+  - type: dropdown
+    id: package-manager
+    attributes:
+      label: 包管理器 / Package manager
+      options:
+        - pnpm
+        - npm
+        - yarn
+        - bun
+  - type: textarea
+    id: logs
+    attributes:
+      label: 错误日志 / Logs
+      description: 如有控制台或终端报错，请粘贴原始文本；必要时可以补充截图。
+      render: shell
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: 提交前确认 / Checklist
+      options:
+        - label: 我已阅读[文档](https://bubblesplant.github.io/antv-next-pro/)和[贡献指南](https://github.com/bubblesplant/antv-next-pro/blob/main/CONTRIBUTING.md)。
+          required: true
+        - label: 我已搜索[现有 Issue](https://github.com/bubblesplant/antv-next-pro/issues)，没有发现重复问题。
+          required: true
+        - label: 我已提供最小复现；如果是文档问题，已提供对应文档链接。
+          required: true

@@ -1,0 +1,41 @@
+name: Semantic Pull Request
+
+on:
+  # 只读取 PR 标题，不检出或执行贡献者提交的代码。
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  title:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1，与 Vite 一致
+        with:
+          types: |
+            build
+            chore
+            ci
+            docs
+            feat
+            fix
+            perf
+            refactor
+            revert
+            style
+            test
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            PR 标题需要使用 fix: 修复问题、feat: 新增功能、docs: 更新文档等格式。
+            当前标题为“{title}”，描述部分“{subject}”不能以大写英文字母开头。
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
