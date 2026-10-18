@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick } from 'vue'
 
 import ProTable from '../src/ProTable.vue'
+import { resolveCssVariableColor } from './helpers/themeProbe'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -55,15 +56,6 @@ function buttonByText(text: string) {
   })
   if (!button) throw new Error(`Button not found: ${text}`)
   return button
-}
-
-function resolveCssVariableColor(root: HTMLElement, variableName: string) {
-  const probe = document.createElement('span')
-  probe.style.backgroundColor = `var(${variableName})`
-  root.append(probe)
-  const color = getComputedStyle(probe).backgroundColor
-  probe.remove()
-  return color
 }
 
 describe('ProTable browser capabilities', () => {

@@ -12,9 +12,8 @@ node_modules
 dist
 dist-ssr
 coverage
-.vitepress/cache
-.vitepress/dist
 *.local
+.vitepress
 
 # dotenv environment variable files
 .env

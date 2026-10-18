@@ -13,6 +13,7 @@ import {
 } from 'vue'
 
 import VNodeContent from '../shared/VNodeContent'
+import { useThemeVars } from '../shared/useThemeVars'
 import { hasExplicitProp, resolveFieldDescriptor, type ProFormControlType } from './fieldRegistry'
 import { normalizeFieldOption, resolveLocalFieldOptions } from './options'
 import ReadonlyField from './ReadonlyField.vue'
@@ -59,6 +60,7 @@ const emit = defineEmits<{
 const attrs = useAttrs()
 const slots = useSlots()
 const instance = getCurrentInstance()
+const themeVars = useThemeVars()
 const captchaLoading = ref(false)
 const remainingSeconds = ref(0)
 let countdownTimer: ReturnType<typeof setInterval> | undefined
@@ -455,7 +457,9 @@ defineExpose({
   >
     <template #default>
       <slot>
-        <div class="antdv-next-pro-upload-dragger-placeholder">点击或拖拽文件到此区域上传</div>
+        <div class="antdv-next-pro-upload-dragger-placeholder" :style="themeVars">
+          点击或拖拽文件到此区域上传
+        </div>
       </slot>
     </template>
     <template v-for="name in resolveNonDefaultSlotNames()" #[name]="slotProps">
@@ -504,7 +508,7 @@ defineExpose({
 
 .antdv-next-pro-upload-dragger-placeholder {
   padding: 24px;
-  color: rgba(0, 0, 0, 0.65);
+  color: var(--antdv-next-pro-color-text-secondary, rgba(0, 0, 0, 0.65));
   text-align: center;
 }
 </style>

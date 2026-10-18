@@ -31,10 +31,11 @@ import {
   SettingOutlined,
   UpOutlined,
 } from '@antdv-next/icons'
-import { Button, Checkbox, Pagination, Popconfirm, Space, Table, theme } from 'antdv-next'
+import { Button, Checkbox, Pagination, Popconfirm, Space, Table } from 'antdv-next'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, useSlots, watch } from 'vue'
 
 import ProFormField from './pro-form-fields/ProFormField.vue'
+import { useThemeVars } from './shared/useThemeVars'
 import RenderNode from './table/RenderNode.vue'
 import { useEditableTable } from './table/editable'
 import {
@@ -92,7 +93,6 @@ const DEFAULT_LOCALE_TEXT: ProTableLocaleText = {
 }
 
 const slots = useSlots()
-const { token } = theme.useToken()
 const rootElement = ref<HTMLElement>()
 const tableData = shallowRef<T[]>([...(props.dataSource ?? props.defaultDataSource ?? [])])
 const internalLoading = ref(false)
@@ -120,18 +120,7 @@ const localeText = computed<ProTableLocaleText>(() => ({
   ...DEFAULT_LOCALE_TEXT,
   ...props.localeText,
 }))
-const rootStyle = computed(
-  () =>
-    ({
-      '--antdv-next-pro-color-text': token.value.colorText,
-      '--antdv-next-pro-color-bg-container': token.value.colorBgContainer,
-      '--antdv-next-pro-color-bg-elevated': token.value.colorBgElevated,
-      '--antdv-next-pro-color-fill-alter': token.value.colorFillAlter,
-      '--antdv-next-pro-color-border-secondary': token.value.colorBorderSecondary,
-      '--antdv-next-pro-color-error': token.value.colorError,
-      '--antdv-next-pro-box-shadow-secondary': token.value.boxShadowSecondary,
-    }) as CSSProperties,
-)
+const rootStyle = useThemeVars()
 
 const initialCurrent = () => {
   if (props.pagination === false) return 1
