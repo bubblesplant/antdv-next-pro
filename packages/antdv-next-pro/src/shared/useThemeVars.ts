@@ -19,6 +19,8 @@ export function useThemeVars() {
         '--antdv-next-pro-color-border-secondary': token.value.colorBorderSecondary,
         '--antdv-next-pro-color-error': token.value.colorError,
         '--antdv-next-pro-box-shadow-secondary': token.value.boxShadowSecondary,
+        '--antdv-next-pro-padding-lg': `${token.value.paddingLG}px`,
+        '--antdv-next-pro-border-radius-lg': `${token.value.borderRadiusLG}px`,
       }) as CSSProperties,
   )
 }

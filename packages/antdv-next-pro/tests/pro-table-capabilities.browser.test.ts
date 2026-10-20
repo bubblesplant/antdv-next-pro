@@ -7,8 +7,11 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { defineComponent, h, nextTick } from 'vue'
 
+import EditableProTable from '../src/EditableProTable.vue'
+import ProCard from '../src/ProCard.vue'
 import ProTable from '../src/ProTable.vue'
 import { resolveCssVariableColor } from './helpers/themeProbe'
+import '../src/style.css'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -59,6 +62,151 @@ function buttonByText(text: string) {
 }
 
 describe('ProTable browser capabilities', () => {
+  it('preserves editable toolbar slots by default and hides them only when explicitly disabled', async () => {
+    wrapper = mount(EditableProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        value: [{ id: 1, name: 'Ada' }],
+      },
+      slots: {
+        'toolbar-title': () => h('strong', { 'data-testid': 'editable-title' }, 'Editable users'),
+        'toolbar-actions': () => h('button', { 'data-testid': 'editable-action' }, 'Export'),
+      },
+    })
+    await flushPromises()
+    expect(wrapper.get('[data-testid="editable-title"]').text()).toBe('Editable users')
+    expect(wrapper.get('[data-testid="editable-action"]').text()).toBe('Export')
+    const table = wrapper.findComponent(ProTable)
+    table
+      .findComponent(Table)
+      .vm.$emit('change', {}, { name: ['Ada'] }, { field: 'name', order: 'ascend' })
+    await flushPromises()
+    expect((wrapper.vm as unknown as ProTableInstance<Row>).getSortFilter()).toEqual({
+      sort: { name: 'ascend' },
+      filter: { name: ['Ada'] },
+    })
+    await wrapper.setProps({ toolbar: false })
+    expect(wrapper.find('.antdv-next-pro__toolbar').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="editable-action"]').exists()).toBe(false)
+  })
+
+  it('places search before a themed card containing the toolbar, table and pagination', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [{ id: 1, name: 'Ada' }],
+        toolbar: { title: 'Users' },
+      },
+    })
+    await flushPromises()
+    const root = wrapper.element as HTMLElement
+    const search = wrapper.get('.antdv-next-pro__search').element
+    const card = wrapper.get('.antdv-next-pro__table-card').element
+    expect(wrapper.findAllComponents(ProCard)).toHaveLength(2)
+    expect(wrapper.find('.antdv-next-pro-card__header').exists()).toBe(false)
+    expect(search.nextElementSibling).toBe(card)
+    expect(card.contains(wrapper.get('.antdv-next-pro__toolbar').element)).toBe(true)
+    expect(card.contains(wrapper.get('.ant-table-wrapper').element)).toBe(true)
+    expect(card.contains(wrapper.get('.antdv-next-pro__pagination').element)).toBe(true)
+    expect(getComputedStyle(search).backgroundColor).toBe(
+      resolveCssVariableColor(root, '--antdv-next-pro-color-bg-container'),
+    )
+    expect(getComputedStyle(card).backgroundColor).toBe(getComputedStyle(search).backgroundColor)
+    expect(
+      getComputedStyle(wrapper.get('.antdv-next-pro__search .antdv-next-pro-card__body').element)
+        .padding,
+    ).toBe('24px')
+    expect(
+      getComputedStyle(
+        wrapper.get('.antdv-next-pro__table-card .antdv-next-pro-card__body').element,
+      ).paddingTop,
+    ).toBe('0px')
+    expect(card.getBoundingClientRect().top).toBeGreaterThan(search.getBoundingClientRect().bottom)
+  })
+
+  it('submits and clears toolbar keywords even when the query form is disabled', async () => {
+    const request = vi.fn(async (): Promise<RequestResult> => ({ data: [], total: 0 }))
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        request,
+        search: false,
+        options: { search: { name: 'q', placeholder: 'Find users' } },
+        pagination: { defaultCurrent: 3 },
+      },
+    })
+    await flushPromises()
+    expect(wrapper.find('.antdv-next-pro__search').exists()).toBe(false)
+    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('Ada')
+    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await flushPromises()
+    expect(request).toHaveBeenLastCalledWith({ q: 'Ada', current: 1, pageSize: 10 }, {}, {})
+    await (wrapper.vm as unknown as ProTableInstance<Row>).reset()
+    await flushPromises()
+    expect(request).toHaveBeenLastCalledWith({ current: 3, pageSize: 10 }, {}, {})
+    expect(
+      (wrapper.get('.antdv-next-pro__toolbar-search input').element as HTMLInputElement).value,
+    ).toBe('')
+  })
+
+  it('filters local rows with toolbar search and honors an async search veto', async () => {
+    const onSearch = vi.fn(async (value: string) =>
+      value === 'blocked' ? (false as const) : undefined,
+    )
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [
+          { id: 1, name: 'Ada' },
+          { id: 2, name: 'Grace' },
+        ],
+        toolbar: { title: 'Users', search: { onSearch } },
+        search: false,
+        pagination: false,
+      },
+    })
+    await flushPromises()
+    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('ada')
+    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('.ant-table-tbody').text()).toContain('Ada')
+    expect(wrapper.get('.ant-table-tbody').text()).not.toContain('Grace')
+    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('blocked')
+    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await flushPromises()
+    expect(onSearch).toHaveBeenLastCalledWith('blocked')
+    expect(wrapper.get('.ant-table-tbody').text()).toContain('Ada')
+    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('')
+    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('.ant-table-tbody').text()).toContain('Grace')
+  })
+
+  it('reflows a partially configured search grid when the container resizes', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [1, 2, 3, 4].map((id) => ({ title: `Field ${id}`, dataIndex: `field${id}` })),
+        dataSource: [],
+        search: { span: { xs: 24, md: 8 }, defaultCollapsed: true },
+        pagination: false,
+      },
+    })
+    const root = wrapper.element as HTMLElement
+    root.style.width = '500px'
+    await vi.waitFor(() =>
+      expect(wrapper!.findAll('.antdv-next-pro__search-field')).toHaveLength(1),
+    )
+    root.style.width = '1100px'
+    await vi.waitFor(() =>
+      expect(wrapper!.findAll('.antdv-next-pro__search-field')).toHaveLength(2),
+    )
+  })
+
   it('applies postData only to rendered rows and preserves the source data', async () => {
     const source: Row[] = [
       { id: 1, name: 'Ada', status: 'active' },
@@ -186,6 +334,18 @@ describe('ProTable browser capabilities', () => {
         { columnKey: 'name', field: 'name', order: 'descend' },
       )
     await flushPromises()
+
+    expect(table.getSortFilter()).toEqual({
+      sort: { name: 'descend' },
+      filter: { status: ['active'] },
+    })
+    const snapshot = table.getSortFilter()
+    snapshot.sort.name = 'ascend'
+    snapshot.filter.status?.push('disabled')
+    expect(table.getSortFilter()).toEqual({
+      sort: { name: 'descend' },
+      filter: { status: ['active'] },
+    })
 
     table.setPageInfo({ current: 3, pageSize: 20 })
     await flushPromises()
@@ -386,8 +546,11 @@ describe('ProTable browser capabilities', () => {
       resolveCssVariableColor(root, '--antdv-next-pro-color-bg-elevated'),
     )
     expect(getComputedStyle(search).backgroundColor).toBe(
-      resolveCssVariableColor(root, '--antdv-next-pro-color-fill-alter'),
+      resolveCssVariableColor(root, '--antdv-next-pro-color-bg-container'),
     )
+    expect(
+      getComputedStyle(wrapper.get('.antdv-next-pro__table-card').element).backgroundColor,
+    ).toBe(getComputedStyle(search).backgroundColor)
   })
 
   it('ignores stale internal search values while search is disabled', async () => {

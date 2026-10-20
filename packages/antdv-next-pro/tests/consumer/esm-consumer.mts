@@ -5,6 +5,7 @@ import AntdvNextPro, {
   EditableProTable,
   Form,
   ModalForm,
+  ProCard,
   ProFormCaptcha,
   ProFormCheckbox,
   ProFormDatePicker,
@@ -33,6 +34,7 @@ import AntdvNextPro, {
   type EditableProTableInstance,
   type EditableProTableProps,
   type ProColumns,
+  type ProCardProps,
   type ProFormCaptchaProps,
   type ProFormCheckboxProps,
   type ProFormDatePickerProps,
@@ -266,6 +268,13 @@ const specializedFieldProps = [
 ]
 
 const tableVNode = ProTable<UserRow, UserQuery>(tableProps)
+const cardVNode = h(ProCard, {
+  title: 'Users',
+  variant: 'borderless',
+  collapsible: 'icon',
+  styles: { body: { padding: 0 } },
+  'onUpdate:collapsed': (collapsed: boolean) => void collapsed,
+} satisfies ProCardProps & { 'onUpdate:collapsed': (collapsed: boolean) => void })
 const editableVNode = EditableProTable<UserRow, UserQuery>(editableProps)
 const schemaFormVNode = SchemaForm<UserRow>(schemaFormProps)
 const formVNode = Form<UserRow>(schemaFormProps)
@@ -289,6 +298,7 @@ const plugins: Plugin[] = [AntdvNextPro, NamedPlugin]
 void [
   plugins,
   tableVNode,
+  cardVNode,
   editableVNode,
   schemaFormVNode,
   formVNode,

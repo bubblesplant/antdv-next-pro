@@ -63,6 +63,7 @@ const expectedRuntimeExports = [
   'Form',
   'LightFilter',
   'ModalForm',
+  'ProCard',
   'ProFormCaptcha',
   'ProFormCheckbox',
   'ProFormDatePicker',

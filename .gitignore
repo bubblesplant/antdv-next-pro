@@ -34,3 +34,7 @@ coverage
 
 # AI agent worktrees
 .claude/worktrees/
+
+
+# vitepress
+.vitepress

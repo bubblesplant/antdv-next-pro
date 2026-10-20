@@ -6,10 +6,13 @@
 
 `@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 与 Antdv Next 高阶数据组件库。参考 `@ant-design/pro-components@2.8.10` 的主要 Props 和工作流，以 Vue 的 `v-model`、事件、插槽和组件 `ref` 提供：
 
+- `ProCard`：主题卡片、标题与操作区、骨架加载、受控/非受控折叠和语义样式。
 - `ProTable`：搜索、分页、排序、筛选、列设置、远程请求与可编辑行。
 - `EditableProTable`：整表受控编辑、新建记录、单行/多行编辑与异步保存。
 - `SchemaForm`：通过 `columns` 生成普通、查询、轻量、弹层和步骤表单。
 - `ProFormFields`：19 个可独立使用的字段组件，统一 FormItem/裸控件、异步选项、只读展示与 `v-model` 协议，覆盖文本、数字、日期、选择、验证码和上传等场景。
+
+2026-10-19 已核对上游 `3.1.15-7` 及主分支更新，新增基础 ProCard，并补齐 ProTable 卡片布局、工具栏关键词搜索、响应式搜索跨度和 `getSortFilter()`；这不表示已完整实现上游 3.x。版本差异与本次同步范围见 [同步记录](./artifacts/upstream-sync-2026-10-19.md)。
 
 [中文文档](https://bubblesplant.github.io/antv-next-pro/) · [English docs](https://bubblesplant.github.io/antv-next-pro/en/)
 
@@ -35,6 +38,7 @@ createApp(App).use(Antd).use(AntdvNextPro).mount('#app')
 ```ts
 import {
   EditableProTable,
+  ProCard,
   ProFormSelect,
   ProFormText,
   ProFormUploadButton,
@@ -45,6 +49,8 @@ import {
 ```
 
 ProFormFields 默认包含 FormItem，设置 `fieldMode="field"` 可只渲染裸控件。完整 19 项导出、组合命名和 Captcha/Upload 边界见 [ProFormFields 文档](https://bubblesplant.github.io/antv-next-pro/components/pro-form-fields)。
+
+ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<ProCard title="用户信息" variant="borderless">内容</ProCard>`；详细 API 与示例见 [ProCard 文档](./apps/docs/components/pro-card.md)。
 
 19 个模板友好公开字段组件为：
 
