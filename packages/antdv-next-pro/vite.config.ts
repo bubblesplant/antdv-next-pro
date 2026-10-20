@@ -36,6 +36,7 @@ export default defineConfig({
     },
     projects: [
       {
+        extends: false,
         plugins: [vue()],
         test: {
           name: 'unit',
@@ -50,6 +51,7 @@ export default defineConfig({
         },
       },
       {
+        extends: false,
         plugins: [vue()],
         test: {
           name: 'browser',

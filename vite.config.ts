@@ -40,8 +40,9 @@ export default defineConfig({
       quality: {
         command:
           'pnpm format:check && pnpm lint:ox && pnpm lint:vue && pnpm typecheck && pnpm test:coverage && pnpm test:browser && pnpm build && pnpm --filter @bubblesjs/antv-next-pro verify:package',
-        cache: true,
-        env: ['CI', 'NODE_ENV'],
+        cache: {
+          env: ['CI', 'NODE_ENV'],
+        },
       },
     },
   },
