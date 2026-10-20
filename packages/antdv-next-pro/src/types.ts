@@ -1,4 +1,49 @@
+import type { CardProps, InputSearchProps } from 'antdv-next'
 import type { CSSProperties, Component, VNodeChild } from 'vue'
+
+export type ProCardSemanticName =
+  | 'root'
+  | 'header'
+  | 'body'
+  | 'extra'
+  | 'title'
+  | 'actions'
+  | 'cover'
+
+export interface ProCardProps {
+  title?: VNodeChild
+  subTitle?: VNodeChild
+  extra?: VNodeChild
+  tooltip?: string
+  cover?: CardProps['cover']
+  actions?: CardProps['actions']
+  size?: 'default' | 'small'
+  type?: 'default' | 'inner'
+  variant?: 'outlined' | 'borderless'
+  bordered?: boolean
+  headerBordered?: boolean
+  ghost?: boolean
+  hoverable?: boolean
+  loading?: boolean
+  collapsible?: boolean | 'header' | 'icon'
+  collapsed?: boolean
+  defaultCollapsed?: boolean
+  headStyle?: CSSProperties
+  bodyStyle?: CSSProperties
+  styles?: Partial<Record<ProCardSemanticName, CSSProperties>>
+  classNames?: Partial<Record<ProCardSemanticName, string>>
+}
+
+export interface ProCardSlots {
+  default?: () => VNodeChild
+  title?: () => VNodeChild
+  subTitle?: () => VNodeChild
+  extra?: () => VNodeChild
+  cover?: () => VNodeChild
+  actions?: () => VNodeChild
+  loading?: () => VNodeChild
+  collapsibleIcon?: (props: { collapsed: boolean }) => VNodeChild
+}
 
 export type ProKey = string | number
 export type ProDataIndex = ProKey | readonly ProKey[]
@@ -103,12 +148,24 @@ export type ProRequest<T, P extends Record<string, unknown>> = (
 
 export interface ProTableSearchConfig {
   labelWidth?: number | 'auto'
-  span?: number
+  span?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
   defaultCollapsed?: boolean
   collapsed?: boolean
   onCollapse?: (collapsed: boolean) => void
   searchText?: string
   resetText?: string
+}
+
+export type ProTableToolbarSearchConfig = Omit<InputSearchProps, 'onSearch'> & {
+  name?: string
+  onSearch?: (value: string) => void | false | Promise<void | false>
+}
+
+export interface ProTableToolbarConfig {
+  title?: VNodeChild
+  actions?: VNodeChild | (() => VNodeChild)
+  search?: boolean | ProTableToolbarSearchConfig
+  onSearch?: (value: string) => void
 }
 
 export interface ProTableLocaleText {
@@ -137,6 +194,7 @@ export interface ProTablePagination {
 }
 
 export interface ProTableOptions {
+  search?: boolean | ProTableToolbarSearchConfig
   density?: boolean
   fullScreen?: boolean
   reload?: boolean
@@ -198,7 +256,7 @@ export interface ProTableProps<
   localeText?: Partial<ProTableLocaleText>
   pagination?: false | ProTablePagination
   options?: false | ProTableOptions
-  toolbar?: false | { title?: VNodeChild; actions?: VNodeChild | (() => VNodeChild) }
+  toolbar?: false | ProTableToolbarConfig
   rowSelection?: false | Record<string, unknown>
   polling?: number
   revalidateOnFocus?: boolean
@@ -212,6 +270,7 @@ export interface ProTableProps<
 }
 
 export interface ProTableInstance<T extends Record<string, unknown> = Record<string, unknown>> {
+  getSortFilter: () => { sort: ProSort; filter: ProFilter }
   reload: (resetPageIndex?: boolean) => Promise<void>
   reset: () => Promise<void>
   setPageInfo: (page: Partial<ProTablePagination>) => void
@@ -241,7 +300,7 @@ export interface EditableProTableProps<
   postData?: (data: T[]) => T[]
   rowKey?: keyof T | string | ((record: T) => ProKey)
   loading?: boolean
-  toolbar?: false | { title?: VNodeChild; actions?: VNodeChild | (() => VNodeChild) }
+  toolbar?: false | ProTableToolbarConfig
   rowSelection?: false | Record<string, unknown>
   polling?: number
   revalidateOnFocus?: boolean

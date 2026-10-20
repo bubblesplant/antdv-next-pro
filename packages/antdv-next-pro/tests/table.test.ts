@@ -1,9 +1,9 @@
 import type { VueWrapper } from '@vue/test-utils'
 import type { EditableAction, ProKey, ProTableInstance } from '../src/types'
 import { DownOutlined, UpOutlined } from '@antdv-next/icons'
-import { flushPromises, shallowMount } from '@vue/test-utils'
+import { config, flushPromises, shallowMount } from '@vue/test-utils'
 import { Button, Pagination, Table } from 'antdv-next'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
 
 import { defineComponent, h } from 'vue'
 import EditableProTable from '../src/EditableProTable.vue'
@@ -21,6 +21,15 @@ type ExtendedInstance = ProTableInstance<Row> & {
 }
 
 let wrapper: VueWrapper | undefined
+const originalRenderStubDefaultSlot = config.global.renderStubDefaultSlot
+
+// Keep table logic visible inside shallowly stubbed layout containers such as ProCard.
+beforeAll(() => {
+  config.global.renderStubDefaultSlot = true
+})
+afterAll(() => {
+  config.global.renderStubDefaultSlot = originalRenderStubDefaultSlot
+})
 
 afterEach(() => {
   wrapper?.unmount()

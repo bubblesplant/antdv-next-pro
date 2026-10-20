@@ -93,7 +93,28 @@ Use `collapsed` and `search-collapse` for controlled state:
 />
 ```
 
-`span` defaults to `8`, or three fields in a 24-column row. Collapsed mode renders the first row only. `search.onCollapse(next)` is also available.
+Without `span`, the query form uses one, two or three columns according to its container width. A numeric span fixes the column count. Responsive objects such as `{ xs: 24, md: 12, xl: 8 }` carry the last configured value forward across omitted breakpoints, following Ant Design Col. Collapsed mode renders the first row only. `search.onCollapse(next)` is also available.
+
+### Toolbar search and card layout
+
+The query form appears above a card containing the toolbar, table and pagination. Both areas reuse [ProCard](./pro-card), inheriting native Card backgrounds, padding, border radius, dark themes, and component token overrides. Set `toolbar: false` to hide the toolbar.
+
+Enable keyword search with `options.search`, including when the query form is disabled:
+
+```vue
+<ProTable
+  :columns="columns"
+  :request="request"
+  :search="false"
+  :options="{ search: { name: 'keyword', placeholder: 'Search users' } }"
+/>
+```
+
+Remote requests receive the submitted keyword under `keyword` (or the configured `name`) and reset to page one. Clearing or resetting removes that parameter. Local data is matched against raw column values. Remote request handlers must implement filtering and pagination.
+
+`toolbar.search` accepts the same configuration and takes precedence over `options.search`. Use `true` for defaults or pass Antdv Next `InputSearch` props. An `onSearch(value)` callback returning `false` or `Promise<false>` cancels submission. Search appears in the right action area when a title exists, or on the left otherwise.
+
+The component ref exposes `getSortFilter()` to read a defensive copy of the current `{ sort, filter }`. The same method is available on `EditableProTable`.
 
 ### Column state and settings
 
@@ -174,8 +195,8 @@ Continue using `renderFormItem(column, context)` for a fully custom search field
 | `loading`                      | `boolean`                                 | External loading state                                 |
 | `search`                       | `false \| ProTableSearchConfig`           | Search and collapse options                            |
 | `pagination`                   | `false \| ProTablePagination`             | Page state and options                                 |
-| `options`                      | `false \| ProTableOptions`                | Density, fullscreen, reload, settings                  |
-| `toolbar`                      | `false \| { title?, actions? }`           | Toolbar content; slots are also available              |
+| `options`                      | `false \| ProTableOptions`                | Keyword search, density, fullscreen, reload, settings  |
+| `toolbar`                      | `false \| ProTableToolbarConfig`          | Title, actions and search; slots are also available    |
 | `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next row-selection config                        |
 | `columnsState`                 | `ProColumnsStateConfig`                   | Visibility, order, fixed-state, and persistence config |
 | `editable`                     | `false \| EditableConfig<T>`              | Single/multiple row editing lifecycle                  |

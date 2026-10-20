@@ -12,6 +12,7 @@ import { Button, Form, Space, Spin, Steps } from 'antdv-next'
 import { computed, Fragment, h, isVNode, ref } from 'vue'
 
 import VNodeContent from '../shared/VNodeContent'
+import { useThemeVars } from '../shared/useThemeVars'
 import SchemaFormFields from './SchemaFormFields.vue'
 import { buildSchemaSteps } from './utils'
 
@@ -59,6 +60,7 @@ const emit = defineEmits<{
 }>()
 
 const formRef = ref<FormApi>()
+const rootStyle = useThemeVars()
 const isStepLayout = computed(
   () => props.layoutType === 'StepForm' || props.layoutType === 'StepsForm',
 )
@@ -202,7 +204,11 @@ defineExpose({ validateFields, resetFields })
 </script>
 
 <template>
-  <div class="antdv-next-pro-schema-body" :class="`is-${layoutType.toLowerCase()}`">
+  <div
+    class="antdv-next-pro-schema-body"
+    :class="`is-${layoutType.toLowerCase()}`"
+    :style="rootStyle"
+  >
     <Spin :spinning="loading">
       <Steps
         v-if="layoutType === 'StepsForm' && steps.length > 1"

@@ -1,4 +1,4 @@
-import { flushPromises, mount, shallowMount } from '@vue/test-utils'
+import { config, flushPromises, mount, shallowMount } from '@vue/test-utils'
 import {
   Checkbox,
   CheckboxGroup,
@@ -17,7 +17,7 @@ import {
   TimeRangePicker,
   TreeSelect,
 } from 'antdv-next'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
 import { h, type Component } from 'vue'
 
 import ProTable from '../src/ProTable.vue'
@@ -28,6 +28,16 @@ import {
   ValueTypeControl,
   type ProFieldOption,
 } from '../src/table/ValueTypeControl'
+
+const originalRenderStubDefaultSlot = config.global.renderStubDefaultSlot
+
+// Keep field controls visible inside shallowly stubbed layout containers such as ProCard.
+beforeAll(() => {
+  config.global.renderStubDefaultSlot = true
+})
+afterAll(() => {
+  config.global.renderStubDefaultSlot = originalRenderStubDefaultSlot
+})
 
 describe('table value type controls', () => {
   it('maps all public table field value types to Antdv Next controls', () => {
@@ -138,13 +148,13 @@ describe('table value type controls', () => {
     const wrapper = mount(ValueTypeControl, {
       props: { column: { valueType: 'digit' }, value: 12 },
     })
-    const input = wrapper.findComponent(InputNumber).vm
+    const input = wrapper.findComponent(InputNumber).vm.$
 
     await wrapper.setProps({ column: { valueType: 'money' } })
-    expect(wrapper.findComponent(InputNumber).vm).toBe(input)
+    expect(wrapper.findComponent(InputNumber).vm.$).toBe(input)
 
     await wrapper.setProps({ column: { valueType: 'percent' } })
-    expect(wrapper.findComponent(InputNumber).vm).toBe(input)
+    expect(wrapper.findComponent(InputNumber).vm.$).toBe(input)
   })
 
   it('re-reads in-place configuration changes on an unrelated rerender', async () => {

@@ -21,14 +21,14 @@
 
 `ProTable.search` 保留 React API 的核心含义：
 
-| 配置                       | 行为                                  |
-| -------------------------- | ------------------------------------- |
-| `defaultCollapsed`         | 只初始化非受控折叠状态                |
-| `collapsed`                | 受控折叠状态；父组件负责更新          |
-| `span`                     | 搜索项栅格跨度，默认 `8`，即每行 3 项 |
-| `labelWidth`               | 数字按 px 设置；`auto` 保持自适应     |
-| `searchText` / `resetText` | 查询与重置按钮文本                    |
-| `onCollapse(next)`         | 折叠状态变化回调                      |
+| 配置                       | 行为                                                     |
+| -------------------------- | -------------------------------------------------------- |
+| `defaultCollapsed`         | 只初始化非受控折叠状态                                   |
+| `collapsed`                | 受控折叠状态；父组件负责更新                             |
+| `span`                     | 数字或 Partial 断点配置；默认随容器宽度每行 1 / 2 / 3 项 |
+| `labelWidth`               | 数字按 px 设置；`auto` 保持自适应                        |
+| `searchText` / `resetText` | 查询与重置按钮文本                                       |
+| `onCollapse(next)`         | 折叠状态变化回调                                         |
 
 Vue 同时触发 `search-collapse` 事件，可用受控方式书写：
 
@@ -147,4 +147,6 @@ Changesets 与 GitHub Actions 属于本项目工程约定，不是 React API 的
 
 ## 明确不包含
 
-首版不提供 ProLayout、ProCard、ProList、ProDescriptions，也不依赖特定请求库。网络层只需实现通用 Promise `request` 回调。
+已新增 [基础 ProCard](../components/pro-card)，覆盖主题容器、标题与操作区、加载、折叠及语义样式；未提供其 tabs、栅格拆分、StatisticCard 和 CheckCard 扩展。
+
+当前不提供 ProLayout、ProList、ProDescriptions，也不依赖特定请求库。网络层只需实现通用 Promise `request` 回调。

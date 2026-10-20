@@ -31,12 +31,15 @@ import {
   SettingOutlined,
   UpOutlined,
 } from '@antdv-next/icons'
-import { Button, Checkbox, Pagination, Popconfirm, Space, Table, theme } from 'antdv-next'
+import { Button, Checkbox, InputSearch, Pagination, Popconfirm, Space, Table } from 'antdv-next'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, useSlots, watch } from 'vue'
 
 import ProFormField from './pro-form-fields/ProFormField.vue'
+import ProCard from './ProCard.vue'
+import { useThemeVars } from './shared/useThemeVars'
 import RenderNode from './table/RenderNode.vue'
 import { useEditableTable } from './table/editable'
+import { getSearchColumns } from './table/searchLayout'
 import {
   formatProValue,
   normalizeFieldOption,
@@ -59,6 +62,7 @@ import {
 } from './table/utils'
 
 const props = withDefaults(defineProps<ProTableProps<T, P>>(), {
+  toolbar: undefined,
   search: () => ({}),
   pagination: () => ({}),
   options: () => ({}),
@@ -92,12 +96,14 @@ const DEFAULT_LOCALE_TEXT: ProTableLocaleText = {
 }
 
 const slots = useSlots()
-const { token } = theme.useToken()
 const rootElement = ref<HTMLElement>()
 const tableData = shallowRef<T[]>([...(props.dataSource ?? props.defaultDataSource ?? [])])
 const internalLoading = ref(false)
 const requestTotal = ref<number>()
 const searchValues = ref<Record<string, unknown>>({})
+const toolbarKeyword = ref('')
+const submittedKeyword = ref('')
+const rootWidth = ref(1024)
 const internalSearchCollapsed = ref(
   typeof props.search === 'object' ? (props.search.defaultCollapsed ?? false) : false,
 )
@@ -115,22 +121,32 @@ const mounted = ref(false)
 let requestSequence = 0
 let optionRequestSequence = 0
 let pollingTimer: ReturnType<typeof setInterval> | undefined
+let resizeObserver: ResizeObserver | undefined
+let resizeFrame: number | undefined
+let toolbarSearchSequence = 0
 
 const localeText = computed<ProTableLocaleText>(() => ({
   ...DEFAULT_LOCALE_TEXT,
   ...props.localeText,
 }))
-const rootStyle = computed(
-  () =>
-    ({
-      '--antdv-next-pro-color-text': token.value.colorText,
-      '--antdv-next-pro-color-bg-container': token.value.colorBgContainer,
-      '--antdv-next-pro-color-bg-elevated': token.value.colorBgElevated,
-      '--antdv-next-pro-color-fill-alter': token.value.colorFillAlter,
-      '--antdv-next-pro-color-border-secondary': token.value.colorBorderSecondary,
-      '--antdv-next-pro-color-error': token.value.colorError,
-      '--antdv-next-pro-box-shadow-secondary': token.value.boxShadowSecondary,
-    }) as CSSProperties,
+const rootStyle = useThemeVars()
+
+const toolbarSearch = computed(() => {
+  if (props.toolbar === false) return false
+  const toolbar = typeof props.toolbar === 'object' ? props.toolbar : undefined
+  return toolbar?.search ?? (typeof props.options === 'object' ? props.options.search : false)
+})
+const toolbarSearchConfig = computed(() =>
+  typeof toolbarSearch.value === 'object' ? toolbarSearch.value : {},
+)
+const toolbarSearchBindings = computed(() => {
+  const { name: _name, onSearch: _onSearch, ...fieldProps } = toolbarSearchConfig.value
+  return { placeholder: localeText.value.search, allowClear: true, ...fieldProps }
+})
+const toolbarSearchParams = computed(() =>
+  toolbarSearch.value && submittedKeyword.value
+    ? { [toolbarSearchConfig.value.name ?? 'keyword']: submittedKeyword.value }
+    : {},
 )
 
 const initialCurrent = () => {
@@ -177,10 +193,9 @@ const searchCollapsed = computed(() =>
     ? internalSearchCollapsed.value
     : searchConfig.value.collapsed,
 )
-const searchColumnsPerRow = computed(() => {
-  const span = Math.min(24, Math.max(1, Math.floor(searchConfig.value.span ?? 8)))
-  return Math.max(1, Math.floor(24 / span))
-})
+const searchColumnsPerRow = computed(() =>
+  getSearchColumns(searchConfig.value.span, rootWidth.value),
+)
 const collapsedSearchFieldCount = computed(() => Math.max(1, searchColumnsPerRow.value - 1))
 const visibleSearchableColumns = computed(() =>
   searchCollapsed.value
@@ -211,20 +226,34 @@ const locallyQueriedData = computed(() =>
       ),
 )
 
+const keywordQueriedData = computed(() => {
+  if (props.request || !toolbarSearch.value || !submittedKeyword.value)
+    return locallyQueriedData.value
+  const keyword = submittedKeyword.value.toLocaleLowerCase()
+  return locallyQueriedData.value.filter((record) =>
+    flattenColumns(effectiveColumns.value).some((column) => {
+      if (column.dataIndex === undefined || column.valueType === 'option') return false
+      return String(getValue(record, column.dataIndex) ?? '')
+        .toLocaleLowerCase()
+        .includes(keyword)
+    }),
+  )
+})
+
 const total = computed(() =>
   props.request
     ? (requestTotal.value ??
       (props.pagination === false ? undefined : props.pagination?.total) ??
-      locallyQueriedData.value.length)
+      keywordQueriedData.value.length)
     : props.pagination === false
-      ? locallyQueriedData.value.length
-      : (props.pagination?.total ?? locallyQueriedData.value.length),
+      ? keywordQueriedData.value.length
+      : (props.pagination?.total ?? keywordQueriedData.value.length),
 )
 
 const displayedData = computed(() => {
-  if (props.pagination === false || props.request) return locallyQueriedData.value
+  if (props.pagination === false || props.request) return keywordQueriedData.value
   const start = Math.max(0, (current.value - 1) * pageSize.value)
-  return locallyQueriedData.value.slice(start, start + pageSize.value)
+  return keywordQueriedData.value.slice(start, start + pageSize.value)
 })
 
 const effectiveLoading = computed(() => Boolean(props.loading) || internalLoading.value)
@@ -297,9 +326,10 @@ const rowSelectionConfig = computed<Record<string, unknown> | undefined>(() => {
 
 const showToolbar = computed(
   () =>
-    (props.toolbar !== false && props.toolbar !== undefined) ||
-    props.options !== false ||
-    Boolean(slots['toolbar-title'] || slots['toolbar-actions']),
+    props.toolbar !== false &&
+    (props.toolbar !== undefined ||
+      props.options !== false ||
+      Boolean(slots['toolbar-title'] || slots['toolbar-actions'])),
 )
 
 const toolbarTitle = computed(() =>
@@ -320,6 +350,16 @@ const toolbarActions = computed(() => {
 const fullscreenClass = computed(() => ({
   'antdv-next-pro__fullscreen': fallbackFullscreen.value,
 }))
+
+watch(toolbarSearch, (search) => {
+  if (search) return
+  const hadKeyword = Boolean(submittedKeyword.value)
+  clearToolbarSearch()
+  if (hadKeyword) {
+    current.value = 1
+    if (mounted.value) void refresh()
+  }
+})
 
 watch(
   () => props.size,
@@ -401,6 +441,7 @@ async function refresh(): Promise<void> {
   internalLoading.value = true
   const requestParams = {
     ...(props.params ?? ({} as P)),
+    ...toolbarSearchParams.value,
     ...(props.search === false
       ? {}
       : buildSearchParams(effectiveColumns.value, searchValues.value)),
@@ -440,6 +481,7 @@ async function reload(resetPageIndex = false): Promise<void> {
 
 async function reset(): Promise<void> {
   searchValues.value = {}
+  clearToolbarSearch()
   activeSort.value = {}
   activeFilter.value = {}
   current.value = initialCurrent()
@@ -588,9 +630,41 @@ function submitSearch(): void {
 
 function resetSearch(): void {
   searchValues.value = {}
+  clearToolbarSearch()
   current.value = 1
   emitTableChange()
   void refresh()
+}
+
+function clearToolbarSearch(): void {
+  toolbarSearchSequence += 1
+  toolbarKeyword.value = ''
+  submittedKeyword.value = ''
+}
+
+async function submitToolbarSearch(value: string): Promise<void> {
+  const sequence = ++toolbarSearchSequence
+  try {
+    const result = await toolbarSearchConfig.value.onSearch?.(value)
+    if (sequence !== toolbarSearchSequence || result === false) return
+    toolbarKeyword.value = value
+    submittedKeyword.value = value
+    if (typeof props.toolbar === 'object') props.toolbar.onSearch?.(value)
+    current.value = 1
+    emitTableChange()
+    await refresh()
+  } catch (error) {
+    if (sequence === toolbarSearchSequence) emit('requestError', error)
+  }
+}
+
+function getSortFilter(): { sort: ProSort; filter: ProFilter } {
+  return {
+    sort: { ...activeSort.value },
+    filter: Object.fromEntries(
+      Object.entries(activeFilter.value).map(([key, values]) => [key, values ? [...values] : null]),
+    ),
+  }
 }
 
 function setSearchValue(column: ProColumns<T>, value: unknown): void {
@@ -997,6 +1071,18 @@ function cloneState(state: Record<string, ProColumnsState>): Record<string, ProC
 
 onMounted(() => {
   mounted.value = true
+  if (typeof ResizeObserver !== 'undefined' && rootElement.value) {
+    resizeObserver = new ResizeObserver(([entry]) => {
+      const width = entry?.contentRect.width
+      if (!width || width === rootWidth.value) return
+      if (resizeFrame !== undefined) cancelAnimationFrame(resizeFrame)
+      resizeFrame = requestAnimationFrame(() => {
+        rootWidth.value = width
+        resizeFrame = undefined
+      })
+    })
+    resizeObserver.observe(rootElement.value)
+  }
   window.addEventListener('focus', onWindowFocus)
   document.addEventListener('fullscreenchange', onFullscreenChange)
   configurePolling()
@@ -1004,6 +1090,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  toolbarSearchSequence += 1
+  resizeObserver?.disconnect()
+  if (resizeFrame !== undefined) cancelAnimationFrame(resizeFrame)
   requestSequence += 1
   optionRequestSequence += 1
   if (pollingTimer) clearInterval(pollingTimer)
@@ -1018,6 +1107,7 @@ defineExpose<
     setRowData: (indexOrKey: number | ProKey, value: Partial<T>) => boolean
   }
 >({
+  getSortFilter,
   reload,
   reset,
   setPageInfo,
@@ -1036,230 +1126,265 @@ defineExpose<
 
 <template>
   <div ref="rootElement" class="antdv-next-pro" :class="fullscreenClass" :style="rootStyle">
-    <div v-if="showToolbar" class="antdv-next-pro__toolbar">
-      <div v-if="showToolbarTitle" class="antdv-next-pro__toolbar-title">
-        <slot name="toolbar-title">
-          <RenderNode v-if="toolbarTitle !== undefined" :content="toolbarTitle" />
-        </slot>
-      </div>
-      <div class="antdv-next-pro__toolbar-actions">
-        <slot name="toolbar-actions">
-          <RenderNode v-if="toolbarActions !== undefined" :content="toolbarActions" />
-        </slot>
-        <Button
-          v-if="showOption('density')"
-          type="text"
-          size="small"
-          :aria-label="optionText('density')"
-          :title="optionText('density')"
-          @click="cycleDensity"
-        >
-          <template #icon><ColumnHeightOutlined /></template>
-        </Button>
-        <Button
-          v-if="showOption('reload')"
-          type="text"
-          size="small"
-          :loading="effectiveLoading"
-          :aria-label="optionText('reload')"
-          :title="optionText('reload')"
-          @click="reload()"
-        >
-          <template #icon><ReloadOutlined /></template>
-        </Button>
-        <Button
-          v-if="showOption('fullScreen')"
-          type="text"
-          size="small"
-          :aria-label="optionText('fullScreen')"
-          :title="optionText('fullScreen')"
-          @click="fullScreen"
-        >
-          <template #icon><FullscreenOutlined /></template>
-        </Button>
-        <Button
-          v-if="showOption('setting')"
-          type="text"
-          size="small"
-          :aria-label="optionText('setting')"
-          :title="optionText('setting')"
-          @click="settingsOpen = !settingsOpen"
-        >
-          <template #icon><SettingOutlined /></template>
-        </Button>
-      </div>
-    </div>
-
-    <div v-if="settingsOpen" class="antdv-next-pro__column-settings">
-      <Checkbox
-        v-for="(column, index) in flattenColumns(effectiveColumns).filter(
-          (item) => item.valueType !== 'option' && !item.hideInTable,
-        )"
-        :key="columnKey(column, String(index))"
-        :checked="isColumnVisible(column)"
-        @update:checked="updateColumnVisibility(column, Boolean($event))"
-      >
-        {{ resolveColumnTitle(column) }}
-      </Checkbox>
-    </div>
-
-    <form
+    <ProCard
       v-if="props.search !== false && searchableColumns.length > 0"
       class="antdv-next-pro__search"
-      @submit.prevent="submitSearch"
+      variant="borderless"
     >
-      <div class="antdv-next-pro__search-fields" :style="searchGridStyle">
-        <ProFormField
-          v-for="(column, index) in visibleSearchableColumns"
-          :key="columnKey(column, String(index))"
-          v-bind="searchFieldBindings(column)"
-          class="antdv-next-pro__search-field"
-          :style="searchFieldStyle()"
-          @update:model-value="setSearchValue(column, $event)"
+      <form @submit.prevent="submitSearch">
+        <div class="antdv-next-pro__search-fields" :style="searchGridStyle">
+          <ProFormField
+            v-for="(column, index) in visibleSearchableColumns"
+            :key="columnKey(column, String(index))"
+            v-bind="searchFieldBindings(column)"
+            class="antdv-next-pro__search-field"
+            :style="searchFieldStyle()"
+            @update:model-value="setSearchValue(column, $event)"
+          />
+          <div class="antdv-next-pro__search-actions">
+            <Button html-type="button" @click="resetSearch">
+              {{
+                typeof props.search === 'object'
+                  ? (props.search.resetText ?? localeText.reset)
+                  : localeText.reset
+              }}
+            </Button>
+            <Button type="primary" html-type="submit">
+              {{
+                typeof props.search === 'object'
+                  ? (props.search.searchText ?? localeText.search)
+                  : localeText.search
+              }}
+            </Button>
+            <Button
+              v-if="showSearchCollapse"
+              class="antdv-next-pro__search-collapse"
+              type="link"
+              html-type="button"
+              icon-placement="end"
+              :aria-expanded="!searchCollapsed"
+              @click="toggleSearchCollapsed"
+            >
+              {{ searchCollapsed ? localeText.expand : localeText.collapse }}
+              <template #icon>
+                <DownOutlined v-if="searchCollapsed" aria-hidden="true" />
+                <UpOutlined v-else aria-hidden="true" />
+              </template>
+            </Button>
+          </div>
+        </div>
+      </form>
+    </ProCard>
+
+    <ProCard
+      class="antdv-next-pro__table-card"
+      variant="borderless"
+      :styles="{ body: showToolbar ? { paddingBlockStart: 0 } : { padding: 0 } }"
+    >
+      <div v-if="showToolbar" class="antdv-next-pro__toolbar">
+        <div v-if="showToolbarTitle" class="antdv-next-pro__toolbar-title">
+          <slot name="toolbar-title">
+            <RenderNode v-if="toolbarTitle !== undefined" :content="toolbarTitle" />
+          </slot>
+        </div>
+        <InputSearch
+          v-if="toolbarSearch && !showToolbarTitle"
+          v-model:value="toolbarKeyword"
+          v-bind="toolbarSearchBindings"
+          class="antdv-next-pro__toolbar-search"
+          :aria-label="toolbarSearchBindings.placeholder"
+          @search="submitToolbarSearch"
         />
-        <div class="antdv-next-pro__search-actions">
-          <Button html-type="button" @click="resetSearch">
-            {{
-              typeof props.search === 'object'
-                ? (props.search.resetText ?? localeText.reset)
-                : localeText.reset
-            }}
-          </Button>
-          <Button type="primary" html-type="submit">
-            {{
-              typeof props.search === 'object'
-                ? (props.search.searchText ?? localeText.search)
-                : localeText.search
-            }}
+        <div class="antdv-next-pro__toolbar-actions">
+          <InputSearch
+            v-if="toolbarSearch && showToolbarTitle"
+            v-model:value="toolbarKeyword"
+            v-bind="toolbarSearchBindings"
+            class="antdv-next-pro__toolbar-search"
+            :aria-label="toolbarSearchBindings.placeholder"
+            @search="submitToolbarSearch"
+          />
+          <slot name="toolbar-actions">
+            <RenderNode v-if="toolbarActions !== undefined" :content="toolbarActions" />
+          </slot>
+          <Button
+            v-if="showOption('density')"
+            type="text"
+            size="small"
+            :aria-label="optionText('density')"
+            :title="optionText('density')"
+            @click="cycleDensity"
+          >
+            <template #icon><ColumnHeightOutlined /></template>
           </Button>
           <Button
-            v-if="showSearchCollapse"
-            class="antdv-next-pro__search-collapse"
-            type="link"
-            html-type="button"
-            icon-placement="end"
-            :aria-expanded="!searchCollapsed"
-            @click="toggleSearchCollapsed"
+            v-if="showOption('reload')"
+            type="text"
+            size="small"
+            :loading="effectiveLoading"
+            :aria-label="optionText('reload')"
+            :title="optionText('reload')"
+            @click="reload()"
           >
-            {{ searchCollapsed ? localeText.expand : localeText.collapse }}
-            <template #icon>
-              <DownOutlined v-if="searchCollapsed" aria-hidden="true" />
-              <UpOutlined v-else aria-hidden="true" />
-            </template>
+            <template #icon><ReloadOutlined /></template>
+          </Button>
+          <Button
+            v-if="showOption('fullScreen')"
+            type="text"
+            size="small"
+            :aria-label="optionText('fullScreen')"
+            :title="optionText('fullScreen')"
+            @click="fullScreen"
+          >
+            <template #icon><FullscreenOutlined /></template>
+          </Button>
+          <Button
+            v-if="showOption('setting')"
+            type="text"
+            size="small"
+            :aria-label="optionText('setting')"
+            :title="optionText('setting')"
+            @click="settingsOpen = !settingsOpen"
+          >
+            <template #icon><SettingOutlined /></template>
           </Button>
         </div>
       </div>
-    </form>
 
-    <Table
-      :columns="tableColumns"
-      :data-source="displayedData"
-      :row-key="effectiveRowKey"
-      :loading="effectiveLoading"
-      :pagination="false"
-      :row-selection="rowSelectionConfig"
-      :scroll="props.scroll"
-      :size="density"
-      :bordered="props.bordered"
-      @change="handleTableChange"
-    >
-      <template #bodyCell="{ column, record, index }">
-        <template v-if="resolveOriginalColumn(column)">
-          <slot
-            v-if="cellSlotName(resolveOriginalColumn(column)!)"
-            :name="cellSlotName(resolveOriginalColumn(column)!)!"
-            :value="getCellValue(record, resolveOriginalColumn(column)!, index)"
-            :record="getDisplayedRecord(record)"
-            :index="index"
-            :column="resolveOriginalColumn(column)!"
-            :editable="isRowEditing(record)"
-          />
+      <div v-if="settingsOpen" class="antdv-next-pro__column-settings">
+        <Checkbox
+          v-for="(column, index) in flattenColumns(effectiveColumns).filter(
+            (item) => item.valueType !== 'option' && !item.hideInTable,
+          )"
+          :key="columnKey(column, String(index))"
+          :checked="isColumnVisible(column)"
+          @update:checked="updateColumnVisibility(column, Boolean($event))"
+        >
+          {{ resolveColumnTitle(column) }}
+        </Checkbox>
+      </div>
 
-          <template v-else-if="resolveOriginalColumn(column)!.valueType === 'option'">
-            <RenderNode v-if="hasCustomActions()" :content="customActions(record)" />
-            <Space v-else-if="isRowEditing(record)" size="small">
+      <Table
+        :columns="tableColumns"
+        :data-source="displayedData"
+        :row-key="effectiveRowKey"
+        :loading="effectiveLoading"
+        :pagination="false"
+        :row-selection="rowSelectionConfig"
+        :scroll="props.scroll"
+        :size="density"
+        :bordered="props.bordered"
+        @change="handleTableChange"
+      >
+        <template #bodyCell="{ column, record, index }">
+          <template v-if="resolveOriginalColumn(column)">
+            <slot
+              v-if="cellSlotName(resolveOriginalColumn(column)!)"
+              :name="cellSlotName(resolveOriginalColumn(column)!)!"
+              :value="getCellValue(record, resolveOriginalColumn(column)!, index)"
+              :record="getDisplayedRecord(record)"
+              :index="index"
+              :column="resolveOriginalColumn(column)!"
+              :editable="isRowEditing(record)"
+            />
+
+            <template v-else-if="resolveOriginalColumn(column)!.valueType === 'option'">
+              <RenderNode v-if="hasCustomActions()" :content="customActions(record)" />
+              <Space v-else-if="isRowEditing(record)" size="small">
+                <Button
+                  type="link"
+                  size="small"
+                  :loading="isRowSaving(record)"
+                  @click="saveRow(record)"
+                >
+                  保存
+                </Button>
+                <Button type="link" size="small" @click="cancelRow(record)"> 取消 </Button>
+              </Space>
+              <Space v-else size="small">
+                <Button type="link" size="small" @click="editRow(record)"> 编辑 </Button>
+                <Popconfirm title="确认删除此行？" @confirm="removeRow(record)">
+                  <Button danger type="link" size="small"> 删除 </Button>
+                </Popconfirm>
+              </Space>
+            </template>
+
+            <div
+              v-else-if="isCellEditable(record, resolveOriginalColumn(column)!, index)"
+              class="antdv-next-pro__editable-cell"
+            >
+              <RenderNode
+                v-if="resolveOriginalColumn(column)!.renderFormItem"
+                :content="customEditor(record, resolveOriginalColumn(column)!, index)"
+              />
+              <ValueTypeControl
+                v-else
+                :column="resolveOriginalColumn(column)!"
+                :value="getCellValue(record, resolveOriginalColumn(column)!, index)"
+                :options="fieldOptions(resolveOriginalColumn(column)!, record)"
+                :loading="isOptionLoading(resolveOriginalColumn(column)!)"
+                :field-props="fieldProps(resolveOriginalColumn(column)!, record)"
+                @update:value="updateCell(record, resolveOriginalColumn(column)!, $event)"
+              />
+              <div
+                v-if="validationMessage(record, resolveOriginalColumn(column)!)"
+                class="antdv-next-pro__validation-error"
+              >
+                {{ validationMessage(record, resolveOriginalColumn(column)!) }}
+              </div>
+            </div>
+
+            <span v-else class="antdv-next-pro__cell-value">
+              <RenderNode
+                :content="getRenderedCell(record, resolveOriginalColumn(column)!, index)"
+              />
               <Button
+                v-if="resolveOriginalColumn(column)!.copyable"
+                class="antdv-next-pro__copy"
                 type="link"
                 size="small"
-                :loading="isRowSaving(record)"
-                @click="saveRow(record)"
+                @click="copyCell(record, resolveOriginalColumn(column)!, index)"
               >
-                保存
+                复制
               </Button>
-              <Button type="link" size="small" @click="cancelRow(record)"> 取消 </Button>
-            </Space>
-            <Space v-else size="small">
-              <Button type="link" size="small" @click="editRow(record)"> 编辑 </Button>
-              <Popconfirm title="确认删除此行？" @confirm="removeRow(record)">
-                <Button danger type="link" size="small"> 删除 </Button>
-              </Popconfirm>
-            </Space>
+            </span>
           </template>
-
-          <div
-            v-else-if="isCellEditable(record, resolveOriginalColumn(column)!, index)"
-            class="antdv-next-pro__editable-cell"
-          >
-            <RenderNode
-              v-if="resolveOriginalColumn(column)!.renderFormItem"
-              :content="customEditor(record, resolveOriginalColumn(column)!, index)"
-            />
-            <ValueTypeControl
-              v-else
-              :column="resolveOriginalColumn(column)!"
-              :value="getCellValue(record, resolveOriginalColumn(column)!, index)"
-              :options="fieldOptions(resolveOriginalColumn(column)!, record)"
-              :loading="isOptionLoading(resolveOriginalColumn(column)!)"
-              :field-props="fieldProps(resolveOriginalColumn(column)!, record)"
-              @update:value="updateCell(record, resolveOriginalColumn(column)!, $event)"
-            />
-            <div
-              v-if="validationMessage(record, resolveOriginalColumn(column)!)"
-              class="antdv-next-pro__validation-error"
-            >
-              {{ validationMessage(record, resolveOriginalColumn(column)!) }}
-            </div>
-          </div>
-
-          <span v-else class="antdv-next-pro__cell-value">
-            <RenderNode :content="getRenderedCell(record, resolveOriginalColumn(column)!, index)" />
-            <Button
-              v-if="resolveOriginalColumn(column)!.copyable"
-              class="antdv-next-pro__copy"
-              type="link"
-              size="small"
-              @click="copyCell(record, resolveOriginalColumn(column)!, index)"
-            >
-              复制
-            </Button>
-          </span>
         </template>
-      </template>
-      <template v-for="(_, name) in slots" #[name]="slotProps">
-        <slot
-          v-if="!String(name).startsWith('cell-') && !String(name).startsWith('header-')"
-          :name="name"
-          v-bind="slotProps ?? {}"
-        />
-      </template>
-    </Table>
+        <template v-for="(_, name) in slots" #[name]="slotProps">
+          <slot
+            v-if="!String(name).startsWith('cell-') && !String(name).startsWith('header-')"
+            :name="name"
+            v-bind="slotProps ?? {}"
+          />
+        </template>
+      </Table>
 
-    <div v-if="props.pagination !== false" class="antdv-next-pro__pagination">
-      <Pagination
-        :current="current"
-        :page-size="pageSize"
-        :total="total"
-        :show-size-changer="paginationOptions?.showSizeChanger"
-        :page-size-options="paginationOptions?.pageSizeOptions"
-        @change="onPageChange"
-      />
-    </div>
+      <div v-if="props.pagination !== false" class="antdv-next-pro__pagination">
+        <Pagination
+          :current="current"
+          :page-size="pageSize"
+          :total="total"
+          :show-size-changer="paginationOptions?.showSizeChanger"
+          :page-size-options="paginationOptions?.pageSizeOptions"
+          @change="onPageChange"
+        />
+      </div>
+    </ProCard>
   </div>
 </template>
 
 <style scoped>
 .antdv-next-pro {
   color: var(--antdv-next-pro-color-text);
+  min-width: 0;
+}
+
+.antdv-next-pro__toolbar {
+  min-height: 64px;
+  margin-block-end: 0;
+  padding-block: 16px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .antdv-next-pro:fullscreen,
@@ -1275,6 +1400,13 @@ defineExpose<
 
 .antdv-next-pro__toolbar-actions {
   margin-inline-start: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.antdv-next-pro__toolbar-search {
+  width: 200px;
+  max-width: 100%;
 }
 
 .antdv-next-pro__column-settings {
@@ -1289,25 +1421,39 @@ defineExpose<
   box-shadow: var(--antdv-next-pro-box-shadow-secondary);
 }
 
-.antdv-next-pro__search {
-  padding: 16px;
-  border-radius: 8px;
-  background: var(--antdv-next-pro-color-fill-alter, rgba(0, 0, 0, 0.02));
-}
-
 .antdv-next-pro__search-fields {
   display: grid;
   grid-template-columns: repeat(var(--antdv-next-pro-search-columns, 3), minmax(0, 1fr));
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 }
 
 .antdv-next-pro__search-field {
-  display: grid;
+  display: block;
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
+  min-width: 0;
   margin-block-end: 0;
+}
+
+.antdv-next-pro__search-field :deep(.ant-form-item-row) {
+  display: grid;
+  grid-template-columns: inherit;
+  align-items: center;
+}
+
+.antdv-next-pro__search-field :deep(.ant-form-item-label) {
+  padding-block-end: 0;
+  white-space: nowrap;
+}
+
+.antdv-next-pro__search-field :deep(.ant-form-item-control) {
+  min-width: 0;
+}
+
+.antdv-next-pro__search-field :deep(.ant-select),
+.antdv-next-pro__search-field :deep(.ant-input-number),
+.antdv-next-pro__search-field :deep(.ant-picker) {
+  width: 100%;
 }
 
 .antdv-next-pro__search-label {
@@ -1352,13 +1498,13 @@ defineExpose<
   margin-block-start: 16px;
 }
 
-@media (width <= 768px) {
-  .antdv-next-pro__search-fields {
-    grid-template-columns: 1fr;
-  }
-
+@media (width <= 575px) {
   .antdv-next-pro__search-actions {
     grid-column: 1 / -1;
+  }
+
+  .antdv-next-pro__toolbar-actions {
+    width: 100%;
   }
 }
 </style>

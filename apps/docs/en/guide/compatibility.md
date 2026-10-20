@@ -21,14 +21,14 @@ Status: <span class="compat-ok">supported</span>, <span class="compat-map">Vue m
 
 `ProTable.search` keeps the core React semantics:
 
-| Option                     | Behavior                                                        |
-| -------------------------- | --------------------------------------------------------------- |
-| `defaultCollapsed`         | Initializes uncontrolled collapse state only                    |
-| `collapsed`                | Controlled state; the parent updates it                         |
-| `span`                     | Search item grid span; defaults to `8`, or three fields per row |
-| `labelWidth`               | Numbers are pixels; `auto` keeps intrinsic sizing               |
-| `searchText` / `resetText` | Search and reset labels                                         |
-| `onCollapse(next)`         | Collapse-state callback                                         |
+| Option                     | Behavior                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `defaultCollapsed`         | Initializes uncontrolled collapse state only                                             |
+| `collapsed`                | Controlled state; the parent updates it                                                  |
+| `span`                     | Number or partial breakpoint map; defaults to 1 / 2 / 3 items per row by container width |
+| `labelWidth`               | Numbers are pixels; `auto` keeps intrinsic sizing                                        |
+| `searchText` / `resetText` | Search and reset labels                                                                  |
+| `onCollapse(next)`         | Collapse-state callback                                                                  |
 
 Vue also emits `search-collapse`:
 
@@ -135,4 +135,6 @@ Changesets and GitHub Actions are project conventions, not React APIs. Describe 
 
 ## Explicitly out of scope
 
-The initial release does not include ProLayout, ProCard, ProList, or ProDescriptions and does not depend on a request library. The network boundary is the generic Promise `request` callback.
+[Basic ProCard](../components/pro-card) now covers theme containers, title/actions, loading, collapse, and semantic styles. Tabs, split grids, StatisticCard, and CheckCard remain outside its scope.
+
+ProLayout, ProList, and ProDescriptions are not included. The project does not depend on a request library; its network boundary is the generic Promise `request` callback.

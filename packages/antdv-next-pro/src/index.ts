@@ -1,6 +1,7 @@
 import type { App, Component, Plugin } from 'vue'
 
 import EditableProTable from './EditableProTable.vue'
+import ProCard from './ProCard.vue'
 import ProTable from './ProTable.vue'
 import SchemaForm from './SchemaForm.vue'
 import {
@@ -17,6 +18,7 @@ import { proFormFieldComponents } from './pro-form-fields'
 import './style.css'
 
 const components: Array<readonly [publicName: string, component: Component]> = [
+  ['ProCard', ProCard],
   ['ProTable', ProTable],
   ['EditableProTable', EditableProTable],
   ['SchemaForm', SchemaForm],
@@ -47,6 +49,7 @@ export {
   Form,
   LightFilter,
   ModalForm,
+  ProCard,
   ProTable,
   QueryFilter,
   SchemaForm,

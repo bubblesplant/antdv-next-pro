@@ -123,7 +123,7 @@ describe('ProTable browser QA matrix', () => {
 
     expect(request).not.toHaveBeenCalled()
     await wrapper.get('[data-testid="remote-name"]').setValue('Ada')
-    await wrapper.get('form.antdv-next-pro__search').trigger('submit')
+    await wrapper.get('.antdv-next-pro__search form').trigger('submit')
     await flushPromises()
 
     expect(request).toHaveBeenLastCalledWith(

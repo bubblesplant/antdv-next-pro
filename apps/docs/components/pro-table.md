@@ -93,7 +93,28 @@ const columns = [
 />
 ```
 
-`span` 默认是 `8`，即 24 栅格下一行 3 项；折叠时仅保留首行。也可通过 `search.onCollapse(next)` 接收状态变化。
+未设置 `span` 时，查询区随容器宽度展示 1、2 或 3 列。数字跨度保持固定列数；也支持 `{ xs: 24, md: 12, xl: 8 }` 这类响应式配置，省略的断点沿用前一个已配置值，与 Ant Design Col 一致。折叠时仅保留首行。也可通过 `search.onCollapse(next)` 接收状态变化。
+
+### 工具栏搜索与卡片布局
+
+查询区位于表格卡片上方；工具栏、表格和分页共享同一张卡片。两个区域都复用 [ProCard](./pro-card)，背景、圆角与内边距沿用 Card 主题，支持深色主题及 Card token 覆盖。`toolbar: false` 隐藏工具栏。
+
+设置 `options.search` 可在工具栏开启关键词搜索；即使 `search: false` 关闭查询表单，关键词搜索仍然可用：
+
+```vue
+<ProTable
+  :columns="columns"
+  :request="request"
+  :search="false"
+  :options="{ search: { name: 'keyword', placeholder: '搜索用户' } }"
+/>
+```
+
+远程模式把关键词写入 `request` 的第一个参数，默认参数名为 `keyword`，提交后回到第一页；清空搜索或重置会移除参数。本地模式按列的原始字段值匹配关键词。远程模式下，后端或示例请求函数需要实现实际筛选和分页。
+
+`toolbar.search` 支持同样配置，并优先于 `options.search`；可传入 Antdv Next `InputSearch` 的属性，或用 `true` 开启默认搜索。`onSearch(value)` 可以返回 `false` 或 `Promise<false>` 阻止本次搜索。标题存在时搜索框位于右侧操作区，否则位于工具栏左侧。
+
+组件 ref 的 `getSortFilter()` 返回当前 `{ sort, filter }` 的副本；修改返回值不会影响内部状态。`EditableProTable` 也提供同名方法。
 
 ### 列状态与列设置
 
@@ -174,8 +195,8 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 | `loading`                      | `boolean`                                 | 叠加外部 loading                         |
 | `search`                       | `false \| ProTableSearchConfig`           | 搜索区和折叠配置                         |
 | `pagination`                   | `false \| ProTablePagination`             | 分页、页大小和选项                       |
-| `options`                      | `false \| ProTableOptions`                | 密度、全屏、刷新和列设置                 |
-| `toolbar`                      | `false \| { title?, actions? }`           | 工具栏内容，也可使用插槽                 |
+| `options`                      | `false \| ProTableOptions`                | 关键词搜索、密度、全屏、刷新和列设置     |
+| `toolbar`                      | `false \| ProTableToolbarConfig`          | 标题、操作与搜索，也可使用插槽           |
 | `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next 行选择配置                    |
 | `columnsState`                 | `ProColumnsStateConfig`                   | 列显隐、顺序、固定和持久化配置           |
 | `editable`                     | `false \| EditableConfig<T>`              | 单行/多行编辑与生命周期                  |

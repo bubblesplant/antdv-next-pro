@@ -27,6 +27,7 @@ import { recordsInTree } from './table/utils'
 
 const props = withDefaults(defineProps<EditableProTableProps<T, P>>(), {
   editable: () => ({ type: 'multiple' }),
+  toolbar: undefined,
 })
 
 const emit = defineEmits<{
@@ -150,6 +151,10 @@ function clearSelected(): void {
   tableRef.value?.clearSelected()
 }
 
+function getSortFilter(): { sort: ProSort; filter: ProFilter } {
+  return tableRef.value?.getSortFilter() ?? { sort: {}, filter: {} }
+}
+
 function fullScreen(): Promise<void> {
   return tableRef.value?.fullScreen() ?? Promise.resolve()
 }
@@ -190,6 +195,7 @@ function setRowData(indexOrKey: number | ProKey, value: Partial<T>): boolean {
 }
 
 defineExpose<EditableProTableInstance<T>>({
+  getSortFilter,
   reload,
   reset,
   setPageInfo,

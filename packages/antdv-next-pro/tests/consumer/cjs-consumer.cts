@@ -3,6 +3,7 @@ import type {
   EditableAction,
   EditableProTableProps,
   ProColumns,
+  ProCardProps,
   ProFormCaptchaProps,
   ProFormCheckboxProps,
   ProFormFieldProps,
@@ -134,6 +135,8 @@ const captchaProps = {
 } satisfies ProFormCaptchaProps
 
 const tableVNode = packageExports.ProTable<CjsRow, CjsQuery>(tableProps)
+const cardProps: ProCardProps = { title: 'Users', ghost: true }
+const cardComponent: Component = packageExports.ProCard
 const editableVNode = packageExports.EditableProTable<CjsRow, CjsQuery>(editableProps)
 const schemaVNode = packageExports.SchemaForm<CjsRow>(schemaProps)
 const drawerVNode = packageExports.DrawerForm<CjsRow>({
@@ -146,6 +149,8 @@ const plugin: Plugin = packageExports.default
 void [
   plugin,
   tableVNode,
+  cardProps,
+  cardComponent,
   editableVNode,
   schemaVNode,
   drawerVNode,

@@ -510,10 +510,15 @@ defineExpose<SchemaFormInstance<T>>({
   border: 0;
 }
 
-.antdv-next-pro-schema-group-title,
+/* Antdv Form's reset targets `.ant-form legend` with higher specificity, so the group title's
+   color, size and margin come from Antdv tokens; only the weight is ours. */
+.antdv-next-pro-schema-group-title {
+  font-weight: 600;
+}
+
 .antdv-next-pro-form-list-title {
   margin-block-end: 16px;
-  color: rgba(0, 0, 0, 0.88);
+  color: var(--antdv-next-pro-color-text, rgba(0, 0, 0, 0.88));
   font-size: 16px;
   font-weight: 600;
 }
@@ -528,7 +533,7 @@ defineExpose<SchemaFormInstance<T>>({
   align-items: flex-start;
   padding: 12px;
   margin-block-end: 8px;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--antdv-next-pro-color-fill-alter, rgba(0, 0, 0, 0.02));
   border-radius: 6px;
 }
 
@@ -540,7 +545,7 @@ defineExpose<SchemaFormInstance<T>>({
 .antdv-next-pro-schema-readonly {
   display: inline-block;
   min-height: 22px;
-  color: rgba(0, 0, 0, 0.88);
+  color: var(--antdv-next-pro-color-text, rgba(0, 0, 0, 0.88));
   line-height: 22px;
 }
 </style>

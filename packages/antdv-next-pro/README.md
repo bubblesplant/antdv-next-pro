@@ -1,6 +1,6 @@
 # @bubblesjs/antv-next-pro
 
-Community-maintained Vue 3 ProTable, EditableProTable, SchemaForm, and ProFormFields powered by Antdv Next.
+Community-maintained Vue 3 ProCard, ProTable, EditableProTable, SchemaForm, and ProFormFields powered by Antdv Next.
 
 The API follows the major workflows of `@ant-design/pro-components@2.8.10`, expressed through idiomatic Vue `v-model`, events, slots, and component refs.
 
@@ -22,6 +22,7 @@ Named imports are available:
 ```ts
 import {
   EditableProTable,
+  ProCard,
   ProFormSelect,
   ProFormText,
   ProFormUploadButton,
@@ -34,6 +35,17 @@ import {
   type SchemaFormInstance,
 } from '@bubblesjs/antv-next-pro'
 ```
+
+## ProCard
+
+```vue
+<ProCard v-model:collapsed="collapsed" title="User details" variant="borderless" collapsible>
+  <template #extra>Actions</template>
+  Content
+</ProCard>
+```
+
+ProCard follows the basic card in ProComponents `3.1.15-7`, using native Card theme tokens, title/action slots, loading skeletons, controlled/uncontrolled collapse, ghost mode, and semantic `styles` / `classNames`. ProTable reuses it for both its query form and table container. Tabs, split grids, StatisticCard, and CheckCard are outside this implementation's scope. See the [ProCard docs](https://bubblesplant.github.io/antv-next-pro/en/components/pro-card).
 
 ## ProTable
 
