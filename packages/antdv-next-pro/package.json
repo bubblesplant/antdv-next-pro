@@ -1,6 +1,6 @@
 {
   "name": "@bubblesjs/antv-next-pro",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Vue 3 ProCard, ProTable, EditableProTable and SchemaForm powered by Antdv Next",
   "keywords": [
     "antdv-next",

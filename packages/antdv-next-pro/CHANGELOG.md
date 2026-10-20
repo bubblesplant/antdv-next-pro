@@ -1,5 +1,17 @@
 # @bubblesjs/antv-next-pro
 
+## 0.2.0
+
+### Minor Changes
+
+- [#7](https://github.com/bubblesplant/antv-next-pro/pull/7) [`ab604a1`](https://github.com/bubblesplant/antv-next-pro/commit/ab604a15513574f43a03a88430b1b8e17f6ff12d) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 新增基于 Antdv Next Card 的 ProCard，提供主题容器、标题和操作插槽、骨架加载、受控/非受控折叠、幽灵模式及语义样式配置。ProTable 查询区与表格区统一使用 ProCard，支持独立导入与插件全局注册。
+
+- [#7](https://github.com/bubblesplant/antv-next-pro/pull/7) [`ab604a1`](https://github.com/bubblesplant/antv-next-pro/commit/ab604a15513574f43a03a88430b1b8e17f6ff12d) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 对照 ProComponents 3.1.15-7 和最新主分支修正 ProTable 卡片布局：搜索区位于工具栏上方，查询区与表格卡片使用主题容器背景，分页保留在卡片内。增加 options.search / toolbar.search 关键词搜索、可省略断点的响应式 search.span，以及 ProTable / EditableProTable 的 getSortFilter() 方法。
+
+### Patch Changes
+
+- [#7](https://github.com/bubblesplant/antv-next-pro/pull/7) [`e593428`](https://github.com/bubblesplant/antv-next-pro/commit/e593428562a043ae0b4fc5ffb95d97e597640047) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 修复暗色主题下的样式掉色：SchemaForm 的分组标题、表单列表标题与列表行、ProFormUploadDragger 的占位文案原先写死浅色值，现在统一由 Antdv Next 主题令牌通过 CSS 变量下发，并抽出共享的 `useThemeVars` 供 ProTable、SchemaForm 与独立字段组件复用。
+
 ## 0.1.4
 
 ### Patch Changes
