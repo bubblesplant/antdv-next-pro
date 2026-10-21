@@ -1,5 +1,11 @@
 # @bubblesjs/antv-next-pro
 
+## 0.2.1
+
+### Patch Changes
+
+- [#9](https://github.com/bubblesplant/antv-next-pro/pull/9) [`e80cbe9`](https://github.com/bubblesplant/antv-next-pro/commit/e80cbe9499901f3e63c27e81feb3734c824643f5) Thanks [@bubblesplant](https://github.com/bubblesplant)! - cicd 升级 发版测试
+
 ## 0.2.0
 
 ### Minor Changes
