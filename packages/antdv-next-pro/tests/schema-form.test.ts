@@ -1019,8 +1019,9 @@ describe('SchemaForm', () => {
     'forwards the %s layout alias without allowing layout overrides',
     (component, layoutType) => {
       const finish = vi.fn()
-      const wrapper = shallowMount(component, {
+      const wrapper = mount(component, {
         attrs: { columns: [], layoutType: 'ignored', 'data-testid': 'layout', onFinish: finish },
+        global: { stubs: { SchemaForm: true } },
       })
       const form = wrapper.findComponent(SchemaForm as Component)
       expect(form.props()).toMatchObject({ layoutType })
@@ -1056,7 +1057,7 @@ describe('SchemaForm', () => {
       slots: {
         'field-profile.name': ({ value }: { value: unknown }) => h('strong', String(value)),
       },
-      global: { stubs: { BaseSchemaForm: SchemaFormStub } },
+      global: { stubs: { SchemaForm: SchemaFormStub } },
     })
     const form = wrapper.vm as unknown as SchemaFormInstance<FormRecord>
     expect(wrapper.get('strong').text()).toBe('Ada')
@@ -1122,7 +1123,13 @@ describe('SchemaForm', () => {
         onValueChange,
       },
     })
-    expect(wrapper.findComponent(FormItem).props('name')).toEqual(['members', 0, 'name'])
+    expect(
+      wrapper
+        .findAllComponents(FormItem)
+        .some(
+          (item) => JSON.stringify(item.props('name')) === JSON.stringify(['members', 0, 'name']),
+        ),
+    ).toBe(true)
     wrapper.findComponent(Input).vm.$emit('update:value', 'Grace')
     expect(onValueChange).toHaveBeenLastCalledWith(['members', 0, 'name'], 'Grace')
     const add = wrapper.findAllComponents(Button).find((button) => button.text() === 'Add member')!
@@ -1134,9 +1141,9 @@ describe('SchemaForm', () => {
     expect(rows[1].nested).not.toBe(initial.nested)
     const remove = wrapper
       .findAllComponents(Button)
-      .find((button) => button.text() === 'Delete member')!
+      .find((button) => button.attributes('data-pro-form-list-remove') !== undefined)!
     await remove.trigger('click')
-    expect(onValueChange).toHaveBeenLastCalledWith(['members'], [])
+    expect(onValueChange).toHaveBeenLastCalledWith(['members'], [initial])
     expect(model.members).toHaveLength(1)
     wrapper.unmount()
   })

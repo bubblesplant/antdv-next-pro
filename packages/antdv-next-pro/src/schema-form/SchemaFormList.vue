@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { FieldProps, FormListState } from './fieldTypes'
-import { Button, Row } from 'antdv-next'
-import { mergeProps } from 'vue'
-import VNodeContent from '../shared/VNodeContent'
+import type { FormRecord } from './utils'
+import type { ProFormListProps } from '../pro-form/types'
+import { Row } from 'antdv-next'
+import { computed, defineComponent, provide } from 'vue'
+import ProForm from '../pro-form/ProForm'
+import { ProFormList } from '../pro-form/structure'
+import { proFormNamePathKey, useProFormContext } from '../pro-form/context'
 import SchemaFormChildren from './SchemaFormChildren.vue'
-import { toDisplayText } from './fieldUtils'
-import { cloneValue } from './utils'
+import { getValue, schemaChildren } from './utils'
 
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{
@@ -13,50 +16,74 @@ const props = defineProps<{
   state: FormListState
   rootAttrs: Record<string, unknown>
 }>()
-
-function removeRow(rowIndex: number): void {
-  const next = props.state.rows.map((row) => cloneValue(row))
-  next.splice(rowIndex, 1)
-  props.context.onValueChange(props.state.path, next)
-}
-
-function addRow(): void {
-  const next = props.state.rows.map((row) => cloneValue(row))
-  const initial = props.state.fieldProps.initialValue
-  next.push(
-    Object.prototype.toString.call(initial) === '[object Object]' ? cloneValue(initial) : {},
-  )
-  props.context.onValueChange(props.state.path, next)
+const form = useProFormContext()
+provide(
+  proFormNamePathKey,
+  computed(() => []),
+)
+const FormContainer = form
+  ? defineComponent({
+      inheritAttrs: false,
+      setup(_props, { slots }) {
+        return () => slots.default?.()
+      },
+    })
+  : ProForm
+const creatorRecord = computed(() => {
+  const value = props.state.fieldProps.creatorRecord ?? props.state.fieldProps.initialValue
+  return typeof value === 'function'
+    ? (value as () => FormRecord)
+    : value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as FormRecord)
+      : {}
+})
+const listProps = computed(() => {
+  const { initialValue: _initial, creatorButtonText: _text, ...rest } = props.state.fieldProps
+  const button = rest.creatorButtonProps
+  return {
+    ...rest,
+    creatorButtonProps: (button === false
+      ? false
+      : {
+          creatorButtonText: props.state.creatorText,
+          ...(button && typeof button === 'object' ? button : {}),
+        }) as ProFormListProps['creatorButtonProps'],
+  }
+})
+function updateModel(values: FormRecord) {
+  if (!form) props.context.onValueChange(props.state.path, getValue(values, props.state.path))
 }
 </script>
 
 <template>
-  <section v-bind="mergeProps({ class: 'antdv-next-pro-form-list' }, rootAttrs)">
-    <div v-if="context.column.title" class="antdv-next-pro-form-list-title">
-      <VNodeContent :content="state.title" />
-    </div>
-    <div
-      v-for="(_row, rowIndex) in state.rows"
-      :key="rowIndex"
-      class="antdv-next-pro-form-list-row"
+  <component
+    :is="FormContainer"
+    :model-value="form ? undefined : context.model"
+    :readonly="context.readonly"
+    :submitter="false"
+    @update:model-value="updateModel"
+  >
+    <ProFormList
+      v-bind="{ ...listProps, ...rootAttrs }"
+      :name="state.path"
+      :label="state.title"
+      :creator-record="creatorRecord"
+      class="antdv-next-pro-form-list"
+      :classes="{ item: 'antdv-next-pro-form-list-row' }"
     >
-      <component
-        :is="context.grid ? Row : 'div'"
-        v-bind="context.grid ? { gutter: 16 } : {}"
-        class="antdv-next-pro-form-list-fields"
-      >
-        <SchemaFormChildren
-          :columns="context.column.columns ?? []"
-          :context="context"
-          :prefix="[...state.path, rowIndex]"
-        />
-      </component>
-      <Button v-if="!context.readonly" danger size="small" type="text" @click="removeRow(rowIndex)">
-        {{ toDisplayText(state.fieldProps.removeText ?? 'Remove') }}
-      </Button>
-    </div>
-    <Button v-if="!context.readonly" block type="dashed" @click="addRow">
-      {{ state.creatorText }}
-    </Button>
-  </section>
+      <template #default="{ index }">
+        <component
+          :is="context.grid ? Row : 'div'"
+          v-bind="context.grid ? { gutter: 16 } : {}"
+          class="antdv-next-pro-form-list-fields"
+        >
+          <SchemaFormChildren
+            :columns="schemaChildren(context.column)"
+            :context="context"
+            :prefix="[...state.path, index]"
+          />
+        </component>
+      </template>
+    </ProFormList>
+  </component>
 </template>

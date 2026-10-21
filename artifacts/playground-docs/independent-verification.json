@@ -1,0 +1,1213 @@
+{
+  "verifiedAt": "2026-10-21T07:25:22.194Z",
+  "routes": [
+    {
+      "path": "/pro-table/basic-query-table",
+      "title": "查询表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/BasicQueryTable.vue",
+      "fallback": false,
+      "preview": 298,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-no-query-form",
+      "title": "无查询表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/BasicNoQueryForm.vue",
+      "fallback": false,
+      "preview": 262,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-card-bordered",
+      "title": "卡片边框",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/BasicCardBordered.vue",
+      "fallback": false,
+      "preview": 312,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-data-source",
+      "title": "使用 DataSource",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/BasicDataSource.vue",
+      "fallback": false,
+      "preview": 248,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-no-toolbar",
+      "title": "无 ToolBar 的表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/BasicNoToolbar.vue",
+      "fallback": false,
+      "preview": 274,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/tree-data",
+      "title": "树形数据",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/TreeTable.vue",
+      "fallback": false,
+      "preview": 106,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-bar-type-switch",
+      "title": "搜索栏类型切换",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchBarTypeSwitch.vue",
+      "fallback": false,
+      "preview": 312,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-no-options",
+      "title": "查询（无按钮）表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchNoOptions.vue",
+      "fallback": false,
+      "preview": 285,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-light-filter",
+      "title": "轻量筛选替换查询表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchLightFilter.vue",
+      "fallback": false,
+      "preview": 283,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-keywords",
+      "title": "使用自带 keyWords 搜索的 table",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchKeywords.vue",
+      "fallback": false,
+      "preview": 275,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-custom-options",
+      "title": "搜索选项自定义",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchCustomOptions.vue",
+      "fallback": false,
+      "preview": 308,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-required-fields",
+      "title": "必填的查询表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/SearchRequiredFields.vue",
+      "fallback": false,
+      "preview": 57,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-search-linkage",
+      "title": "动态联动搜索栏",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/CustomSearchLinkage.vue",
+      "fallback": false,
+      "preview": 314,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-search-form-ref",
+      "title": "通过 formRef 来操作查询表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/CustomSearchFormRef.vue",
+      "fallback": false,
+      "preview": 325,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-batch-actions",
+      "title": "表格批量操作",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/FeatureBatchActions.vue",
+      "fallback": false,
+      "preview": 283,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-nested-table",
+      "title": "嵌套表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/FeatureNestedTable.vue",
+      "fallback": false,
+      "preview": 69,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-split-layout",
+      "title": "左右结构",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/FeatureSplitLayout.vue",
+      "fallback": false,
+      "preview": 276,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-polling",
+      "title": "表格轮询",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/FeaturePolling.vue",
+      "fallback": false,
+      "preview": 274,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-date-formatter",
+      "title": "dateFormatter - 日期格式化",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/FeatureDateFormatter.vue",
+      "fallback": false,
+      "preview": 370,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/toolbar-custom",
+      "title": "Toolbar 自定义",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ToolbarCustom.vue",
+      "fallback": false,
+      "preview": 327,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/toolbar-custom-table-body",
+      "title": "表格主体自定义",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ToolbarCustomTableBody.vue",
+      "fallback": false,
+      "preview": 293,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/card-table",
+      "title": "卡片表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/CardTable.vue",
+      "fallback": false,
+      "preview": 324,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/no-search-table",
+      "title": "无搜索表格",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/NoSearchTable.vue",
+      "fallback": false,
+      "preview": 262,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-date",
+      "title": "valueType - 日期类",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ValueTypeDate.vue",
+      "fallback": false,
+      "preview": 444,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-number",
+      "title": "valueType - 数字类",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ValueTypeNumber.vue",
+      "fallback": false,
+      "preview": 149,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-style",
+      "title": "valueType - 样式类",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ValueTypeStyle.vue",
+      "fallback": false,
+      "preview": 166,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-select",
+      "title": "valueType - 选择类",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ValueTypeSelect.vue",
+      "fallback": false,
+      "preview": 209,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-custom",
+      "title": "自定义 valueType",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ValueTypeCustom.vue",
+      "fallback": false,
+      "preview": 174,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/internationalization",
+      "title": "国际化相关的配置",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/Internationalization.vue",
+      "fallback": false,
+      "preview": 310,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/rtl-arabic",
+      "title": "RTL (النسخة العربية)",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/RtlArabic.vue",
+      "fallback": false,
+      "preview": 442,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/theme-dark-compact",
+      "title": "黑色主题 / 紧凑主题",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ThemeDarkCompact.vue",
+      "fallback": false,
+      "preview": 336,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-error-boundary",
+      "title": "自定义错误边界",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/CustomErrorBoundary.vue",
+      "fallback": false,
+      "preview": 297,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/disabled-error-boundary",
+      "title": "取消自定义错误边界",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/DisabledErrorBoundary.vue",
+      "fallback": false,
+      "preview": 303,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-columns-state",
+      "title": "列状态 columnsState",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/OtherColumnsState.vue",
+      "fallback": false,
+      "preview": 341,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-custom-setting-icon",
+      "title": "自定义列设置图标",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/OtherCustomSettingIcon.vue",
+      "fallback": false,
+      "preview": 276,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-content-query-item",
+      "title": "内容类查询项",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/OtherContentQueryItem.vue",
+      "fallback": false,
+      "preview": 305,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-basic",
+      "title": "列表工具栏-基本使用",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ListToolbarBasic.vue",
+      "fallback": false,
+      "preview": 284,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-no-title",
+      "title": "无标题",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ListToolbarNoTitle.vue",
+      "fallback": false,
+      "preview": 262,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-multiple-line",
+      "title": "双行布局",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ListToolbarMultipleLine.vue",
+      "fallback": false,
+      "preview": 300,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-tabs",
+      "title": "带标签",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ListToolbarTabs.vue",
+      "fallback": false,
+      "preview": 270,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-title-menu",
+      "title": "列表工具栏-标题下拉菜单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/ListToolbarTitleMenu.vue",
+      "fallback": false,
+      "preview": 276,
+      "passed": true
+    },
+    {
+      "path": "/pro-table/editable-pro-form-validation",
+      "title": "ProForm 内 EditableProTable（列校验）",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-table/EditableProFormValidation.vue",
+      "fallback": false,
+      "preview": 81,
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/multiple-row",
+      "title": "多行编辑与新增",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/editable-table/MultipleRowEditing.vue",
+      "fallback": false,
+      "preview": 122,
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/single-row",
+      "title": "单行编辑",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/editable-table/SingleRowEditing.vue",
+      "fallback": false,
+      "preview": 122,
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/tree-data",
+      "title": "树形编辑与子节点新增",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/editable-table/EditableTree.vue",
+      "fallback": false,
+      "preview": 97,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/basic",
+      "title": "基础表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/BasicForm.vue",
+      "fallback": false,
+      "preview": 93,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/query-filter",
+      "title": "查询筛选",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/QueryFilterForm.vue",
+      "fallback": false,
+      "preview": 93,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/light-filter",
+      "title": "轻量筛选",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/LightFilterForm.vue",
+      "fallback": false,
+      "preview": 93,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/modal-form",
+      "title": "弹窗表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/ModalForm.vue",
+      "fallback": false,
+      "preview": 68,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/drawer-form",
+      "title": "抽屉表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/DrawerForm.vue",
+      "fallback": false,
+      "preview": 68,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/steps-form",
+      "title": "分步表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/StepsForm.vue",
+      "fallback": false,
+      "preview": 88,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/embed",
+      "title": "嵌入式表单",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/EmbedForm.vue",
+      "fallback": false,
+      "preview": 93,
+      "passed": true
+    },
+    {
+      "path": "/schema-form/tree-select",
+      "title": "树选择字段",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/schema-form/TreeSelectForm.vue",
+      "fallback": false,
+      "preview": 40,
+      "passed": true
+    },
+    {
+      "path": "/pro-card/basic",
+      "title": "基础卡片",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-card/BasicCard.vue",
+      "fallback": false,
+      "preview": 69,
+      "passed": true
+    },
+    {
+      "path": "/pro-card/collapsible",
+      "title": "折叠卡片",
+      "file": "C:/malei/stu/antv-next-pro/apps/playground/src/demos/pro-card/CollapsibleCard.vue",
+      "fallback": false,
+      "preview": 62,
+      "passed": true
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "/pro-table/basic-query-table",
+      "entry": "pro-table/BasicQueryTable.vue",
+      "files": ["pro-table/BasicQueryTable.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-no-query-form",
+      "entry": "pro-table/BasicNoQueryForm.vue",
+      "files": ["pro-table/BasicNoQueryForm.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-card-bordered",
+      "entry": "pro-table/BasicCardBordered.vue",
+      "files": ["pro-table/BasicCardBordered.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-data-source",
+      "entry": "pro-table/BasicDataSource.vue",
+      "files": ["pro-table/BasicDataSource.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/basic-no-toolbar",
+      "entry": "pro-table/BasicNoToolbar.vue",
+      "files": ["pro-table/BasicNoToolbar.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/tree-data",
+      "entry": "pro-table/TreeTable.vue",
+      "files": ["pro-table/TreeTable.vue"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-bar-type-switch",
+      "entry": "pro-table/SearchBarTypeSwitch.vue",
+      "files": ["pro-table/SearchBarTypeSwitch.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-no-options",
+      "entry": "pro-table/SearchNoOptions.vue",
+      "files": ["pro-table/SearchNoOptions.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-light-filter",
+      "entry": "pro-table/SearchLightFilter.vue",
+      "files": ["pro-table/SearchLightFilter.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-keywords",
+      "entry": "pro-table/SearchKeywords.vue",
+      "files": ["pro-table/SearchKeywords.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-custom-options",
+      "entry": "pro-table/SearchCustomOptions.vue",
+      "files": ["pro-table/SearchCustomOptions.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/search-required-fields",
+      "entry": "pro-table/SearchRequiredFields.vue",
+      "files": ["pro-table/SearchRequiredFields.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-search-linkage",
+      "entry": "pro-table/CustomSearchLinkage.vue",
+      "files": ["pro-table/CustomSearchLinkage.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-search-form-ref",
+      "entry": "pro-table/CustomSearchFormRef.vue",
+      "files": ["pro-table/CustomSearchFormRef.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-batch-actions",
+      "entry": "pro-table/FeatureBatchActions.vue",
+      "files": ["pro-table/FeatureBatchActions.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-nested-table",
+      "entry": "pro-table/FeatureNestedTable.vue",
+      "files": ["pro-table/FeatureNestedTable.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-split-layout",
+      "entry": "pro-table/FeatureSplitLayout.vue",
+      "files": ["pro-table/FeatureSplitLayout.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-polling",
+      "entry": "pro-table/FeaturePolling.vue",
+      "files": ["pro-table/FeaturePolling.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/feature-date-formatter",
+      "entry": "pro-table/FeatureDateFormatter.vue",
+      "files": ["pro-table/FeatureDateFormatter.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/toolbar-custom",
+      "entry": "pro-table/ToolbarCustom.vue",
+      "files": ["pro-table/ToolbarCustom.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/toolbar-custom-table-body",
+      "entry": "pro-table/ToolbarCustomTableBody.vue",
+      "files": ["pro-table/ToolbarCustomTableBody.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/card-table",
+      "entry": "pro-table/CardTable.vue",
+      "files": ["pro-table/CardTable.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/no-search-table",
+      "entry": "pro-table/NoSearchTable.vue",
+      "files": ["pro-table/NoSearchTable.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-date",
+      "entry": "pro-table/ValueTypeDate.vue",
+      "files": ["pro-table/ValueTypeDate.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-number",
+      "entry": "pro-table/ValueTypeNumber.vue",
+      "files": ["pro-table/ValueTypeNumber.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-style",
+      "entry": "pro-table/ValueTypeStyle.vue",
+      "files": ["pro-table/ValueTypeStyle.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-select",
+      "entry": "pro-table/ValueTypeSelect.vue",
+      "files": ["pro-table/ValueTypeSelect.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/value-type-custom",
+      "entry": "pro-table/ValueTypeCustom.vue",
+      "files": ["pro-table/ValueTypeCustom.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/internationalization",
+      "entry": "pro-table/Internationalization.vue",
+      "files": ["pro-table/Internationalization.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/rtl-arabic",
+      "entry": "pro-table/RtlArabic.vue",
+      "files": ["pro-table/RtlArabic.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/theme-dark-compact",
+      "entry": "pro-table/ThemeDarkCompact.vue",
+      "files": ["pro-table/ThemeDarkCompact.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/custom-error-boundary",
+      "entry": "pro-table/CustomErrorBoundary.vue",
+      "files": [
+        "pro-table/CustomErrorBoundary.vue",
+        "pro-table/demoData.ts",
+        "pro-table/ScenarioErrorBoundary.vue"
+      ],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/disabled-error-boundary",
+      "entry": "pro-table/DisabledErrorBoundary.vue",
+      "files": [
+        "pro-table/DisabledErrorBoundary.vue",
+        "pro-table/demoData.ts",
+        "pro-table/ScenarioErrorBoundary.vue"
+      ],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-columns-state",
+      "entry": "pro-table/OtherColumnsState.vue",
+      "files": ["pro-table/OtherColumnsState.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-custom-setting-icon",
+      "entry": "pro-table/OtherCustomSettingIcon.vue",
+      "files": ["pro-table/OtherCustomSettingIcon.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/other-content-query-item",
+      "entry": "pro-table/OtherContentQueryItem.vue",
+      "files": ["pro-table/OtherContentQueryItem.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-basic",
+      "entry": "pro-table/ListToolbarBasic.vue",
+      "files": ["pro-table/ListToolbarBasic.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-no-title",
+      "entry": "pro-table/ListToolbarNoTitle.vue",
+      "files": ["pro-table/ListToolbarNoTitle.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-multiple-line",
+      "entry": "pro-table/ListToolbarMultipleLine.vue",
+      "files": ["pro-table/ListToolbarMultipleLine.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-tabs",
+      "entry": "pro-table/ListToolbarTabs.vue",
+      "files": ["pro-table/ListToolbarTabs.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/list-toolbar-title-menu",
+      "entry": "pro-table/ListToolbarTitleMenu.vue",
+      "files": ["pro-table/ListToolbarTitleMenu.vue", "pro-table/demoData.ts"],
+      "passed": true
+    },
+    {
+      "path": "/pro-table/editable-pro-form-validation",
+      "entry": "pro-table/EditableProFormValidation.vue",
+      "files": ["pro-table/EditableProFormValidation.vue"],
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/multiple-row",
+      "entry": "editable-table/MultipleRowEditing.vue",
+      "files": ["editable-table/MultipleRowEditing.vue"],
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/single-row",
+      "entry": "editable-table/SingleRowEditing.vue",
+      "files": ["editable-table/SingleRowEditing.vue"],
+      "passed": true
+    },
+    {
+      "path": "/editable-pro-table/tree-data",
+      "entry": "editable-table/EditableTree.vue",
+      "files": ["editable-table/EditableTree.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/basic",
+      "entry": "schema-form/BasicForm.vue",
+      "files": ["schema-form/BasicForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/query-filter",
+      "entry": "schema-form/QueryFilterForm.vue",
+      "files": ["schema-form/QueryFilterForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/light-filter",
+      "entry": "schema-form/LightFilterForm.vue",
+      "files": ["schema-form/LightFilterForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/modal-form",
+      "entry": "schema-form/ModalForm.vue",
+      "files": ["schema-form/ModalForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/drawer-form",
+      "entry": "schema-form/DrawerForm.vue",
+      "files": ["schema-form/DrawerForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/steps-form",
+      "entry": "schema-form/StepsForm.vue",
+      "files": ["schema-form/StepsForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/embed",
+      "entry": "schema-form/EmbedForm.vue",
+      "files": ["schema-form/EmbedForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/schema-form/tree-select",
+      "entry": "schema-form/TreeSelectForm.vue",
+      "files": ["schema-form/TreeSelectForm.vue"],
+      "passed": true
+    },
+    {
+      "path": "/pro-card/basic",
+      "entry": "pro-card/BasicCard.vue",
+      "files": ["pro-card/BasicCard.vue"],
+      "passed": true
+    },
+    {
+      "path": "/pro-card/collapsible",
+      "entry": "pro-card/CollapsibleCard.vue",
+      "files": ["pro-card/CollapsibleCard.vue"],
+      "passed": true
+    }
+  ],
+  "mobile": [
+    {
+      "path": "/pro-table/basic-query-table",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/basic-no-query-form",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/basic-card-bordered",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/basic-data-source",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/basic-no-toolbar",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/tree-data",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-bar-type-switch",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-no-options",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-light-filter",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-keywords",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-custom-options",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/search-required-fields",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/custom-search-linkage",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/custom-search-form-ref",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/feature-batch-actions",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/feature-nested-table",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/feature-split-layout",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/feature-polling",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/feature-date-formatter",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/toolbar-custom",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/toolbar-custom-table-body",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/card-table",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/no-search-table",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/value-type-date",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/value-type-number",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/value-type-style",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/value-type-select",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/value-type-custom",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/internationalization",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/rtl-arabic",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/theme-dark-compact",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/custom-error-boundary",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/disabled-error-boundary",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/other-columns-state",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/other-custom-setting-icon",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/other-content-query-item",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/list-toolbar-basic",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/list-toolbar-no-title",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/list-toolbar-multiple-line",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/list-toolbar-tabs",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/list-toolbar-title-menu",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-table/editable-pro-form-validation",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/editable-pro-table/multiple-row",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/editable-pro-table/single-row",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/editable-pro-table/tree-data",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/basic",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/query-filter",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/light-filter",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/modal-form",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/drawer-form",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/steps-form",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/embed",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/schema-form/tree-select",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-card/basic",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    },
+    {
+      "path": "/pro-card/collapsible",
+      "passed": true,
+      "width": 390,
+      "scroll": 390,
+      "fallback": false
+    }
+  ],
+  "interactions": [
+    "工具栏标签驱动请求",
+    "标签切换保留独立交互",
+    "标题菜单更新请求条件",
+    "必填查询阻止空值请求",
+    "必填查询通过后请求",
+    "本地数据示例独立增删状态",
+    "国际化表头切换",
+    "保留工具栏国际化文案",
+    "保留密度菜单国际化文案",
+    "基础表单保留必填校验",
+    "基础表单独立提交",
+    "分步表单阻止空值跳步",
+    "分步表单进入发布设置",
+    "分步表单独立提交",
+    "modal-form 独立打开并提交",
+    "drawer-form 独立打开并提交",
+    "基础卡片操作独立",
+    "折叠卡片收起",
+    "折叠卡片展开",
+    "custom-error-boundary 正确隔离异常",
+    "custom-error-boundary 可以恢复",
+    "disabled-error-boundary 正确隔离异常",
+    "disabled-error-boundary 可以恢复",
+    "single 编辑状态独立正确",
+    "multiple 编辑状态独立正确",
+    "树形示例展开与收起",
+    "代码区显示当前独立组件的真实文件",
+    "复制当前独立组件代码",
+    "复制当前独立路由链接",
+    "下载只包含当前组件及必要依赖",
+    "下载源码和入口说明与实际文件一致",
+    "/pro-table/tree-data 可直接访问并刷新",
+    "/editable-pro-table/single-row 可直接访问并刷新",
+    "/schema-form/modal-form 可直接访问并刷新",
+    "/pro-card/basic 可直接访问并刷新",
+    "浏览器后退恢复对应示例",
+    "浏览器前进恢复对应示例",
+    "手机代码区保持页面宽度"
+  ],
+  "uncaughtErrors": []
+}

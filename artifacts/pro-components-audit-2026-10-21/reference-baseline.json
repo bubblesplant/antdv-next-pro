@@ -1,0 +1,10 @@
+{
+  "source": "https://github.com/ant-design/pro-components.git",
+  "commit": "3bf43278d39f2d31489749132982488f57a9eb5e",
+  "packageVersion": "3.1.15-7",
+  "websiteDeploymentCommitVerified": false,
+  "referenceDirectory": "C:\\Users\\Administrator\\Documents\\Codex\\scratch-tests\\pro-components-audit-20261021-01a15d5a",
+  "removed": false,
+  "cleanupStatus": "blocked_by_tool_policy",
+  "cleanupReason": "自动审批审查拒绝执行递归删除命令，未重试或绕过"
+}

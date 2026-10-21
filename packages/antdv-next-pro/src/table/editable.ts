@@ -1,5 +1,7 @@
 import type { Ref } from 'vue'
 import { ref } from 'vue'
+import { message } from 'antdv-next'
+import { resolveColumnValueType } from './valueType'
 
 import type { EditableConfig, ProColumns, ProDataIndex, ProKey, RecordCreatorProps } from '../types'
 import {
@@ -31,6 +33,8 @@ export interface EditableTableOptions<T extends Record<string, unknown>> {
   onRowsChange: (rows: T[], changedRecord?: T, silent?: boolean) => void
   onDraftChange?: (rows: T[], changedRecord: T, reason: 'change' | 'cancel') => void
   onEditableKeysChange: (keys: ProKey[]) => void
+  validateRecord?: (key: ProKey, record: T) => Promise<Map<string, string>>
+  getMessage?: (key: string, fallback: string) => string
   onError?: (error: unknown) => void
 }
 
@@ -64,6 +68,15 @@ export function useEditableTable<T extends Record<string, unknown>>(
   const updateEditableKeys = (keys: ProKey[]) => {
     options.editableKeys.value = keys
     options.onEditableKeysChange([...keys])
+    const config = options.editable()
+    if (config)
+      config.onChange?.(
+        [...keys],
+        keys
+          .map((key) => findRecord(options.rows.value, key, options.rowKey()))
+          .filter((record): record is T => Boolean(record))
+          .map(displayRecord),
+      )
   }
 
   const clearKeyState = (key: ProKey) => {
@@ -104,6 +117,8 @@ export function useEditableTable<T extends Record<string, unknown>>(
   ): void => {
     if (cachedKeys.has(key)) return
     options.onDraftChange?.(rows, cloneRecord(draft), reason)
+    const config = options.editable()
+    if (config) config.onValuesChange?.(cloneRecord(draft), rows)
   }
 
   const syncKeys = (keys: ProKey[]): void => {
@@ -152,12 +167,18 @@ export function useEditableTable<T extends Record<string, unknown>>(
   const start = (key: ProKey): boolean => {
     const editable = options.editable()
     if (!editable) return false
+    if (isEditing(key) && drafts.value.has(key)) return true
     const record = findRecord(options.rows.value, key, options.rowKey())
     if (!record) return false
 
     if (editable.type !== 'multiple') {
-      for (const activeKey of options.editableKeys.value) {
-        if (activeKey !== key) cancel(activeKey)
+      if (options.editableKeys.value.some((activeKey) => activeKey !== key)) {
+        message.warning(
+          editable.onlyOneLineEditorAlertMessage ??
+            options.getMessage?.('editableTable.onlyOneLineEditor', '只能同时编辑一行') ??
+            '只能同时编辑一行',
+        )
+        return false
       }
     }
     if (!origins.has(key)) origins.set(key, cloneRecord(record))
@@ -201,7 +222,9 @@ export function useEditableTable<T extends Record<string, unknown>>(
 
     savingKeys.value = new Set(savingKeys.value).add(key)
     try {
-      const errors = await validateRecord(draft, options.columns())
+      const errors = options.validateRecord
+        ? await options.validateRecord(key, draft)
+        : await validateEditableRecord(draft, options.columns(), options.getMessage)
       validationErrors.value = mergeValidationErrors(validationErrors.value, key, errors)
       if (errors.size > 0) return false
 
@@ -268,6 +291,15 @@ export function useEditableTable<T extends Record<string, unknown>>(
     if (!options.editable()) return false
     const key = resolveRowKey(record, options.rowKey())
     if (key === undefined) return false
+    const config = options.editable()
+    if (config && config.type !== 'multiple' && options.editableKeys.value.length > 0) {
+      message.warning(
+        config.onlyAddOneLineAlertMessage ??
+          options.getMessage?.('editableTable.onlyAddOneLine', '只能新增一行') ??
+          '只能新增一行',
+      )
+      return false
+    }
     if (
       recordsInTree(options.rows.value).some((row) => resolveRowKey(row, options.rowKey()) === key)
     ) {
@@ -289,7 +321,12 @@ export function useEditableTable<T extends Record<string, unknown>>(
 
   const isCellEditable = (record: T, column: ProColumns<T>, index: number): boolean => {
     const key = resolveRowKey(record, options.rowKey())
-    if (!isEditing(key) || column.readonly || column.valueType === 'option') return false
+    if (
+      !isEditing(key) ||
+      column.readonly ||
+      resolveColumnValueType(column.valueType, record, index).type === 'option'
+    )
+      return false
     return typeof column.editable === 'function'
       ? column.editable(record, index)
       : column.editable !== false
@@ -317,9 +354,10 @@ export function useEditableTable<T extends Record<string, unknown>>(
   }
 }
 
-async function validateRecord<T extends Record<string, unknown>>(
+export async function validateEditableRecord<T extends Record<string, unknown>>(
   record: T,
   columns: ProColumns<T>[],
+  getMessage: (key: string, fallback: string) => string = (_key, fallback) => fallback,
 ): Promise<Map<string, string>> {
   const errors = new Map<string, string>()
   for (const column of flattenColumns(columns)) {
@@ -337,14 +375,17 @@ async function validateRecord<T extends Record<string, unknown>>(
     const value = getValue(record, column.dataIndex)
     for (const rule of rules) {
       if (rule.required && isEmpty(value)) {
-        errors.set(columnKey(column), rule.message ?? '此项为必填项')
+        errors.set(columnKey(column), rule.message ?? getMessage('form.required', '此项为必填项'))
         break
       }
       if (!rule.validator) continue
       try {
         const result = await rule.validator(rule, value, record)
         if (result === false) {
-          errors.set(columnKey(column), rule.message ?? '校验失败')
+          errors.set(
+            columnKey(column),
+            rule.message ?? getMessage('form.validationFailed', '校验失败'),
+          )
           break
         }
       } catch (error) {
@@ -354,7 +395,7 @@ async function validateRecord<T extends Record<string, unknown>>(
             ? error.message
             : typeof error === 'string'
               ? error
-              : (rule.message ?? '校验失败'),
+              : (rule.message ?? getMessage('form.validationFailed', '校验失败')),
         )
         break
       }

@@ -1,0 +1,96 @@
+// Copyright Ant Design Pro Components contributors. MIT license.
+import type { ProLocale } from './zh_CN'
+
+const enUS: ProLocale = {
+  moneySymbol: '$',
+  deleteThisLine: 'Delete this line',
+  copyThisLine: 'Copy this line',
+  form: {
+    required: 'This field is required',
+    validationFailed: 'Validation failed',
+    lightFilter: {
+      more: 'More',
+      clear: 'Clear',
+      confirm: 'Confirm',
+      itemUnit: 'Items',
+    },
+  },
+  field: {
+    colorPicker: {
+      recommended: 'Recommended',
+    },
+  },
+  tableForm: {
+    search: 'Query',
+    reset: 'Reset',
+    submit: 'Submit',
+    collapsed: 'Expand',
+    expand: 'Collapse',
+    inputPlaceholder: 'Please enter',
+    selectPlaceholder: 'Please select',
+  },
+  alert: {
+    clear: 'Clear',
+    selected: 'Selected',
+    item: 'Item',
+  },
+  pagination: {
+    total: {
+      range: ' ',
+      total: 'of',
+      item: 'items',
+    },
+  },
+  tableToolBar: {
+    leftPin: 'Pin to left',
+    rightPin: 'Pin to right',
+    noPin: 'Unpinned',
+    leftFixedTitle: 'Fixed to the left',
+    rightFixedTitle: 'Fixed to the right',
+    noFixedTitle: 'Not Fixed',
+    reset: 'Reset',
+    columnDisplay: 'Column Display',
+    columnSetting: 'Table Settings',
+    fullScreen: 'Full Screen',
+    exitFullScreen: 'Exit Full Screen',
+    reload: 'Refresh',
+    density: 'Density',
+    densityDefault: 'Default',
+    densityLarger: 'Larger',
+    densityMiddle: 'Middle',
+    densitySmall: 'Compact',
+  },
+  stepsForm: {
+    next: 'Next',
+    prev: 'Previous',
+    submit: 'Finish',
+  },
+  loginForm: {
+    submitText: 'Login',
+  },
+  editableTable: {
+    onlyOneLineEditor: 'Only one line can be edited',
+    onlyAddOneLine: 'Only one line can be added',
+    action: {
+      save: 'Save',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      add: 'add a row of data',
+    },
+  },
+  switch: {
+    open: 'open',
+    close: 'close',
+  },
+  captcha: {
+    getCaptcha: 'Get CAPTCHA',
+    retryAfter: 'Retry in {count}s',
+  },
+  upload: {
+    button: 'Click to upload',
+    drag: 'Click or drag a file to this area to upload',
+    description: 'Supports single or batch upload',
+  },
+}
+
+export default enUS

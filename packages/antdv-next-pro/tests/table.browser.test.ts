@@ -117,7 +117,7 @@ describe('EditableProTable browser interactions', () => {
     await nextTick()
     expect(wrapper.emitted('update:value')?.at(-1)?.[0]).toEqual([{ id: 1, name: 'Grace' }])
 
-    await wrapper.get('.antdv-next-pro__creator button').trigger('click')
+    await wrapper.get('[data-pro-table-record-creator] button').trigger('click')
     await flushPromises()
     expect(table.getRowsData()).toEqual([
       { id: 1, name: 'Grace' },

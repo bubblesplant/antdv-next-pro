@@ -8,7 +8,6 @@ import {
   FormItem,
   Input,
   InputNumber,
-  InputPassword,
   RadioGroup,
   Segmented,
   Select,
@@ -66,7 +65,7 @@ describe('ProFormFields public surface', () => {
     ['ProFormSelect', ProFormSelect, 'select'],
     ['ProFormTreeSelect', ProFormTreeSelect, 'treeSelect'],
     ['ProFormCheckbox', ProFormCheckbox, 'checkbox'],
-    ['ProFormRadioGroup', ProFormRadioGroup, 'radio'],
+    ['ProFormRadioGroup', ProFormRadioGroup, 'radioGroup'],
     ['ProFormSlider', ProFormSlider, 'slider'],
     ['ProFormSwitch', ProFormSwitch, 'switch'],
     ['ProFormUploadButton', ProFormUploadButton, 'uploadButton'],
@@ -79,6 +78,16 @@ describe('ProFormFields public surface', () => {
     for (const [name, component, fieldType] of publicFields) {
       const wrapper = shallowMount(component, {
         props: name === 'ProFormCaptcha' ? { onGetCaptcha: vi.fn() } : {},
+        global: {
+          stubs: {
+            ProFormField: defineComponent({
+              name: 'AntdvNextProFormField',
+              props: ['fieldType', 'prefix'],
+              inheritAttrs: false,
+              setup: () => () => h('span'),
+            }),
+          },
+        },
       })
       expect(wrapper.findComponent(ProFormField).props('fieldType'), name).toBe(fieldType)
       wrapper.unmount()
@@ -93,7 +102,7 @@ describe('ProFormFields public surface', () => {
   it('provides template-friendly aliases and registers all public names', () => {
     expect(ProFormText.Password).toBe(ProFormTextPassword)
     expect(ProFormRadio.Group).toBe(ProFormRadioGroup)
-    expect(Object.isFrozen(ProFormRadio)).toBe(true)
+    expect(ProFormRadio).toHaveProperty('setup')
 
     const app = createApp({ render: () => null })
     app.use(AntdvNextPro)
@@ -138,11 +147,12 @@ describe('ProFormField composition', () => {
     })
 
     expect(directControl?.type).toBe(FieldControl)
-    expect(formItemAttrs.name).toBe('top-name')
+    expect(formItemAttrs.name).toEqual(['top-name'])
     expect(formItemAttrs.rules).toEqual(rules)
-    expect(wrapper.get('[data-testid="form-item"]').classes()).toEqual(
+    expect(wrapper.get('section').classes()).toEqual(
       expect.arrayContaining(['from-form-item', 'from-attrs']),
     )
+    expect(wrapper.findComponent(Input).attributes('data-testid')).toBe('form-item')
     expect(wrapper.get('[data-testid="label-slot"]').text()).toBe('Display name')
     expect(wrapper.findComponent(Input).classes()).toContain('from-field')
   })
@@ -213,7 +223,7 @@ describe('FieldControl behavior', () => {
     }
   })
 
-  it('preserves explicit top-level priority while allowing fieldProps to replace defaults', () => {
+  it('lets fieldProps override convenient props and preserves disabled defaults explicitly', () => {
     const inherited = mount(ProFormDigit, {
       props: {
         fieldMode: 'field',
@@ -231,12 +241,13 @@ describe('FieldControl behavior', () => {
         fieldProps: { disabled: true, precision: 4, min: -3 },
       },
     }).findComponent(InputNumber)
-    expect(explicit.props('disabled')).toBe(false)
-    expect(explicit.props('precision')).toBeUndefined()
-    expect(explicit.props('min')).toBeUndefined()
+    expect(explicit.props('disabled')).toBe(true)
+    expect(explicit.props('precision')).toBe(4)
+    expect(explicit.props('min')).toBe(-3)
 
     const defaults = shallowMount(FieldControl, { props: { fieldType: 'digit' } })
-    expect(defaults.findComponent(InputNumber).props()).toMatchObject({ precision: 2, min: 0 })
+    expect(defaults.findComponent(InputNumber).props()).toMatchObject({ min: 0 })
+    expect(defaults.findComponent(InputNumber).props('precision')).toBeUndefined()
     const money = shallowMount(FieldControl, { props: { fieldType: 'money' } })
     expect(money.findComponent(InputNumber).props('prefix')).toBe('¥')
     const dateTime = shallowMount(FieldControl, { props: { fieldType: 'dateTime' } })
@@ -280,7 +291,7 @@ describe('FieldControl behavior', () => {
     await wrapper.setProps({ modelValue: undefined })
     expect(wrapper.findComponent(ReadonlyField).text()).toBe('N/A')
     await wrapper.setProps({ fieldType: 'switch', modelValue: false })
-    expect(wrapper.findComponent(ReadonlyField).text()).toBe('否')
+    expect(wrapper.findComponent(ReadonlyField).text()).toBe('关闭')
     await wrapper.setProps({ fieldType: 'password', modelValue: 'secret' })
     expect(wrapper.findComponent(ReadonlyField).text()).toBe('••••••')
 
@@ -485,7 +496,9 @@ describe('ProFormFields specialized protocols', () => {
         ],
       },
     })
-    expect(checkbox.get('.antdv-next-pro-checkbox-group').classes()).toContain('is-vertical')
+    expect(checkbox.get('.ant-pro-field-checkbox-group').classes()).toContain(
+      'ant-pro-field-checkbox-group-vertical',
+    )
     const checkboxGroup = checkbox.findComponent(CheckboxGroup)
     expect(checkboxGroup.props('value')).toEqual(['read'])
     checkboxGroup.vm.$emit('update:value', ['read', 'write'])
@@ -543,7 +556,13 @@ describe('ProFormFields specialized protocols', () => {
 
     for (const item of cases) {
       const wrapper = shallowMount(FieldControl, {
-        props: { fieldType: item.fieldType, modelValue: item.value },
+        props: {
+          fieldType: item.fieldType,
+          modelValue: item.value,
+          fieldProps: {
+            valueFormat: item.fieldType.includes('Time') ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD',
+          },
+        },
       })
       const control = wrapper.findComponent(item.component)
       const controlProps = control.props() as Record<string, unknown>

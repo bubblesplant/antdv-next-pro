@@ -4,15 +4,16 @@ pageClass: component-doc
 
 <script setup>
 import ProFormFieldsDemo from '../examples/ProFormFieldsDemo.vue'
+import ProFormFieldsExtendedDemo from '../examples/ProFormFieldsExtendedDemo.vue'
 </script>
 
 # ProFormFields
 
-19 个独立字段组件为普通表单、自定义布局、ProTable 搜索与行内编辑、SchemaForm 提供同一套值绑定、选项请求和只读展示协议。默认组件自带 Antdv Next `FormItem`；需要只渲染控件时使用 `fieldMode="field"`。
+独立字段组件为普通表单、自定义布局、ProTable 搜索与行内编辑、SchemaForm 提供同一套值绑定、选项请求和只读展示协议。原有 19 个字段保持公开，并增加日期变体、时间、级联、颜色、评分、数字区间等字段。默认组件自带 Antdv Next `FormItem`；只渲染控件使用 `fieldMode="field"` 或 `ignoreFormItem`。
 
 ## 完整字段示例
 
-下面的 Vue SFC 示例实际渲染全部 19 个公开字段，并演示只读态、异步选项、验证码回调、上传入口和裸控件模式。
+下面的 Vue SFC 示例实际渲染原有 19 个字段，并演示只读态、异步选项、验证码回调、上传入口和裸控件模式。
 
 <ClientOnly>
   <ProFormFieldsDemo />
@@ -27,7 +28,7 @@ import ProFormFieldsDemo from '../examples/ProFormFieldsDemo.vue'
 
 ## 导入与命名
 
-19 个模板友好名称均支持具名导入；安装默认插件后也会注册为同名全局组件。
+原有 19 个模板友好名称均支持具名导入；安装默认插件后也会注册为同名全局组件。
 
 ```ts
 import {
@@ -58,9 +59,16 @@ import {
 ```ts
 ProFormText.Password === ProFormTextPassword
 ProFormRadio.Group === ProFormRadioGroup
+ProFormCheckbox.Group === ProFormCheckboxGroup
+ProFormDatePicker.Week === ProFormDateWeekPicker
+ProFormDatePicker.Month === ProFormDateMonthPicker
+ProFormDatePicker.Quarter === ProFormDateQuarterPicker
+ProFormDatePicker.Year === ProFormDateYearPicker
+ProFormTimePicker.RangePicker === ProFormTimeRangePicker
+ProFormSelect.SearchSelect === ProFormSearchSelect
 ```
 
-Vue 模板推荐直接使用 `ProFormTextPassword` 和 `ProFormRadioGroup`。`ProFormRadio` 是只读命名空间对象，不是第 20 个字段组件，也不会作为带点名称全局注册。
+Vue 模板也可直接使用具名组件。`ProFormRadio` 本身是可渲染的原子 Radio，支持布尔 `v-model`；`.Group` 是单选组，`.Button` 是原生 RadioButton。插件注册具名组件，不注册带点名称。
 
 ## 通用 API
 
@@ -103,13 +111,17 @@ Vue 模板推荐直接使用 `ProFormTextPassword` 和 `ProFormRadioGroup`。`Pr
 
 同名普通属性按以下顺序取值：
 
-1. 组件顶层显式属性。
-2. `fieldProps` 或 `formItemProps` 中的同名属性。
+1. 控件属性优先使用 `fieldProps` 中的显式配置。
+2. 组件顶层便利控件属性。
 3. 组件默认值。
 
-因此顶层 `disabled` 会覆盖 `fieldProps.disabled`，顶层 `label` 会覆盖 `formItemProps.label`。内部受控值与更新监听器始终由字段核心写入，使用者回调会被组合，不会覆盖 `v-model` 更新。
+因此 `fieldProps.disabled`、`fieldProps.placeholder`、`fieldProps.min` 等优先于顶层同义配置。FormItem 的顶层 `name` / `label` / `rules` 优先于 `formItemProps`。内部受控值与更新监听器始终由字段核心写入，使用者回调会被组合，不会覆盖 `v-model` 更新。
 
-`fieldProps.class/style` 作用于基础控件，`formItemProps.class/style` 作用于 FormItem。普通 `class`、`style`、`data-*` 和 `aria-*` 在表单项模式落到 FormItem，在 `field` 模式落到基础控件。
+`fieldProps.class/style` 作用于基础控件，`formItemProps.class/style` 作用于 FormItem。普通 `class`、`style` 和表单项属性落到 FormItem；`placeholder`、`max`、`data-*`、`aria-*` 等控件属性进入基础控件。`field` 模式下 class/style 也进入控件。
+
+`classes` / `styles` 支持对象或 `({ props }) => ({ root: ... })`；`root` 定制当前模式的根，`control` 定制基础控件。UploadButton 还提供 `button`，UploadDragger 提供 `icon`、`title`、`description`。旧 `classNames` 补充 classes 未指定的部位；同部位以 classes 为准。原生 Upload 将 class 放在包装层、style 放在上传触发区，`field` 模式下也保留该原生行为。
+
+`width` 接受像素数字及 xs/sm/md/lg/xl（104/216/328/440/552px）。在 ProForm 内，`name` 连接表单 store，`convertValue` 处理输入，`transform` 处理格式化提交；`proFieldProps.mode='read'` 可指定只读。
 
 ### `v-model` 桥接
 
@@ -144,6 +156,7 @@ Vue 模板推荐直接使用 `ProFormTextPassword` 和 `ProFormRadioGroup`。`Pr
 - UploadDragger 的默认插槽替换拖拽区内容。
 - 选项类组件通过 ref 暴露 `refresh(): Promise<void>`。
 - Captcha 通过 ref 暴露 `resetCountdown(): void`。
+- Captcha 同时提供 `focus()`、`startTiming()`、`endTiming()`；旧 resetCountdown 为停止倒计时的兼容入口。
 
 ## 选项、请求与只读
 
@@ -167,6 +180,7 @@ Select、TreeSelect、Checkbox 组、RadioGroup 与 Segmented 使用相同协议
 - 没有 `request` 时，优先级为顶层 `options` → `fieldProps.options`（TreeSelect 为 `treeData`）→ `valueEnum`。
 - 请求失败保留最后一次成功结果；从未成功时保留本地回退，并触发 `requestError`。
 - `request` 或 `params` 变化会刷新；并发时只有最后一次请求可以更新状态。
+- 原生远程搜索传入 `{ ...params, keyWords }`；`searchValue`、`debounceTime`、`proFieldKey`、`cacheForSwr` 控制受控关键词、防抖与作用域缓存，卸载或过期响应不会覆盖新状态。
 
 选项会按 `label ?? text ?? title ?? name ?? value` 解析标签，按 `value ?? key ?? id` 解析值。若 `valueEnum` 需要严格保留数值 key，请使用 `ReadonlyMap`，或在枚举项中显式写 `value`：
 
@@ -197,7 +211,7 @@ const alternate = {
 
 ### ProFormDigit
 
-数值字段，`modelValue` 为 `number | string | null`。默认 `min=0`、`precision=2`；顶层 `min` / `precision` 优先于 `fieldProps`，传 `false` 可不向 InputNumber 下发对应限制。
+数值字段，`modelValue` 为 `number | string | null`。默认 `min=0`，不指定精度；`fieldProps.min` / `fieldProps.precision` 优先于顶层同义配置，传 `false` 可不向 InputNumber 下发对应限制。顶层 `max` 也会进入控件。
 
 ```vue
 <ProFormDigit v-model="count" :min="false" :precision="0" />
@@ -213,21 +227,21 @@ const alternate = {
 
 ### ProFormCaptcha
 
-验证码输入由 Input 与发送按钮组成。`onGetCaptcha` 必填；`countDown` 默认 60 秒，按钮默认文案为“获取验证码”。回调 resolve 且结果不为 `false` 时开始倒计时，reject 或 `false` 会恢复按钮并触发 `captchaError`。
+验证码输入由 Input 与发送按钮组成。`onGetCaptcha(phone)` 必填；`countDown` 默认 60 秒，按钮文案读取 intl。指定 `phoneName` 时先校验 ProForm 对应字段，再取手机号传入回调；失败不发送。回调 resolve 且结果不为 `false` 时开始倒计时，reject 或 `false` 会恢复按钮并触发 `captchaError`。
 
-组件不读取手机号、不发送网络请求、不持久化验证码；业务侧必须提供 `onGetCaptcha`。loading、倒计时、disabled、readonly 任一成立时都会阻止重复点击。
+`captchaTextRender(timing, count)` 定制按钮文案，`captchaProps` 配置按钮，`onTiming(count)` 接收倒计时。业务侧提供网络请求；loading、倒计时、disabled、readonly 任一成立时阻止重复点击，卸载会清理计时器。
 
 ### ProFormDatePicker
 
-日期选择器，值保持 Antdv Next 的 Dayjs 协议，不自动转换为字符串或原生 Date。格式、禁用日期、面板等属性通过 `fieldProps` 传入。
+日期选择器接受 Dayjs、日期字符串、数值时间戳和 Date 输入，未配置 `valueFormat` 时内部转为 Dayjs；配置后保留原生字符串协议。输出遵循原生组件协议，提交格式转换由 ProForm 的 dateFormatter/transform 控制。格式、禁用日期、面板等属性通过 `fieldProps` 传入。
 
 ### ProFormDateTimePicker
 
-日期时间选择器，值保持 Dayjs；默认 `showTime=true`，可通过顶层 `showTime` 或 `fieldProps.showTime` 传入具体配置。
+日期时间选择器使用相同日期值协议；默认 `showTime=true`，`fieldProps.showTime` 优先于顶层 `showTime`。
 
 ### ProFormDateRangePicker
 
-日期区间选择器，值为 Dayjs 区间或 `null`；清空时不会合成空字符串。范围预设、禁用日期等通过 `fieldProps` 传入。
+日期区间选择器使用相同日期值协议，支持区间数组或 `null`；清空时不会合成空字符串。范围预设、禁用日期等通过 `fieldProps` 传入。
 
 ### ProFormDateTimeRangePicker
 
@@ -247,7 +261,7 @@ const alternate = {
 
 ### ProFormRadioGroup
 
-单选组，共用选项请求协议；方向、button style 等能力通过底层 RadioGroup 的 `fieldProps` 使用。模板推荐 `ProFormRadioGroup`，同时提供 `ProFormRadio.Group` 命名关系。
+单选组，共用选项请求协议；`radioType="button"` 使用按钮样式，`layout="vertical"` 垂直排列，`fieldProps` 同义配置优先。模板可用 `ProFormRadioGroup` 或 `ProFormRadio.Group`。
 
 ### ProFormSlider
 
@@ -269,7 +283,7 @@ const alternate = {
 
 ### ProFormMoney
 
-金额字段，`modelValue` 为 `number | string | null`。默认前缀为 `¥`；顶层 `prefix` 或 `fieldProps.prefix` 可覆盖，传 `false` 可关闭。`formatter`、`parser`、`stringMode` 直接透传给 InputNumber。
+金额字段，`modelValue` 为 `number | string | null`。默认两位小数并读取 intl 的 locale；`locale`、`customSymbol`、`moneySymbol`、`numberFormatOptions` 控制分隔符、符号和精度。`prefix=false` 或 `moneySymbol=false` 关闭符号；同义 `fieldProps` 配置优先。原始受控数值不被格式化污染，原生 `formatter`、`parser`、`stringMode` 仍可定制。
 
 ### ProFormSegmented
 
@@ -283,4 +297,22 @@ const alternate = {
 - SchemaForm 保留自己的 FormItem、嵌套路径、动态插槽和组合字段，仅默认控件分支复用裸控件核心。
 - EditableProTable 通过 ProTable 间接复用，不创建第三套字段映射。
 
-本期 `valueType` 新增 `treeSelect`、`slider`、`segmented`。Captcha、UploadButton、UploadDragger 只作为独立组件提供，不映射为 `valueType`，也不内置后端。
+ProField 的 42 个内置类型和三种模式见 [ProField](./pro-field.md)。Captcha、UploadButton、UploadDragger 只作为独立组件提供，不映射为 `valueType`，也不内置后端。
+
+## 增强字段与组合成员
+
+<ClientOnly><ProFormFieldsExtendedDemo /></ClientOnly>
+
+<<< ../examples/ProFormFieldsExtendedDemo.vue
+
+| 字段                                          | 值与行为                                                                                |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ProFormCascader                               | 级联路径数组；支持 options/request、清空与只读标签                                      |
+| ProFormColorPicker                            | 原生颜色值；只读使用原生颜色触发器并保持弹层关闭                                        |
+| ProFormRate                                   | 原生评分数值；只读禁用评分展示                                                          |
+| ProFormDigitRange                             | `[number \| null, number \| null]`；两个独立数字输入，单端清空保留另一端                |
+| ProFormTimePicker / ProFormTimeRangePicker    | 原生时间及区间协议；字符串输入转换与 valueFormat 同日期字段                             |
+| ProFormDateWeek/Month/Quarter/YearPicker      | 日期值协议，默认设置对应 picker                                                         |
+| ProFormDateWeek/Month/Quarter/YearRangePicker | 日期区间协议，默认设置对应 picker                                                       |
+| ProFormCheckboxGroup                          | 始终渲染 CheckboxGroup，`ProFormCheckbox.Group` 指向同一组件                            |
+| ProFormSearchSelect                           | 默认 multiple、labelInValue、showSearch；`mode="single"` 切为单选，同义 fieldProps 优先 |

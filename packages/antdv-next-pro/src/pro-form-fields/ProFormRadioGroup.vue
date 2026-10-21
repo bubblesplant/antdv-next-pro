@@ -21,7 +21,7 @@ defineExpose({ refresh })
 <template>
   <ProFormField
     ref="fieldRef"
-    field-type="radio"
+    field-type="radioGroup"
     v-bind="{ ...explicitProps(), ...$attrs }"
     @update:model-value="emit('update:modelValue', $event as ProFormRadioGroupProps['modelValue'])"
     @change="(...args) => emit('change', ...args)"

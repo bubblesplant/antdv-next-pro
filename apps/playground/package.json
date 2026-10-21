@@ -11,7 +11,9 @@
   "dependencies": {
     "@bubblesjs/antv-next-pro": "workspace:*",
     "antdv-next": "catalog:",
-    "vue": "catalog:"
+    "fflate": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

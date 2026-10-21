@@ -4,15 +4,16 @@ pageClass: component-doc
 
 <script setup>
 import ProFormFieldsDemo from '../../examples/ProFormFieldsDemo.vue'
+import ProFormFieldsExtendedDemo from '../../examples/ProFormFieldsExtendedDemo.vue'
 </script>
 
 # ProFormFields
 
-Nineteen standalone field components give regular forms, custom layouts, ProTable search and inline editing, and SchemaForm one value-binding, option-request, and readonly-display protocol. A field includes an Antdv Next `FormItem` by default; use `fieldMode="field"` when only the control should render.
+Standalone fields give regular forms, custom layouts, ProTable search and inline editing, and SchemaForm one value-binding, option-request and readonly-display protocol. The original 19 fields remain available, alongside new date/time variants, cascader, color, rate and numeric-range fields. A field includes an Antdv Next `FormItem` by default; use `fieldMode="field"` or `ignoreFormItem` for a bare control.
 
 ## Complete field demo
 
-This Vue SFC renders all 19 public fields and demonstrates readonly state, async options, the captcha callback, upload entry points, and bare-control mode.
+This Vue SFC renders the original 19 fields and demonstrates readonly state, async options, the captcha callback, upload entry points, and bare-control mode.
 
 <ClientOnly>
   <ProFormFieldsDemo />
@@ -58,9 +59,16 @@ The package also provides names matching the composed Ant Design Pro Components 
 ```ts
 ProFormText.Password === ProFormTextPassword
 ProFormRadio.Group === ProFormRadioGroup
+ProFormCheckbox.Group === ProFormCheckboxGroup
+ProFormDatePicker.Week === ProFormDateWeekPicker
+ProFormDatePicker.Month === ProFormDateMonthPicker
+ProFormDatePicker.Quarter === ProFormDateQuarterPicker
+ProFormDatePicker.Year === ProFormDateYearPicker
+ProFormTimePicker.RangePicker === ProFormTimeRangePicker
+ProFormSelect.SearchSelect === ProFormSearchSelect
 ```
 
-Prefer `ProFormTextPassword` and `ProFormRadioGroup` in Vue templates. `ProFormRadio` is a readonly namespace object, not a twentieth field, and no dotted global component name is registered.
+Named components work directly in Vue templates. `ProFormRadio` is a renderable atomic Radio with boolean `v-model`; `.Group` is a group and `.Button` exposes the native RadioButton. The plugin registers named components, without dotted global names.
 
 ## Common API
 
@@ -103,13 +111,17 @@ Use bare-control mode when a parent already owns the FormItem, or when the field
 
 Ordinary properties resolve in this order:
 
-1. Explicit top-level component prop.
-2. The same key in `fieldProps` or `formItemProps`.
+1. Explicit control configuration in `fieldProps`.
+2. Top-level convenience control props.
 3. Component default.
 
-Top-level `disabled` therefore overrides `fieldProps.disabled`, and top-level `label` overrides `formItemProps.label`. The field core always owns controlled value props and update listeners; consumer handlers are composed with, not substituted for, `v-model` updates.
+For example, `fieldProps.disabled`, `fieldProps.placeholder` and `fieldProps.min` win over matching convenience props. Top-level FormItem `name` / `label` / `rules` win over `formItemProps`. The field core owns controlled value props and update listeners; consumer handlers are composed with `v-model` updates.
 
-`fieldProps.class/style` targets the base control, while `formItemProps.class/style` targets FormItem. Plain `class`, `style`, `data-*`, and `aria-*` attrs target FormItem in form-item mode and the base control in `field` mode.
+`fieldProps.class/style` targets the control and `formItemProps.class/style` targets FormItem. Plain class/style and form-item attributes target FormItem; placeholder, max, data-* and aria-* reach the control. In bare mode class/style also reach the control.
+
+`classes` / `styles` accept objects or `({ props }) => ({ root: ... })`. `root` styles the current mode's root, and `control` styles the native control. UploadButton also exposes `button`; UploadDragger exposes `icon`, `title` and `description`. Legacy `classNames` fills parts missing from classes; classes wins for matching parts. Native Upload puts class on its wrapper and style on its upload trigger; bare mode preserves this native behavior.
+
+`width` accepts pixel numbers or xs/sm/md/lg/xl (104/216/328/440/552px). Within ProForm, `name` connects to the form store, `convertValue` handles incoming values and `transform` handles formatted submission. `proFieldProps.mode='read'` selects readonly mode.
 
 ### `v-model` bridges
 
@@ -144,6 +156,7 @@ The base event order is internal model update → `fieldProps` handler → wrapp
 - UploadDragger's default slot replaces the drag area.
 - Option fields expose `refresh(): Promise<void>` through a component ref.
 - Captcha exposes `resetCountdown(): void`.
+- Captcha also exposes `focus()`, `startTiming()` and `endTiming()`; resetCountdown remains a compatibility stop/reset method.
 
 ## Options, requests, and readonly display
 
@@ -167,6 +180,7 @@ Select, TreeSelect, Checkbox groups, RadioGroup, and Segmented share one protoco
 - Without `request`, precedence is top-level `options` → `fieldProps.options` (or `treeData` for TreeSelect) → `valueEnum`.
 - A failure preserves the last successful result. Before any success, it preserves the local fallback and emits `requestError`.
 - Changing `request` or `params` refreshes options. Only the newest concurrent request may update state.
+- Remote search passes `{ ...params, keyWords }`. `searchValue`, `debounceTime`, `proFieldKey` and `cacheForSwr` control keywords, debounce and scoped caching. Stale or unmounted requests cannot overwrite current state.
 
 Options use `label ?? text ?? title ?? name ?? value` as the label and `value ?? key ?? id` as the value. To preserve numeric `valueEnum` keys strictly, use a `ReadonlyMap` or set `value` explicitly:
 
@@ -197,7 +211,7 @@ A single-line text field with `string | undefined` model values and an Input bas
 
 ### ProFormDigit
 
-A numeric field with `number | string | null` values. It defaults to `min=0` and `precision=2`. Top-level `min` / `precision` win over `fieldProps`; pass `false` to omit either constraint.
+A numeric field with `number | string | null` values. It defaults to `min=0` with no fixed precision. Matching `fieldProps.min` / `fieldProps.precision` win over convenience props; pass `false` to omit either constraint. Top-level max also reaches InputNumber.
 
 ```vue
 <ProFormDigit v-model="count" :min="false" :precision="0" />
@@ -213,21 +227,21 @@ A multiline `string | undefined` field. Pass `rows`, `autoSize`, `maxlength`, an
 
 ### ProFormCaptcha
 
-An Input and send-button composition. `onGetCaptcha` is required, `countDown` defaults to 60 seconds, and the default button text is “获取验证码”. A resolved result other than `false` starts the countdown; rejection or `false` restores the button and emits `captchaError`.
+An Input and send-button composition. `onGetCaptcha(phone)` is required and countDown defaults to 60 seconds. Button text follows intl. With phoneName, the field first validates that ProForm path, then passes its phone value; failed validation prevents sending. A resolved result other than false starts the countdown; rejection or false restores the button and emits captchaError.
 
-The component does not read phone numbers, send a built-in request, or persist codes. The consumer must implement `onGetCaptcha`. Loading, countdown, disabled, and readonly states all prevent repeated sends.
+`captchaTextRender(timing, count)` customizes text, captchaProps configures the button and onTiming receives countdown values. The consumer implements the network request. Loading, countdown, disabled and readonly prevent repeated sends; unmount cleans the timer.
 
 ### ProFormDatePicker
 
-A date picker that preserves Antdv Next's Dayjs value protocol. It does not convert to strings or native Date values. Pass formatting, disabled dates, and panel props through `fieldProps`.
+A date picker accepting Dayjs, string, timestamp and Date inputs. Without valueFormat it converts control input to Dayjs; with valueFormat it retains the native string protocol. Output follows the native picker; ProForm dateFormatter/transform controls submission conversion. Pass formatting, disabled dates and panel props through fieldProps.
 
 ### ProFormDateTimePicker
 
-A Dayjs date-time picker with `showTime=true` by default. Override it with top-level `showTime` or a concrete `fieldProps.showTime` configuration.
+A date-time picker using the same date-value protocol, with showTime=true by default. fieldProps.showTime wins over top-level showTime.
 
 ### ProFormDateRangePicker
 
-A Dayjs range value or `null`. Clearing does not synthesize an empty string. Range presets, disabled dates, and related props pass through `fieldProps`.
+The same date-value protocol applied to a range array or null. Clearing does not synthesize an empty string. Range presets and disabled dates pass through fieldProps.
 
 ### ProFormDateTimeRangePicker
 
@@ -247,7 +261,7 @@ Without an option source, it renders a single Checkbox and bridges native `check
 
 ### ProFormRadioGroup
 
-A RadioGroup using the shared option-request protocol. Native orientation and button-style capabilities pass through `fieldProps`. Prefer `ProFormRadioGroup` in templates; `ProFormRadio.Group` is also exported.
+A RadioGroup using the shared option-request protocol. radioType="button" selects button options; layout="vertical" stacks options. Matching fieldProps settings take precedence. Both ProFormRadioGroup and ProFormRadio.Group are available.
 
 ### ProFormSlider
 
@@ -269,7 +283,7 @@ A drag-and-drop upload entry point with the same `UploadFile[]`, `fileList`, and
 
 ### ProFormMoney
 
-A `number | string | null` amount field. The prefix defaults to `¥`; top-level `prefix` or `fieldProps.prefix` can override it, and `false` disables it. `formatter`, `parser`, and `stringMode` pass to InputNumber.
+A number/string/null amount field with two decimal places by default and locale inherited from intl. locale, customSymbol, moneySymbol and numberFormatOptions control separators, symbols and precision. prefix=false or moneySymbol=false hides the symbol. fieldProps wins on matching settings. Formatting preserves the raw controlled value; native formatter, parser and stringMode remain customizable.
 
 ### ProFormSegmented
 
@@ -283,4 +297,22 @@ Standalone fields and higher-level components use the same registry and FieldCon
 - SchemaForm keeps its own FormItem, nested paths, dynamic slots, and composition fields while its default-control branch uses the bare field core.
 - EditableProTable reuses the core through ProTable instead of maintaining a third field map.
 
-This release adds `treeSelect`, `slider`, and `segmented` to `valueType`. Captcha, UploadButton, and UploadDragger remain standalone-only components: they have no `valueType` mapping and no built-in backend.
+See [ProField](./pro-field.md) for 42 built-in valueTypes and their three modes. Captcha, UploadButton and UploadDragger remain standalone-only fields without a valueType mapping or built-in backend.
+
+## Additional fields and composed members
+
+<ClientOnly><ProFormFieldsExtendedDemo /></ClientOnly>
+
+<<< ../../examples/ProFormFieldsExtendedDemo.vue
+
+| Field                                         | Values and behavior                                                                                             |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ProFormCascader                               | Cascaded path arrays; options/request, clearing and readonly labels                                             |
+| ProFormColorPicker                            | Native color values; the readonly native color trigger keeps its popup closed                                   |
+| ProFormRate                                   | Numeric ratings; disabled rating display in read mode                                                           |
+| ProFormDigitRange                             | `[number \| null, number \| null]`; independently editable endpoints                                            |
+| ProFormTimePicker / ProFormTimeRangePicker    | Native time/range protocol; string normalization and valueFormat follow date fields                             |
+| ProFormDateWeek/Month/Quarter/YearPicker      | Date values with the corresponding picker default                                                               |
+| ProFormDateWeek/Month/Quarter/YearRangePicker | Range values with the corresponding picker default                                                              |
+| ProFormCheckboxGroup                          | Always renders CheckboxGroup; also available as ProFormCheckbox.Group                                           |
+| ProFormSearchSelect                           | Defaults to multiple, labelInValue and showSearch; mode="single" selects one item; fieldProps wins on conflicts |

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 
-import { getCurrentInstance } from 'vue'
+import { resolveColumnValueType } from './valueType'
+import { computed, getCurrentInstance } from 'vue'
+import { ProField } from '../pro-field'
+import { useProConfig } from '../provider/context'
 
 import FieldControl from '../pro-form-fields/FieldControl.vue'
 import { hasExplicitProp, type ProFormControlType } from '../pro-form-fields/fieldRegistry'
@@ -32,6 +35,8 @@ const emit = defineEmits({
 })
 
 const instance = getCurrentInstance()
+const config = useProConfig()
+const registeredType = computed(() => Boolean(config.valueTypeMap.value[resolveFieldType()]))
 
 function resolveColumn(): ProColumns<Record<string, unknown>> {
   return props.column as ProColumns<Record<string, unknown>>
@@ -39,7 +44,7 @@ function resolveColumn(): ProColumns<Record<string, unknown>> {
 
 function resolveFieldType(): ProFormControlType {
   const valueType = resolveColumn().valueType
-  if (valueType !== undefined) return valueType
+  if (valueType !== undefined) return resolveColumnValueType(valueType, {}, 0).type
   return props.options.length > 0 || resolveColumn().valueEnum !== undefined ? 'select' : 'text'
 }
 
@@ -70,7 +75,18 @@ function resolveControlProps(): Record<string, unknown> {
 </script>
 
 <template>
+  <ProField
+    v-if="registeredType"
+    v-bind="$attrs"
+    :value-type="resolveColumnValueType(resolveColumn().valueType, {}, 0)"
+    mode="edit"
+    :model-value="props.value"
+    :field-props="props.fieldProps"
+    :options="props.options"
+    @update:model-value="emit('update:value', $event)"
+  />
   <FieldControl
+    v-else
     v-bind="{ ...resolveControlProps(), ...$attrs }"
     @update:model-value="emit('update:value', $event)"
   >

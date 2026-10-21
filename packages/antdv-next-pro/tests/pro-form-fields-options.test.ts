@@ -269,7 +269,7 @@ describe('readonly formatting', () => {
     ).toBe('One')
     expect(formatReadonlyValue(['start', 'end'], { type: 'dateRange' })).toBe('start ~ end')
     expect(formatReadonlyValue('secret', { type: 'password' })).toBe('••••••')
-    expect(formatReadonlyValue(12, { type: 'money' })).toBe('¥12')
+    expect(formatReadonlyValue(12, { type: 'money' })).toBe('¥12.00')
     expect(formatReadonlyValue(dateLike, { type: 'date' })).toBe('2026-09-14')
     expect(
       formatReadonlyValue([{ name: 'a.txt' }, { fileName: 'b.txt' }], { type: 'upload' }),

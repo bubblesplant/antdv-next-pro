@@ -118,7 +118,9 @@ The component ref exposes `getSortFilter()` to read a defensive copy of the curr
 
 ### Column state and settings
 
-The built-in column settings panel in the toolbar only toggles visibility. Control column order and fixed placement programmatically with `order` and `fixed` under each column key in `columnsState` (the column `key` takes precedence, otherwise `dataIndex` is used):
+Column settings use the native `Popover` and support visibility (including action columns), select all, reset, and drag sorting within the same column group. Focus a drag handle and use the up/down arrow keys to reorder with the keyboard. Reset restores `columnsState.defaultValue`, or the column definitions when no defaults are configured. The density `Popover` offers loose, middle, and compact options and highlights the current selection.
+
+Control visibility, order, and fixed placement programmatically with `show`, `order`, and `fixed` under each column key in `columnsState` (the column `key` takes precedence, otherwise `dataIndex` is used):
 
 ```ts
 const columnsState = ref<Record<string, ProColumnsState>>({
@@ -141,7 +143,7 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 <ProTable :columns-state="tableColumnsState" />
 ```
 
-Pair `value` with `onChange` for fully controlled state, or use `defaultValue` for an uncontrolled initial state. With `persistenceKey`, the state can be stored in `localStorage` or `sessionStorage`, including `show` changes made by the panel and programmatic `order` / `fixed` values.
+Pair `value` with `onChange` for fully controlled state, or use `defaultValue` for an uncontrolled initial state. With `persistenceKey`, the state can be stored in `localStorage` or `sessionStorage`, including `show` / `order` changes made by the panel and programmatic `fixed` values.
 
 ### Built-in editing
 

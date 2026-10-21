@@ -1,10 +1,10 @@
 import { createApp } from 'vue'
-import Antd from 'antdv-next'
 
+import App from './App.vue'
+import { router } from './router'
 import 'antdv-next/dist/reset.css'
+
 import '../../../packages/antdv-next-pro/src/style.css'
 import './style.css'
 
-import App from './App.vue'
-
-createApp(App).use(Antd).mount('#app')
+createApp(App).use(router).mount('#app')

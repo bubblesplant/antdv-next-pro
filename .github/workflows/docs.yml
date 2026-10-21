@@ -1,4 +1,4 @@
-name: Docs
+name: Docs and Playground
 
 on:
   push:
@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - apps/docs/**
+      - apps/playground/**
       - packages/antdv-next-pro/src/**
       - packages/antdv-next-pro/package.json
       - packages/antdv-next-pro/vite.config.ts
       - package.json
       - pnpm-lock.yaml
       - pnpm-workspace.yaml
+      - vite.config.ts
       - .github/workflows/docs.yml
   workflow_dispatch:
 
@@ -24,7 +26,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Build and publish documentation branch
+    name: Build and publish docs and Playground
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -50,6 +52,14 @@ jobs:
 
       - name: Build VitePress
         run: pnpm docs:build
+
+      - name: Build Playground
+        run: pnpm --filter playground build
+
+      - name: Include Playground in the documentation site
+        run: |
+          mkdir -p apps/docs/.vitepress/dist/playground
+          cp -R apps/playground/dist/. apps/docs/.vitepress/dist/playground/
 
       - name: Publish gh-pages branch
         uses: peaceiris/actions-gh-pages@v4

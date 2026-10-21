@@ -1,0 +1,134 @@
+{
+  "checkedAt": "2026-10-21T11:30:20.984Z",
+  "baseURL": "http://127.0.0.1:9903",
+  "checks": [
+    {
+      "route": "/pro-list/projects",
+      "demo": "pro-list",
+      "passed": true,
+      "steps": [
+        {
+          "name": "初次请求与两条分页",
+          "passed": true
+        },
+        {
+          "name": "受控勾选与清空",
+          "passed": true
+        },
+        {
+          "name": "翻页并展开记录",
+          "passed": true
+        },
+        {
+          "name": "查询、重置与重新加载",
+          "passed": true
+        },
+        {
+          "name": "详情操作与基础卡片键盘交互",
+          "passed": true
+        }
+      ],
+      "browserErrors": [],
+      "consoleMessages": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        }
+      ]
+    },
+    {
+      "route": "/pro-descriptions/editable",
+      "demo": "pro-descriptions",
+      "passed": true,
+      "steps": [
+        {
+          "name": "详情请求与只读格式",
+          "passed": true
+        },
+        {
+          "name": "必填校验阻止保存",
+          "passed": true
+        },
+        {
+          "name": "保存编辑并重新请求",
+          "passed": true
+        },
+        {
+          "name": "取消编辑后恢复原值",
+          "passed": true
+        }
+      ],
+      "browserErrors": [],
+      "consoleMessages": []
+    },
+    {
+      "route": "/table-enhancements/edit-and-sort",
+      "demo": "table-enhancements",
+      "passed": true,
+      "steps": [
+        {
+          "name": "键盘调整排序与排序回调",
+          "passed": true
+        },
+        {
+          "name": "行编辑公开方法、必填校验与保存",
+          "passed": true
+        },
+        {
+          "name": "行编辑取消丢弃草稿",
+          "passed": true
+        },
+        {
+          "name": "双击行后离开焦点自动保存",
+          "passed": true
+        },
+        {
+          "name": "单元格编辑仅开放当前字段、校验并保存",
+          "passed": true
+        },
+        {
+          "name": "单元格取消与双击切换",
+          "passed": true
+        }
+      ],
+      "browserErrors": [],
+      "consoleMessages": []
+    },
+    {
+      "route": "/shared-components/interactions",
+      "demo": "shared-components",
+      "passed": true,
+      "steps": [
+        {
+          "name": "工具栏搜索与两个下拉菜单",
+          "passed": true
+        },
+        {
+          "name": "独立 Search 提交与重置",
+          "passed": true
+        },
+        {
+          "name": "FilterDropdown 确认及 FieldLabel 清空",
+          "passed": true
+        },
+        {
+          "name": "LightWrapper 提交与关闭恢复草稿",
+          "passed": true
+        },
+        {
+          "name": "独立 footer 与行内校验",
+          "passed": true
+        },
+        {
+          "name": "ErrorBoundary 捕获并恢复",
+          "passed": true
+        }
+      ],
+      "browserErrors": [],
+      "consoleMessages": []
+    }
+  ],
+  "passed": true,
+  "stepCount": 21,
+  "passedStepCount": 21
+}

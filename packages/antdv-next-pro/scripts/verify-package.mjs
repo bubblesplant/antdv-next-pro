@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import ts from 'typescript'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
@@ -91,7 +91,127 @@ const expectedRuntimeExports = [
   'SchemaForm',
   'StepForm',
   'StepsForm',
+  'ProConfigProvider',
+  'ProProvider',
+  'useProConfig',
+  'useIntl',
+  'createIntl',
+  'intlMap',
+  'ProField',
+  'ProForm',
+  'BetaSchemaForm',
+  'ProFormGroup',
+  'ProFormFieldSet',
+  'ProFormList',
+  'ProFormDependency',
+  'ProFormItem',
+  'ProFormErrorList',
+  'ProFormProvider',
+  'ProFormCascader',
+  'ProFormColorPicker',
+  'ProFormRate',
+  'ProFormDigitRange',
+  'ProFormTimePicker',
+  'ProFormTimeRangePicker',
+  'ProFormDateWeekPicker',
+  'ProFormDateMonthPicker',
+  'ProFormDateQuarterPicker',
+  'ProFormDateYearPicker',
+  'ProFormDateWeekRangePicker',
+  'ProFormDateMonthRangePicker',
+  'ProFormDateQuarterRangePicker',
+  'ProFormDateYearRangePicker',
+  'ProFormCheckboxGroup',
+  'ProFormSearchSelect',
+  'ProCardGroup',
+  'ProCardDivider',
+  'ProCardTabPane',
+  'ProList',
+  'BaseProList',
+  'ProDescriptions',
+  'ProDescriptionsItem',
+  'DragSortTable',
+  'RowEditorTable',
+  'CellEditorTable',
+  'ListToolBar',
+  'TableDropdown',
+  'TableDropdownButton',
+  'Search',
+  'LightWrapper',
+  'ErrorBoundary',
+  'DropdownFooter',
+  'FieldLabel',
+  'FilterDropdown',
+  'InlineErrorFormItem',
+  'LabelIconTip',
   'default',
+  ...[
+    'Text',
+    'Cascader',
+    'Checkbox',
+    'Code',
+    'ColorPicker',
+    'DatePicker',
+    'Digit',
+    'DigitRange',
+    'FromNow',
+    'Image',
+    'Money',
+    'Options',
+    'Password',
+    'Percent',
+    'Progress',
+    'Radio',
+    'RangePicker',
+    'Rate',
+    'Second',
+    'Segmented',
+    'Select',
+    'Slider',
+    'Switch',
+    'TextArea',
+    'TimePicker',
+    'TimeRangePicker',
+    'TreeSelect',
+    'IndexColumn',
+    'Status',
+  ].map((name) => `Field${name}`),
+  ...[
+    'arEG',
+    'caES',
+    'csCZ',
+    'deDE',
+    'enGB',
+    'enUS',
+    'esES',
+    'faIR',
+    'frFR',
+    'heIL',
+    'hrHR',
+    'idID',
+    'itIT',
+    'jaJP',
+    'koKR',
+    'mnMN',
+    'msMY',
+    'nlNL',
+    'plPL',
+    'ptBR',
+    'roRO',
+    'ruRU',
+    'skSK',
+    'srRS',
+    'svSE',
+    'thTH',
+    'trTR',
+    'ukUA',
+    'urPK',
+    'uzUZ',
+    'viVN',
+    'zhCN',
+    'zhHK',
+    'zhTW',
+  ].map((name) => `${name}Intl`),
 ]
 
 function parseBundle(file, format) {
@@ -134,6 +254,32 @@ function parseBundle(file, format) {
     ) {
       exportBindings.set(statement.expression.left.name.text, statement.expression.right.text)
     }
+    if (
+      format === 'CJS' &&
+      ts.isExpressionStatement(statement) &&
+      isStaticMethodCall(statement.expression, 'Object', 'defineProperty')
+    ) {
+      const [target, name, descriptor] = statement.expression.arguments
+      if (
+        target &&
+        ts.isIdentifier(target) &&
+        target.text === 'exports' &&
+        name &&
+        ts.isStringLiteral(name) &&
+        descriptor &&
+        ts.isObjectLiteralExpression(descriptor)
+      ) {
+        const getter = descriptor.properties.find(
+          (property) =>
+            (ts.isMethodDeclaration(property) || ts.isPropertyAssignment(property)) &&
+            property.name.getText(sourceFile) === 'get',
+        )
+        const body =
+          getter && ts.isPropertyAssignment(getter) ? getter.initializer.body : getter?.body
+        const returned = body?.statements?.find(ts.isReturnStatement)?.expression
+        if (returned) exportBindings.set(name.text, returned.getText(sourceFile))
+      }
+    }
   }
 
   return { exportBindings, format, sourceFile }
@@ -171,14 +317,12 @@ function assertExactObjectAlias(objectLiteral, property, targetBinding, format, 
     ts.isObjectLiteralExpression(objectLiteral),
     `${format} 的 ${owner} 别名参数必须是对象字面量`,
   )
-  assert.equal(
-    objectLiteral.properties.length,
-    1,
-    `${format} 的 ${owner} 别名对象必须只包含 ${property}`,
+  const aliasProperty = objectLiteral.properties.find(
+    (node) => ts.isPropertyAssignment(node) && node.name.getText() === property,
   )
-  const aliasProperty = objectLiteral.properties[0]
   assert.ok(
-    ts.isPropertyAssignment(aliasProperty) &&
+    aliasProperty &&
+      ts.isPropertyAssignment(aliasProperty) &&
       aliasProperty.name.getText() === property &&
       ts.isIdentifier(aliasProperty.initializer) &&
       aliasProperty.initializer.text === targetBinding,
@@ -271,7 +415,60 @@ for (const bundle of [parseBundle('dist/index.js', 'ESM'), parseBundle('dist/ind
     assert.ok(bundle.exportBindings.has(name), `${bundle.format} 缺少导出 ${name}`)
   }
   assertBundledAlias(bundle, 'ProFormText', 'Password', 'ProFormTextPassword', 'assign')
-  assertBundledAlias(bundle, 'ProFormRadio', 'Group', 'ProFormRadioGroup', 'freeze')
+  assertBundledAlias(bundle, 'ProFormRadio', 'Group', 'ProFormRadioGroup', 'assign')
+  assertBundledAlias(bundle, 'ProFormCheckbox', 'Group', 'ProFormCheckboxGroup', 'assign')
+}
+
+// Real module loading also catches invalid external ESM paths that AST/type checks cannot find.
+const esm = await import(pathToFileURL(resolve(packageRoot, 'dist/index.js')).href)
+const cjs = require(resolve(packageRoot, 'dist/index.cjs'))
+for (const [format, loaded] of [
+  ['ESM', esm],
+  ['CJS', cjs],
+]) {
+  for (const name of expectedRuntimeExports) assert.ok(loaded[name], `${format} 运行时缺少 ${name}`)
+  for (const [owner, member, target] of [
+    ['ProFormText', 'Password', 'ProFormTextPassword'],
+    ['ProFormRadio', 'Group', 'ProFormRadioGroup'],
+    ['ProFormCheckbox', 'Group', 'ProFormCheckboxGroup'],
+    ['ProFormDatePicker', 'Week', 'ProFormDateWeekPicker'],
+    ['ProFormDatePicker', 'Month', 'ProFormDateMonthPicker'],
+    ['ProFormDatePicker', 'Quarter', 'ProFormDateQuarterPicker'],
+    ['ProFormDatePicker', 'Year', 'ProFormDateYearPicker'],
+    ['ProFormSelect', 'SearchSelect', 'ProFormSearchSelect'],
+    ['ProCard', 'Group', 'ProCardGroup'],
+    ['ProCard', 'Divider', 'ProCardDivider'],
+    ['ProCard', 'TabPane', 'ProCardTabPane'],
+    ['TableDropdown', 'Button', 'TableDropdownButton'],
+    ['ProDescriptions', 'Item', 'ProDescriptionsItem'],
+    ['StepsForm', 'StepForm', 'StepForm'],
+  ])
+    assert.equal(
+      loaded[owner][member],
+      loaded[target],
+      `${format} 的 ${owner}.${member} 引用不正确`,
+    )
+  assert.equal(Object.keys(loaded.intlMap).length, 34, `${format} 内置语言数量不正确`)
+  const registrations = new Map()
+  loaded.default.install({
+    component(name, component) {
+      registrations.set(name, component)
+    },
+  })
+  for (const name of [
+    'ProForm',
+    'BetaSchemaForm',
+    'ProConfigProvider',
+    'ProField',
+    'BaseProList',
+    'ProDescriptionsItem',
+    'DragSortTable',
+    'ProFormCascader',
+    'FieldMoney',
+    'DropdownFooter',
+  ]) {
+    assert.equal(registrations.get(name), loaded[name], `${format} 全局注册 ${name} 不正确`)
+  }
 }
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'

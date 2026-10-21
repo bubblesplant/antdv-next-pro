@@ -53,12 +53,30 @@ export default defineConfig({
       {
         extends: false,
         plugins: [vue()],
+        resolve: { dedupe: ['vue'] },
+        optimizeDeps: {
+          include: [
+            'vue',
+            'antdv-next',
+            'antdv-next/config-provider',
+            '@antdv-next/icons',
+            'dayjs',
+            'dayjs/plugin/advancedFormat',
+            'dayjs/plugin/customParseFormat',
+            'dayjs/plugin/weekOfYear',
+            'dayjs/plugin/weekYear',
+          ],
+        },
         test: {
           name: 'browser',
           include: ['tests/**/*.browser.test.ts'],
           browser: {
             enabled: true,
-            provider: playwright(),
+            provider: playwright({
+              launchOptions: {
+                channel: process.env.PRO_BROWSER_CHANNEL === 'chrome' ? 'chrome' : undefined,
+              },
+            }),
             instances: [{ browser: 'chromium' }],
           },
         },

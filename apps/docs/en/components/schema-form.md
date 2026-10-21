@@ -6,9 +6,9 @@ pageClass: component-doc
 import SchemaFormDemo from '../../examples/SchemaFormDemo.vue'
 </script>
 
-# SchemaForm
+# BetaSchemaForm
 
-`SchemaForm` generates fields from the single `columns` schema and manages its model with Vue `v-model`. It shares `dataIndex`, `valueType`, `valueEnum`, validation, and transforms with the table components.
+`BetaSchemaForm` generates fields from top-level `columns` and manages its model with Vue `v-model`. `SchemaForm` remains a compatibility alias. It shares field types, validation, and transforms with tables. Use [ProForm](./pro-form) to compose child fields without a schema.
 
 ## When to use
 
@@ -32,7 +32,7 @@ Use it when one `columns` schema should describe standard forms, query filters, 
 ### Basic usage
 
 ```vue
-<SchemaForm ref="formRef" v-model="form" :columns="columns" @finish="save" />
+<BetaSchemaForm ref="formRef" v-model="form" :columns="columns" :on-finish="save" />
 ```
 
 `initialValues`, asynchronous `request(params)`, URL values, and the controlled value merge in this precedence order, with the right side winning:
@@ -116,7 +116,7 @@ import { ModalForm, StepsForm } from '@bubblesjs/antv-next-pro'
 </template>
 ```
 
-For multiple steps, every top-level column must be a `group` or `formSet` with child columns. Each top-level group becomes one step. `next()` validates the current step before advancing; the last step submits the complete result. A Steps title may navigate directly to an earlier step. Clicking a later step invokes one validated `next()` transition and cannot bypass the current step.
+Multi-step schemas use top-level group/formSet nodes with children, one per step. Legacy nested columns is a fallback. next() validates before advancing, and final submission validates and merges the steps. Returning to an earlier step retains its values. Use composed StepsForm.StepForm when every step needs its own native form and instance.
 
 ### Composition and dynamic schemas
 
@@ -125,7 +125,7 @@ const columns: SchemaFormColumn<Project>[] = [
   {
     title: 'Basics',
     valueType: 'group',
-    columns: [
+    children: [
       { title: 'Name', dataIndex: 'name', valueType: 'text' },
       { title: 'Kind', dataIndex: 'kind', valueType: 'select', valueEnum: kinds },
     ],
@@ -139,7 +139,7 @@ const columns: SchemaFormColumn<Project>[] = [
       removeText: 'Remove',
       initialValue: { name: '', email: '' },
     },
-    columns: [
+    children: [
       { title: 'Name', dataIndex: 'name', valueType: 'text' },
       { title: 'Email', dataIndex: 'email', valueType: 'text' },
     ],
@@ -147,13 +147,13 @@ const columns: SchemaFormColumn<Project>[] = [
 ]
 ```
 
-`columns` may be computed; adding or removing columns from external state creates dynamic fields. `dependencies` passes dependency values to field slots. A `dependency` column with `renderFormItem` creates a custom reactive region.
+Top-level columns can be computed. Groups, lists, and dependencies use children; legacy nested columns is used only when children is absent. dependencies exposes dependent values to field slots, and dependency can use formItemRender for dependent content.
 
-For a regular field, extension precedence is: dynamic field slot (`field-${path}`, `${path}`, or the column `key`) → `renderFormItem` → `column.component` → the default `valueType` control. A `column.component` is still wrapped by SchemaForm's FormItem and receives `value`, `modelValue`, `disabled`, and matching update listeners. Use a field slot or `renderFormItem` when the custom content should take over completely.
+Regular field extension precedence is: dynamic field slot → formItemRender(schema, context, nativeForm) → legacy renderFormItem(context) → column.component → default control. The context exposes value/record/update/defaultRender; the third argument is the native Form instance. The legacy callback is a fallback, with no function-arity guessing. Custom components retain FormItem registration and value/modelValue/disabled/update bindings.
 
 ### Value transforms
 
-`convertValue` only processes values entering the form, including initialization, external `v-model` updates, and `setFieldsValue`. `transform` only processes submission output when `submit()` runs. `validate()` validates and returns the raw form values without applying `transform`.
+convertValue handles inbound values, including initialization, external v-model updates, and setFieldsValue. submit() applies dateFormatter before transform; validate() returns raw values. dateFormatter defaults to string; number produces timestamps, false preserves date objects, and a function customizes formatting. Set :date-formatter="false" for the example below, which calls Dayjs methods inside transform.
 
 ```ts
 const columns = [
@@ -170,7 +170,27 @@ const columns = [
 ]
 ```
 
-An object returned by `transform` merges into the final `submit()` result. A scalar remains under the original `dataIndex`. Use `validate()` when you need validated raw form values and `submit()` when you need the transformed API payload.
+An object returned by transform replaces the source field and merges into the submission root; a scalar remains under the original path. Formatting and transforms do not mutate the raw store.
+
+### Submission and dialogs
+
+Standard forms now default to vertical; set layout="horizontal" for the previous layout. Bind :on-finish="save" for an awaited business callback. Pending submissions show loading and share duplicate submit() calls. Modal/Drawer closes only for true; false, undefined, and rejection preserve open state and values. A stale submission cannot close a reopened or unmounted dialog. The submit event observes submission and does not replace the awaited callback.
+
+The default Cancel button closes the dialog, invokes its native close callback, and preserves drafts; reset() restores initial values. modalProps/drawerProps pass native settings through while the form coordinates open, title/width, footer, and closing. destroyOnHidden=true resets after the closing animation. A positive submitTimeout temporarily disables cancellation and interactive closing. Timeout releases protection without aborting submission; loading remains until the Promise completes. See [ProForm](./pro-form).
+
+```vue
+<BetaSchemaForm
+  v-model:open="open"
+  layout-type="ModalForm"
+  :columns="columns"
+  :on-finish="
+    async (values) => {
+      await api.save(values)
+      return true
+    }
+  "
+/>
+```
 
 ### URL synchronization
 
@@ -191,41 +211,48 @@ Per-field mode removes empty URL values; named-key mode stores the complete mode
 
 ### Props
 
-| Prop                      | Type                                   | Description                                 |
-| ------------------------- | -------------------------------------- | ------------------------------------------- |
-| `columns`                 | `SchemaFormColumn<T>[]`                | The single schema entry point               |
-| `modelValue`              | `Partial<T>`                           | Standard `v-model` value                    |
-| `initialValues`           | `Partial<T>`                           | Initialization and reset baseline           |
-| `request`                 | `(params?) => Promise<Partial<T>>`     | Asynchronous initial values                 |
-| `params`                  | `Record<string, unknown>`              | Initialization request params               |
-| `layoutType`              | `SchemaFormLayoutType`                 | Form layout; defaults to `Form`             |
-| `open`                    | `boolean`                              | Modal/Drawer state; supports `v-model:open` |
-| `current`                 | `number`                               | Step index; supports `v-model:current`      |
-| `title` / `width`         | Text or size                           | Overlay title and width                     |
-| `labelCol` / `wrapperCol` | Antdv Next Form config                 | Label and control layout                    |
-| `grid`                    | `boolean`                              | Responsive Row/Col grid                     |
-| `readonly`                | `boolean`                              | Whole-form readonly mode                    |
-| `urlSync`                 | `boolean \| { key?, mode? }`           | Query/hash synchronization                  |
-| `submitter`               | `false \| { submitText?, resetText? }` | Default action area                         |
-| `style`                   | `CSSProperties`                        | Root style                                  |
+| Prop                                | Type                                                      | Description                                                                 |
+| ----------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `columns`                           | `SchemaFormColumn<T>[]`                                   | The single schema entry point                                               |
+| `modelValue`                        | `Partial<T>`                                              | Standard `v-model` value                                                    |
+| `initialValues`                     | `Partial<T>`                                              | Initialization and reset baseline                                           |
+| `request`                           | `(params?) => Promise<Partial<T>>`                        | Asynchronous initial values                                                 |
+| `params`                            | `Record<string, unknown>`                                 | Initialization request params                                               |
+| `layoutType`                        | `SchemaFormLayoutType`                                    | Form layout; defaults to `Form`                                             |
+| `open`                              | `boolean`                                                 | Modal/Drawer state; supports `v-model:open`                                 |
+| `current`                           | `number`                                                  | Step index; supports `v-model:current`                                      |
+| `title` / `width`                   | Text or size                                              | Overlay title and width                                                     |
+| `labelCol` / `wrapperCol`           | Antdv Next Form config                                    | Label and control layout                                                    |
+| `grid`                              | `boolean`                                                 | Responsive Row/Col grid                                                     |
+| `readonly`                          | `boolean`                                                 | Whole-form readonly mode                                                    |
+| `urlSync`                           | `boolean \| { key?, mode? }`                              | Query/hash synchronization                                                  |
+| `syncToUrl` / `syncToInitialValues` | `boolean \| function` / `boolean`                         | URL mapping / initial hydration                                             |
+| `dateFormatter`                     | `'string' \| 'number' \| false \| function`               | Defaults to string, runs before transform                                   |
+| `onFinish`                          | `(values) => boolean \| void \| Promise<boolean \| void>` | Await business submission; true closes dialogs                              |
+| `formProps`                         | `FormProps`                                               | Native form configuration                                                   |
+| `submitter`                         | `false \| SubmitterProps`                                 | searchConfig/render/submitButtonProps/resetButtonProps and legacy text      |
+| `submitTimeout`                     | `number`                                                  | Dialog close-protection duration in milliseconds; does not abort submission |
+| `style`                             | `CSSProperties`                                           | Root style                                                                  |
 
 Columns also accept `component`, `colProps`, `rowProps`, `tooltip`, and `extra`.
 
 ### Events
 
-| Event                | Arguments         | Description                             |
-| -------------------- | ----------------- | --------------------------------------- |
-| `update:model-value` | `values`          | Default `v-model` update                |
-| `update:open`        | `open`            | Overlay two-way binding                 |
-| `update:current`     | `current`         | Step two-way binding                    |
-| `change`             | `values`          | Any field change                        |
-| `values-change`      | `changed, values` | `changed` contains `path` and `value`   |
-| `submit` / `finish`  | `values`          | Validated, transformed result           |
-| `reset`              | `values`          | Restored initialization snapshot        |
-| `open` / `close`     | none              | Component method or overlay interaction |
-| `current-change`     | `current`         | Active step change                      |
-| `request-error`      | `error`           | Async initial value failure             |
-| `error`              | `error`           | Initialization or validation failure    |
+| Event                | Arguments                 | Description                                      |
+| -------------------- | ------------------------- | ------------------------------------------------ |
+| `update:model-value` | `values`                  | Default `v-model` update                         |
+| `update:open`        | `open`                    | Overlay two-way binding                          |
+| `update:current`     | `current`                 | Step two-way binding                             |
+| `change`             | `values`                  | Any field change                                 |
+| `values-change`      | `changedValues, values`   | Nested changed-values object                     |
+| `field-change`       | `{ path, value }, values` | Raw field path and value                         |
+| `submit`             | `values`                  | Validated, formatted and transformed result      |
+| `finish`             | `values`                  | Compatibility notification without onFinish prop |
+| `reset`              | `values`                  | Restored initialization snapshot                 |
+| `open` / `close`     | none                      | Component method or overlay interaction          |
+| `current-change`     | `current`                 | Active step change                               |
+| `request-error`      | `error`                   | Async initial value failure                      |
+| `error`              | `error`                   | Initialization or validation failure             |
 
 ### Slots
 
@@ -246,8 +273,8 @@ Field paths are dot-joined, so `['profile', 'name']` becomes `profile.name`.
   </template>
 
   <template #submitter="{ current }">
-    <button @click="formRef?.prev()">Previous</button>
-    <button @click="formRef?.submit()">Submit step {{ current + 1 }}</button>
+    <button type="button" @click="formRef?.prev()">Previous</button>
+    <button type="button" @click="formRef?.submit()">Submit step {{ current + 1 }}</button>
   </template>
 </SchemaForm>
 ```
@@ -287,3 +314,9 @@ await formRef.value?.next()
 | `submit()`               | Validate, transform, emit `submit` / `finish`, and return the transformed result |
 | `open()` / `close()`     | Control Modal/Drawer                                                             |
 | `next()` / `prev()`      | Control steps; `next` returns whether it advanced                                |
+
+### Configuration and semantic styles
+
+Forms inherit native ConfigProvider locale, direction, componentSize/Disabled, prefixCls, theme algorithms, global tokens, and native Form/Input component tokens. Pro extensions use ProConfigProvider.token and valueTypeMap. Standard forms use ant-pro-form; query, light, and step layouts use ant-pro-query-filter, ant-pro-form-light-filter, and ant-pro-steps-form. Step navigation, content, and the active step expose -steps-container, -container, and -step-active. Native prefix demo produces demo-pro classes; explicit prefixCls overrides the layout prefix.
+
+classes/styles accept an object or `({ props }) => object`; classes wins over legacy classNames for the same part. Schema supports root/content, step submitter, and the applicable filter parts such as row/item/actions/container/collapseButton. Configure the internal standard form through formProps classes/styles. class/style/id/data-_/aria-_ target the visible form or layout container; modalProps/drawerProps configure the overlay shell.

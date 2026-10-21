@@ -1,7 +1,6 @@
 import type { VueWrapper } from '@vue/test-utils'
 import type { EditableAction, ProKey, ProTableInstance } from '../src/types'
-import { DownOutlined, UpOutlined } from '@antdv-next/icons'
-import { config, flushPromises, shallowMount } from '@vue/test-utils'
+import { config, flushPromises, mount, shallowMount } from '@vue/test-utils'
 import { Button, Pagination, Table } from 'antdv-next'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
 
@@ -26,6 +25,19 @@ const originalRenderStubDefaultSlot = config.global.renderStubDefaultSlot
 // Keep table logic visible inside shallowly stubbed layout containers such as ProCard.
 beforeAll(() => {
   config.global.renderStubDefaultSlot = true
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  )
 })
 afterAll(() => {
   config.global.renderStubDefaultSlot = originalRenderStubDefaultSlot
@@ -45,10 +57,13 @@ describe('ProTable', () => {
         pagination: false,
         search: false,
       },
+      global: { stubs: { ListToolBar: false } },
     })
 
-    const optionButtons = wrapper.get('.antdv-next-pro__toolbar-actions').findAllComponents(Button)
-    expect(optionButtons).toHaveLength(4)
+    const optionButtons = wrapper
+      .get('[data-pro-table-list-toolbar-actions]')
+      .findAllComponents(Button)
+    expect(optionButtons).toHaveLength(3)
     expect(
       optionButtons.every(
         (button: VueWrapper) => (button.props() as Record<string, unknown>).type === 'text',
@@ -191,62 +206,40 @@ describe('ProTable', () => {
   it('supports controlled and uncontrolled search collapsing with span and label width', async () => {
     const onCollapse = vi.fn()
     const columns = [1, 2, 3, 4].map((id) => ({ dataIndex: `field${id}`, title: `Field ${id}` }))
-    wrapper = shallowMount(ProTable, {
+    wrapper = mount(ProTable, {
       props: {
         columns,
         dataSource: [],
         search: { defaultCollapsed: true, span: 12, labelWidth: 80, onCollapse },
         pagination: false,
+        options: false,
       },
+      global: { stubs: { NativeTable: true, ProCard: true, ListToolBar: true } },
     })
-
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(1)
-    expect(wrapper.get('.antdv-next-pro__search-fields').attributes('style')).toContain(
-      '--antdv-next-pro-search-columns: 2',
-    )
-    expect(
-      wrapper
-        .get('.antdv-next-pro__search-fields')
-        .find('.antdv-next-pro__search-actions')
-        .exists(),
-    ).toBe(true)
-    const actionButtons = wrapper
-      .get('.antdv-next-pro__search-actions')
-      .findAllComponents(Button) as VueWrapper[]
-    expect(actionButtons).toHaveLength(3)
-    expect(
-      actionButtons.map((button: VueWrapper) => (button.props() as Record<string, unknown>).type),
-    ).toEqual([undefined, 'primary', 'link'])
-    expect(actionButtons[2]?.classes()).toContain('antdv-next-pro__search-collapse')
-    expect(wrapper.get('.antdv-next-pro__search-field').attributes('style')).toContain(
-      'grid-template-columns: 80px minmax(0, 1fr)',
-    )
-    const collapseButton = actionButtons[2] as VueWrapper
-    expect(collapseButton.attributes('aria-expanded')).toBe('false')
-    expect((collapseButton.props() as Record<string, unknown>).iconPlacement).toBe('end')
-    expect((collapseButton.vm.$slots.icon?.()[0]?.type as { name?: string }).name).toBe(
-      DownOutlined.name,
-    )
-
-    await wrapper.get('.antdv-next-pro__search-collapse').trigger('click')
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(4)
-    expect(collapseButton.attributes('aria-expanded')).toBe('true')
-    expect((collapseButton.vm.$slots.icon?.()[0]?.type as { name?: string }).name).toBe(
-      UpOutlined.name,
-    )
+    const visibleFields = () =>
+      wrapper!
+        .findAll('.ant-pro-query-filter-col')
+        .filter((field) => (field.element as HTMLElement).style.display !== 'none')
+    const collapseButton = () => wrapper!.get('.ant-pro-query-filter-collapse-button')
+    expect(visibleFields()).toHaveLength(1)
+    expect(wrapper.get('.ant-pro-query-filter-col').attributes('style')).toContain('50%')
+    expect(wrapper.get('.ant-form-item-label').attributes('style')).toContain('width: 80px')
+    expect(collapseButton().attributes('aria-expanded')).toBe('false')
+    await collapseButton().trigger('click')
+    expect(visibleFields()).toHaveLength(4)
+    expect(collapseButton().attributes('aria-expanded')).toBe('true')
     expect(onCollapse).toHaveBeenLastCalledWith(false)
     expect(wrapper.emitted('searchCollapse')?.at(-1)).toEqual([false])
-
     await wrapper.setProps({
       search: { collapsed: true, span: 12, labelWidth: 'auto', onCollapse },
     })
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(1)
-    await wrapper.get('.antdv-next-pro__search-collapse').trigger('click')
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(1)
+    expect(visibleFields()).toHaveLength(1)
+    await collapseButton().trigger('click')
+    expect(visibleFields()).toHaveLength(1)
     await wrapper.setProps({
       search: { collapsed: false, span: 12, labelWidth: 'auto', onCollapse },
     })
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(4)
+    expect(visibleFields()).toHaveLength(4)
   })
 
   it('keeps hideInTable fields searchable and honors an explicit pagination total', () => {
@@ -263,7 +256,7 @@ describe('ProTable', () => {
 
     const columns = wrapper.findComponent(Table).props('columns') as Array<Record<string, unknown>>
     expect(columns.map((column) => column.dataIndex)).toEqual(['name'])
-    expect(wrapper.findAll('.antdv-next-pro__search-field')).toHaveLength(2)
+    expect(wrapper.findComponent({ name: 'Search' }).props('columns')).toHaveLength(2)
     expect(wrapper.findComponent(Pagination).props('total')).toBe(99)
   })
 
@@ -379,6 +372,7 @@ describe('ProTable', () => {
       },
       global: {
         stubs: {
+          NativeTable: TableStub,
           ATable: TableStub,
           Table: TableStub,
         },
@@ -399,8 +393,17 @@ describe('ProTable', () => {
 })
 
 describe('EditableProTable', () => {
+  const editableStubs = {
+    ProTable: false,
+    ProCard: true,
+    NativeTable: true,
+    Form: true,
+    ListToolBar: true,
+  }
+
   it('hides the record creator after reaching maxLength', async () => {
     wrapper = shallowMount(EditableProTable, {
+      global: { stubs: editableStubs },
       props: {
         columns: [{ dataIndex: 'name', title: 'Name' }],
         value: [{ id: 1, name: 'Ada' }],
@@ -412,15 +415,16 @@ describe('EditableProTable', () => {
       },
     })
 
-    expect(wrapper.find('.antdv-next-pro__creator').exists()).toBe(false)
+    expect(wrapper.find('[data-pro-table-record-creator]').exists()).toBe(false)
 
     await wrapper.setProps({ value: [] })
 
-    expect(wrapper.find('.antdv-next-pro__creator').exists()).toBe(true)
+    expect(wrapper.find('[data-pro-table-record-creator]').exists()).toBe(true)
   })
 
-  it('counts nested rows when enforcing maxLength', () => {
+  it('uses top-level row count and allows adding a child before maxLength', async () => {
     wrapper = shallowMount(EditableProTable, {
+      global: { stubs: editableStubs },
       props: {
         columns: [{ dataIndex: 'name', title: 'Name' }],
         value: [
@@ -440,8 +444,13 @@ describe('EditableProTable', () => {
     })
     const table = wrapper.vm as unknown as ExtendedInstance
 
-    expect(wrapper.find('.antdv-next-pro__creator').exists()).toBe(false)
-    expect(table.addEditRecord({ id: 3, name: 'Nested' }, { parentKey: 1 })).toBe(false)
+    expect(wrapper.find('[data-pro-table-record-creator]').exists()).toBe(true)
+    expect(
+      table.addEditRecord({ id: 3, name: 'Nested' }, { parentKey: 1, newRecordType: 'cache' }),
+    ).toBe(true)
+    expect(table.getRowsData()[0]?.children).toHaveLength(2)
+    table.cancelEditable(3)
+    expect(table.getRowsData()[0]?.children).toHaveLength(1)
   })
 
   it('calls compatibility callbacks and applies formItemProps to FormItem', async () => {

@@ -18,7 +18,7 @@ export function toPath(dataIndex?: ProDataIndex): ProKey[] {
 }
 
 export function columnKey<T extends Record<string, unknown>>(
-  column: ProColumns<T>,
+  column: Pick<ProColumns<T>, 'key' | 'dataIndex'>,
   fallback = '',
 ): string {
   if (column.key !== undefined) return String(column.key)
@@ -69,7 +69,9 @@ export function flattenColumns<T extends Record<string, unknown>>(
   columns: ProColumns<T>[],
 ): ProColumns<T>[] {
   return columns.flatMap((column) =>
-    column.columns?.length ? flattenColumns(column.columns) : [column],
+    (column.children ?? column.columns)?.length
+      ? flattenColumns((column.children ?? column.columns)!)
+      : [column],
   )
 }
 
@@ -188,7 +190,9 @@ export function applyLocalQuery<T extends Record<string, unknown>>(
       const comparison =
         typeof column.sorter === 'function'
           ? column.sorter(left, right)
-          : compareValues(getValue(left, column.dataIndex), getValue(right, column.dataIndex))
+          : typeof column.sorter === 'object' && column.sorter.compare
+            ? column.sorter.compare(left, right)
+            : compareValues(getValue(left, column.dataIndex), getValue(right, column.dataIndex))
       if (comparison !== 0) return direction === 'ascend' ? comparison : -comparison
     }
     return 0

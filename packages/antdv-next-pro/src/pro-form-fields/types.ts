@@ -1,5 +1,9 @@
 import type {
   ButtonProps,
+  CascaderProps,
+  ColorPickerProps,
+  RateProps,
+  TimePickerProps,
   CheckboxGroupProps,
   CheckboxProps,
   DatePickerProps,
@@ -7,8 +11,10 @@ import type {
   InputNumberProps,
   InputPasswordProps,
   InputProps,
+  ImageProps,
   RangePickerProps,
   RadioGroupProps,
+  RadioProps,
   SegmentedProps,
   SelectProps,
   SliderProps,
@@ -21,7 +27,10 @@ import type {
 } from 'antdv-next'
 import type { VNodeChild } from 'vue'
 
-import type { ProDataIndex, ProValueEnumItem, ProValueType } from '../types'
+import type { ProDataIndex, ProValueEnumItem } from '../types'
+import type { ProFieldValueTypeInput } from '../pro-field/valueType'
+import type { FieldMoneyOptions } from '../pro-field/money'
+import type { ProSemanticClasses, ProSemanticStyles, ProSemanticSource } from '../provider/types'
 
 export type ProFormFieldMode = 'form-item' | 'field'
 export type ProFormFieldName = ProDataIndex
@@ -70,6 +79,17 @@ export interface ProFormBaseFieldProps<
   readonly?: boolean
   emptyText?: VNodeChild
   readonlyRender?: (value: Value) => VNodeChild
+  width?: number | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  ignoreFormItem?: boolean
+  placeholder?: FieldProps extends { placeholder?: infer P } ? P : string | string[]
+  prefixCls?: string
+  classes?: ProSemanticSource<ProSemanticClasses>
+  classNames?: ProSemanticSource<ProSemanticClasses>
+  styles?: ProSemanticSource<ProSemanticStyles>
+  convertValue?: (value: unknown, values: Record<string, unknown>) => unknown
+  transform?: (value: unknown, values: Record<string, unknown>) => unknown
+  preserve?: boolean
+  proFieldProps?: Record<string, unknown>
 }
 
 export interface ProFormOptionFieldProps<
@@ -80,6 +100,10 @@ export interface ProFormOptionFieldProps<
   valueEnum?: ProFormValueEnum<OptionValue>
   request?: ProFormFieldRequest<OptionValue, Params>
   params?: Params
+  debounceTime?: number
+  proFieldKey?: string
+  cacheForSwr?: boolean
+  searchValue?: string
 }
 
 export interface ProFormFieldProps<
@@ -91,7 +115,7 @@ export interface ProFormFieldProps<
   extends
     ProFormBaseFieldProps<ModelValue, FieldProps>,
     ProFormOptionFieldProps<OptionValue, Params> {
-  valueType?: ProValueType
+  valueType?: ProFieldValueTypeInput
 }
 
 export type ProFormTextProps = ProFormBaseFieldProps<string | undefined, InputProps>
@@ -108,10 +132,10 @@ export interface ProFormDigitProps extends ProFormBaseFieldProps<
   min?: InputNumberProps['min'] | false
 }
 
-export interface ProFormMoneyProps extends ProFormBaseFieldProps<
-  number | string | null,
-  InputNumberProps
-> {
+export interface ProFormMoneyProps
+  extends
+    FieldMoneyOptions,
+    ProFormBaseFieldProps<number | string | null, InputNumberProps & FieldMoneyOptions> {
   prefix?: InputNumberProps['prefix'] | false
 }
 
@@ -148,6 +172,10 @@ export interface ProFormSelectProps<
     ProFormBaseFieldProps<ModelValue, SelectProps>,
     ProFormOptionFieldProps<OptionValue, Params> {}
 
+export interface ProFormSearchSelectProps extends ProFormSelectProps {
+  mode?: 'multiple' | 'tags' | 'single'
+}
+
 export interface ProFormTreeSelectProps<
   ModelValue = TreeSelectProps['value'],
   OptionValue = ProFormOptionValue<ModelValue>,
@@ -166,7 +194,8 @@ export interface ProFormCheckboxProps<
 >
   extends
     ProFormBaseFieldProps<ModelValue, CheckboxProps | CheckboxGroupProps>,
-    ProFormOptionFieldProps<OptionValue, Params> {
+    Omit<ProFormOptionFieldProps<OptionValue, Params>, 'options'> {
+  options?: CheckboxGroupProps['options'] | Array<ProFormFieldOption<OptionValue>>
   layout?: 'horizontal' | 'vertical'
 }
 
@@ -177,15 +206,38 @@ export interface ProFormRadioGroupProps<
 >
   extends
     ProFormBaseFieldProps<ModelValue, RadioGroupProps>,
-    ProFormOptionFieldProps<OptionValue, Params> {}
+    Omit<ProFormOptionFieldProps<OptionValue, Params>, 'options'> {
+  options?: RadioGroupProps['options'] | Array<ProFormFieldOption<OptionValue>>
+  radioType?: 'button' | 'radio'
+  layout?: 'horizontal' | 'vertical'
+}
 
 export type ProFormSliderProps = ProFormBaseFieldProps<number | number[] | undefined, SliderProps>
 
 export type ProFormSwitchProps = ProFormBaseFieldProps<SwitchProps['checked'], SwitchProps>
 
-export type ProFormUploadButtonProps = ProFormBaseFieldProps<UploadFile[], UploadProps>
+export interface ProFormUploadButtonProps extends ProFormBaseFieldProps<UploadFile[], UploadProps> {
+  icon?: VNodeChild
+  title?: VNodeChild
+  max?: number
+  buttonProps?: Partial<ButtonProps>
+  action?: UploadProps['action']
+  accept?: UploadProps['accept']
+  listType?: UploadProps['listType']
+  imageProps?: Omit<ImageProps, 'src'>
+}
 
-export type ProFormUploadDraggerProps = ProFormBaseFieldProps<UploadFile[], UploadDraggerProps>
+export interface ProFormUploadDraggerProps extends ProFormBaseFieldProps<
+  UploadFile[],
+  UploadDraggerProps
+> {
+  icon?: VNodeChild
+  title?: VNodeChild
+  description?: VNodeChild
+  max?: number
+  action?: UploadProps['action']
+  accept?: UploadProps['accept']
+}
 
 export interface ProFormSegmentedProps<
   ModelValue = SegmentedProps['value'],
@@ -197,7 +249,11 @@ export interface ProFormSegmentedProps<
     ProFormOptionFieldProps<OptionValue, Params> {}
 
 export interface ProFormCaptchaProps extends ProFormBaseFieldProps<string | undefined, InputProps> {
-  onGetCaptcha: () => void | boolean | Promise<void | boolean>
+  onGetCaptcha: (phone: string) => void | boolean | Promise<void | boolean>
+  phoneName?: ProDataIndex
+  captchaTextRender?: (timing: boolean, count: number) => VNodeChild
+  captchaProps?: Partial<ButtonProps>
+  onTiming?: (count: number) => void
   countDown?: number
   captchaText?: VNodeChild
   countDownText?: (seconds: number) => VNodeChild
@@ -206,4 +262,29 @@ export interface ProFormCaptchaProps extends ProFormBaseFieldProps<string | unde
 
 export interface ProFormCaptchaInstance {
   resetCountdown: () => void
+  startTiming: () => void
+  endTiming: () => void
+  focus: () => void
 }
+
+export type ProFormCascaderProps = ProFormBaseFieldProps<CascaderProps['value'], CascaderProps> &
+  ProFormOptionFieldProps
+export type ProFormColorPickerProps = ProFormBaseFieldProps<
+  ColorPickerProps['value'],
+  ColorPickerProps
+>
+export type ProFormRateProps = ProFormBaseFieldProps<RateProps['value'], RateProps>
+export type ProFormDigitRangeProps = ProFormBaseFieldProps<
+  [number | null, number | null],
+  InputNumberProps
+>
+export type ProFormTimePickerProps = ProFormBaseFieldProps<
+  TimePickerProps['value'],
+  TimePickerProps
+>
+export type ProFormTimeRangePickerProps = ProFormBaseFieldProps<
+  RangePickerProps['value'],
+  RangePickerProps
+>
+export type ProFormRadioProps = ProFormBaseFieldProps<RadioProps['checked'], RadioProps>
+export type ProFormCheckboxGroupProps = ProFormCheckboxProps

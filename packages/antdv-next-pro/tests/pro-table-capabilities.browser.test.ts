@@ -87,7 +87,7 @@ describe('ProTable browser capabilities', () => {
       filter: { name: ['Ada'] },
     })
     await wrapper.setProps({ toolbar: false })
-    expect(wrapper.find('.antdv-next-pro__toolbar').exists()).toBe(false)
+    expect(wrapper.find('[data-pro-table-list-toolbar]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="editable-action"]').exists()).toBe(false)
   })
 
@@ -102,26 +102,24 @@ describe('ProTable browser capabilities', () => {
     })
     await flushPromises()
     const root = wrapper.element as HTMLElement
-    const search = wrapper.get('.antdv-next-pro__search').element
-    const card = wrapper.get('.antdv-next-pro__table-card').element
+    const search = wrapper.get('[data-pro-table-search]').element
+    const card = wrapper.get('[data-pro-table-container]').element
     expect(wrapper.findAllComponents(ProCard)).toHaveLength(2)
-    expect(wrapper.find('.antdv-next-pro-card__header').exists()).toBe(false)
+    expect(wrapper.find('[data-pro-card-header]').exists()).toBe(false)
     expect(search.nextElementSibling).toBe(card)
-    expect(card.contains(wrapper.get('.antdv-next-pro__toolbar').element)).toBe(true)
+    expect(card.contains(wrapper.get('[data-pro-table-list-toolbar]').element)).toBe(true)
     expect(card.contains(wrapper.get('.ant-table-wrapper').element)).toBe(true)
-    expect(card.contains(wrapper.get('.antdv-next-pro__pagination').element)).toBe(true)
+    expect(card.contains(wrapper.get('[data-pro-table-pagination]').element)).toBe(true)
     expect(getComputedStyle(search).backgroundColor).toBe(
       resolveCssVariableColor(root, '--antdv-next-pro-color-bg-container'),
     )
     expect(getComputedStyle(card).backgroundColor).toBe(getComputedStyle(search).backgroundColor)
     expect(
-      getComputedStyle(wrapper.get('.antdv-next-pro__search .antdv-next-pro-card__body').element)
-        .padding,
+      getComputedStyle(wrapper.get('[data-pro-table-search] .ant-pro-card-body').element).padding,
     ).toBe('24px')
     expect(
-      getComputedStyle(
-        wrapper.get('.antdv-next-pro__table-card .antdv-next-pro-card__body').element,
-      ).paddingTop,
+      getComputedStyle(wrapper.get('[data-pro-table-container] .ant-pro-card-body').element)
+        .paddingTop,
     ).toBe('0px')
     expect(card.getBoundingClientRect().top).toBeGreaterThan(search.getBoundingClientRect().bottom)
   })
@@ -139,16 +137,16 @@ describe('ProTable browser capabilities', () => {
       },
     })
     await flushPromises()
-    expect(wrapper.find('.antdv-next-pro__search').exists()).toBe(false)
-    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('Ada')
-    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    expect(wrapper.find('[data-pro-table-search]').exists()).toBe(false)
+    await wrapper.get('[data-pro-table-toolbar-search] input').setValue('Ada')
+    await wrapper.get('[data-pro-table-toolbar-search] .ant-input-search-btn').trigger('click')
     await flushPromises()
     expect(request).toHaveBeenLastCalledWith({ q: 'Ada', current: 1, pageSize: 10 }, {}, {})
     await (wrapper.vm as unknown as ProTableInstance<Row>).reset()
     await flushPromises()
     expect(request).toHaveBeenLastCalledWith({ current: 3, pageSize: 10 }, {}, {})
     expect(
-      (wrapper.get('.antdv-next-pro__toolbar-search input').element as HTMLInputElement).value,
+      (wrapper.get('[data-pro-table-toolbar-search] input').element as HTMLInputElement).value,
     ).toBe('')
   })
 
@@ -170,18 +168,18 @@ describe('ProTable browser capabilities', () => {
       },
     })
     await flushPromises()
-    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('ada')
-    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await wrapper.get('[data-pro-table-toolbar-search] input').setValue('ada')
+    await wrapper.get('[data-pro-table-toolbar-search] .ant-input-search-btn').trigger('click')
     await flushPromises()
     expect(wrapper.get('.ant-table-tbody').text()).toContain('Ada')
     expect(wrapper.get('.ant-table-tbody').text()).not.toContain('Grace')
-    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('blocked')
-    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await wrapper.get('[data-pro-table-toolbar-search] input').setValue('blocked')
+    await wrapper.get('[data-pro-table-toolbar-search] .ant-input-search-btn').trigger('click')
     await flushPromises()
     expect(onSearch).toHaveBeenLastCalledWith('blocked')
     expect(wrapper.get('.ant-table-tbody').text()).toContain('Ada')
-    await wrapper.get('.antdv-next-pro__toolbar-search input').setValue('')
-    await wrapper.get('.antdv-next-pro__toolbar-search .ant-input-search-btn').trigger('click')
+    await wrapper.get('[data-pro-table-toolbar-search] input').setValue('')
+    await wrapper.get('[data-pro-table-toolbar-search] .ant-input-search-btn').trigger('click')
     await flushPromises()
     expect(wrapper.get('.ant-table-tbody').text()).toContain('Grace')
   })
@@ -199,11 +197,15 @@ describe('ProTable browser capabilities', () => {
     const root = wrapper.element as HTMLElement
     root.style.width = '500px'
     await vi.waitFor(() =>
-      expect(wrapper!.findAll('.antdv-next-pro__search-field')).toHaveLength(1),
+      expect(
+        wrapper!.findAll('.ant-pro-query-filter-col').filter((field) => field.isVisible()),
+      ).toHaveLength(1),
     )
     root.style.width = '1100px'
     await vi.waitFor(() =>
-      expect(wrapper!.findAll('.antdv-next-pro__search-field')).toHaveLength(2),
+      expect(
+        wrapper!.findAll('.ant-pro-query-filter-col').filter((field) => field.isVisible()),
+      ).toHaveLength(2),
     )
   })
 
@@ -384,7 +386,7 @@ describe('ProTable browser capabilities', () => {
         }
       ).selectedRowKeys,
     ).toEqual([])
-    expect(onSelectionChange).toHaveBeenLastCalledWith([], [])
+    expect(onSelectionChange).toHaveBeenLastCalledWith([], [], { type: 'none' })
     expect(wrapper.emitted('selectionChange')?.at(-1)).toEqual([[], []])
 
     await table.reset()
@@ -447,17 +449,21 @@ describe('ProTable browser capabilities', () => {
         dataSource: [],
         search: { defaultCollapsed: true, span: 12 },
         pagination: false,
+        options: { fullScreen: true },
         localeText: {
           search: 'Search',
           reset: 'Reset',
           expand: 'Expand',
           collapse: 'Collapse',
+          density: 'Density',
           densityDefault: 'Default density',
           densityCompact: 'Compact density',
           densityLoose: 'Loose density',
           fullScreen: 'Fullscreen',
           reload: 'Reload',
           setting: 'Column settings',
+          columnDisplay: 'Columns',
+          columnDrag: 'Drag to reorder',
         },
       },
     })
@@ -472,11 +478,19 @@ describe('ProTable browser capabilities', () => {
     await buttonByText('Expand').trigger('click')
     expect(buttonByText('Collapse').exists()).toBe(true)
 
-    await buttonByText('Default density').trigger('click')
-    expect(buttonByText('Compact density').exists()).toBe(true)
+    await buttonByText('Density').trigger('click')
+    await vi.waitFor(() => expect(buttonByText('Compact density').exists()).toBe(true))
+    await buttonByText('Compact density').trigger('click')
+    expect(wrapper.findComponent(Table).props('size')).toBe('small')
 
     await buttonByText('Column settings').trigger('click')
-    expect(wrapper.get('.antdv-next-pro__column-settings').text()).toContain('Field 1')
+    await vi.waitFor(() =>
+      expect(wrapper!.get('[data-pro-table-column-settings]').text()).toContain('Field 1'),
+    )
+    expect(wrapper.get('[data-pro-table-column-settings-header]').text()).toContain('Columns')
+    expect(wrapper.get('[data-pro-table-column-drag-handle]').attributes('aria-label')).toBe(
+      'Drag to reorder',
+    )
   })
 
   it('prefers search-specific labels and falls back for partial localeText', async () => {
@@ -507,9 +521,9 @@ describe('ProTable browser capabilities', () => {
     expect(buttonByText('Clear query').exists()).toBe(true)
     expect(wrapper.text()).not.toContain('Locale search')
     expect(buttonByText('展开').exists()).toBe(true)
-    expect(buttonByText('默认').exists()).toBe(true)
+    expect(buttonByText('密度').exists()).toBe(true)
     expect(buttonByText('刷新').exists()).toBe(true)
-    expect(buttonByText('全屏').exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="全屏"]').exists()).toBe(false)
     expect(buttonByText('Settings').exists()).toBe(true)
   })
 
@@ -536,11 +550,13 @@ describe('ProTable browser capabilities', () => {
     wrapper = mount(DarkThemeHost, { attachTo: document.body })
     await flushPromises()
     await wrapper.get('button[aria-label="列设置"]').trigger('click')
-    await nextTick()
+    await vi.waitFor(() =>
+      expect(wrapper!.find('[data-pro-table-column-settings]').exists()).toBe(true),
+    )
 
-    const root = wrapper.get('.antdv-next-pro').element as HTMLElement
-    const settings = wrapper.get('.antdv-next-pro__column-settings').element as HTMLElement
-    const search = wrapper.get('.antdv-next-pro__search').element as HTMLElement
+    const root = wrapper.get('[data-pro-table]').element as HTMLElement
+    const settings = wrapper.get('[data-pro-table-column-settings]').element as HTMLElement
+    const search = wrapper.get('[data-pro-table-search]').element as HTMLElement
     expect(root.style.getPropertyValue('--antdv-next-pro-color-bg-elevated')).not.toBe('')
     expect(getComputedStyle(settings).backgroundColor).toBe(
       resolveCssVariableColor(root, '--antdv-next-pro-color-bg-elevated'),
@@ -549,7 +565,7 @@ describe('ProTable browser capabilities', () => {
       resolveCssVariableColor(root, '--antdv-next-pro-color-bg-container'),
     )
     expect(
-      getComputedStyle(wrapper.get('.antdv-next-pro__table-card').element).backgroundColor,
+      getComputedStyle(wrapper.get('[data-pro-table-container]').element).backgroundColor,
     ).toBe(getComputedStyle(search).backgroundColor)
   })
 
@@ -581,7 +597,7 @@ describe('ProTable browser capabilities', () => {
     await wrapper.get('[data-testid="search-name"]').setValue('Ada')
     await buttonByText('查询').trigger('click')
     await flushPromises()
-    expect(request.mock.calls.at(-1)?.[0]).toEqual({ name: 'Ada' })
+    await vi.waitFor(() => expect(request.mock.calls.at(-1)?.[0]).toEqual({ name: 'Ada' }))
 
     await wrapper.setProps({ search: false, params: { name: 'Grace' } })
     await flushPromises()
@@ -664,7 +680,7 @@ describe('ProTable browser capabilities', () => {
     expect(wrapper.findAll('thead th').map((cell) => cell.text())).not.toContain('Age')
   })
 
-  it('cycles all three density levels and updates the rendered table size', async () => {
+  it('selects density from a Popover without changing size when the menu is opened', async () => {
     wrapper = mount(ProTable, {
       attachTo: document.body,
       props: {
@@ -684,18 +700,173 @@ describe('ProTable browser capabilities', () => {
     await flushPromises()
 
     expect(wrapper.findComponent(Table).props('size')).toBe('middle')
-    await buttonByText('默认').trigger('click')
-    await nextTick()
-    expect(wrapper.findComponent(Table).props('size')).toBe('small')
-
+    await buttonByText('密度').trigger('click')
+    await vi.waitFor(() => expect(wrapper!.find('[role="menu"]').exists()).toBe(true))
+    expect(wrapper.findComponent(Table).props('size')).toBe('middle')
+    expect(buttonByText('中等').attributes('aria-checked')).toBe('true')
+    expect(wrapper.findAll('[role="menuitemradio"]').map((item) => item.text())).toEqual([
+      '宽松',
+      '中等',
+      '紧凑',
+    ])
     await buttonByText('紧凑').trigger('click')
-    await nextTick()
+    expect(wrapper.findComponent(Table).props('size')).toBe('small')
+    expect(buttonByText('密度').attributes('aria-expanded')).toBe('false')
+
+    await buttonByText('密度').trigger('click')
+    await buttonByText('宽松').trigger('click')
     expect(wrapper.findComponent(Table).props('size')).toBe('large')
 
-    await buttonByText('宽松').trigger('click')
-    await nextTick()
+    await buttonByText('密度').trigger('click')
+    await buttonByText('中等').trigger('click')
     expect(wrapper.findComponent(Table).props('size')).toBe('middle')
-    expect(buttonByText('默认').exists()).toBe(true)
+    expect(buttonByText('密度').exists()).toBe(true)
+  })
+
+  it('anchors column settings in a Popover and persists visibility, sorting and reset', async () => {
+    const onChange = vi.fn()
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [
+          { title: 'Name', dataIndex: 'name' },
+          { title: 'Status', dataIndex: 'status' },
+          { title: 'Actions', key: 'actions', valueType: 'option' },
+          { title: 'Hidden', dataIndex: 'hidden', hideInTable: true },
+        ],
+        dataSource: [{ id: 1, name: 'Ada', status: 'active' }],
+        search: false,
+        pagination: false,
+        columnsState: {
+          persistenceKey: columnsStateStorageKey,
+          defaultValue: { name: { fixed: 'left' } },
+          onChange,
+        },
+      },
+    })
+    await flushPromises()
+    const tableTop = wrapper.get('table').element.getBoundingClientRect().top
+    expect(wrapper.find('[data-pro-table-column-settings]').exists()).toBe(false)
+    await buttonByText('列设置').trigger('click')
+    await vi.waitFor(() =>
+      expect(wrapper!.find('[data-pro-table-column-settings]').exists()).toBe(true),
+    )
+    const panel = wrapper.get('[data-pro-table-column-settings]')
+    expect(panel.element.closest('.ant-popover')).not.toBeNull()
+    expect(panel.text()).toContain('列展示')
+    expect(panel.text()).not.toContain('Hidden')
+    expect(panel.findAll('[data-pro-table-column-settings-item]')).toHaveLength(3)
+    expect(wrapper.get('table').element.getBoundingClientRect().top).toBe(tableTop)
+
+    await panel.get('[data-column-key="actions"] input').setValue(false)
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).not.toContain('Actions')
+    expect(panel.find('.ant-checkbox-indeterminate').exists()).toBe(true)
+    expect(onChange).toHaveBeenLastCalledWith({ name: { fixed: 'left' }, actions: { show: false } })
+
+    await panel
+      .get('[data-column-key="status"] [data-pro-table-column-drag-handle]')
+      .trigger('dragstart')
+    await panel.get('[data-column-key="name"]').trigger('drop')
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual(['Status', 'Name'])
+    expect(JSON.parse(window.localStorage.getItem(columnsStateStorageKey)!)).toEqual({
+      name: { fixed: 'left', order: 1 },
+      status: { order: 0 },
+      actions: { show: false, order: 2 },
+    })
+
+    await panel.get('[data-pro-table-column-settings-header] input').setValue(true)
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual([
+      'Status',
+      'Name',
+      'Actions',
+    ])
+    await panel.get('[data-pro-table-column-settings-header] input').setValue(false)
+    expect(onChange).toHaveBeenLastCalledWith({
+      name: { fixed: 'left', order: 1, show: false },
+      status: { order: 0, show: false },
+      actions: { order: 2, show: false },
+    })
+    await panel.get('[data-pro-table-column-settings-header] input').setValue(true)
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual([
+      'Status',
+      'Name',
+      'Actions',
+    ])
+
+    await buttonByText('重置').trigger('click')
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual([
+      'Name',
+      'Status',
+      'Actions',
+    ])
+    expect(JSON.parse(window.localStorage.getItem(columnsStateStorageKey)!)).toEqual({
+      name: { fixed: 'left' },
+    })
+
+    await panel.trigger('keydown', { key: 'Escape' })
+    expect(buttonByText('列设置').attributes('aria-expanded')).toBe('false')
+  })
+
+  it('keeps sorting within column groups and handles columns without explicit keys', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [
+          {
+            title: 'Group',
+            key: 'group',
+            columns: [
+              { title: 'Name', dataIndex: 'name' },
+              { title: 'Actions', valueType: 'option' },
+            ],
+          },
+          { title: 'Status', dataIndex: 'status' },
+          {
+            title: 'Hidden group',
+            hideInTable: true,
+            columns: [{ title: 'Hidden child', dataIndex: 'hidden' }],
+          },
+        ],
+        dataSource: [{ id: 1, name: 'Ada', status: 'active' }],
+        search: false,
+        pagination: false,
+      },
+    })
+    await buttonByText('列设置').trigger('click')
+    await vi.waitFor(() =>
+      expect(wrapper!.find('[data-pro-table-column-settings]').exists()).toBe(true),
+    )
+    const panel = wrapper.get('[data-pro-table-column-settings]')
+    expect(panel.text()).not.toContain('Hidden child')
+    const keys = () =>
+      panel.findAll('[data-column-key]').map((item) => item.attributes('data-column-key'))
+    expect(keys()).toEqual(['name', 'group.column-1', 'status'])
+
+    const handle = panel.get(
+      '[data-column-key="group.column-1"] [data-pro-table-column-drag-handle]',
+    )
+    await handle.trigger('dragstart')
+    await panel.get('[data-column-key="status"]').trigger('drop')
+    expect(keys()).toEqual(['name', 'group.column-1', 'status'])
+    await handle.trigger('keydown', { key: 'ArrowUp' })
+    expect(keys()).toEqual(['group.column-1', 'name', 'status'])
+    expect(
+      wrapper
+        .findAll('thead tr')
+        .at(-1)!
+        .findAll('th')
+        .map((cell) => cell.text()),
+    ).toEqual(['Actions', 'Name'])
+
+    await panel.get('[data-column-key="group.column-1"] input').setValue(false)
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).not.toContain('Actions')
+    await buttonByText('重置').trigger('click')
+    expect(keys()).toEqual(['name', 'group.column-1', 'status'])
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toContain('Actions')
+
+    await buttonByText('密度').trigger('click')
+    expect(buttonByText('列设置').attributes('aria-expanded')).toBe('false')
+    expect(buttonByText('密度').attributes('aria-expanded')).toBe('true')
   })
 
   it('syncs the rendered table size when the controlled size prop changes', async () => {
@@ -778,7 +949,7 @@ describe('ProTable browser capabilities', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Display: Ada')
-    await wrapper.get('.antdv-next-pro__copy').trigger('click')
+    await wrapper.get('.ant-typography-copy').trigger('click')
     await flushPromises()
     expect(writeText).toHaveBeenCalledOnce()
     expect(writeText).toHaveBeenCalledWith('Display: Ada')

@@ -123,8 +123,11 @@ describe('ProTable browser QA matrix', () => {
 
     expect(request).not.toHaveBeenCalled()
     await wrapper.get('[data-testid="remote-name"]').setValue('Ada')
-    await wrapper.get('.antdv-next-pro__search form').trigger('submit')
-    await flushPromises()
+    await wrapper.get('[data-pro-table-search] form').trigger('submit')
+    await vi.waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(1)
+      expect(wrapper!.text()).toContain('Ada-1')
+    })
 
     expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({ current: 1, name: 'Ada', pageSize: 1 }),
@@ -220,7 +223,7 @@ describe('ProTable browser QA matrix', () => {
 
     await buttonByText('列设置').trigger('click')
     const ageSetting = wrapper
-      .findAll('.antdv-next-pro__column-settings label')
+      .findAll('[data-pro-table-column-settings] label')
       .find((item) => item.text().includes('Age'))
     expect(ageSetting).toBeDefined()
     await ageSetting?.get('input').trigger('click')
@@ -303,14 +306,14 @@ describe('EditableProTable browser QA matrix', () => {
     await buttonByText('保存').trigger('click')
     await flushPromises()
 
-    expect(wrapper.get('.antdv-next-pro__validation-error').text()).toBe('Name is required')
+    expect(wrapper.get('[data-pro-table-validation-error]').text()).toBe('Name is required')
     expect(onSave).not.toHaveBeenCalled()
 
     await editor.setValue('blocked')
     await buttonByText('保存').trigger('click')
     await flushPromises()
     expect(onSave).toHaveBeenLastCalledWith(1, { id: 1, name: 'blocked' }, { id: 1, name: 'Ada' })
-    expect(wrapper.find('.antdv-next-pro__editable-cell').exists()).toBe(true)
+    expect(wrapper.find('[data-pro-table-editable-cell]').exists()).toBe(true)
 
     await buttonByText('取消').trigger('click')
     await nextTick()
@@ -382,14 +385,14 @@ describe('EditableProTable browser QA matrix', () => {
       },
     })
 
-    expect(wrapper.find('.antdv-next-pro__creator').exists()).toBe(false)
+    expect(wrapper.find('[data-pro-table-record-creator]').exists()).toBe(false)
     await wrapper.setProps({ value: [] })
     await nextTick()
     expect(buttonByText('Add row').exists()).toBe(true)
 
     await buttonByText('Add row').trigger('click')
     await nextTick()
-    expect(wrapper.find('.antdv-next-pro__creator').exists()).toBe(false)
+    expect(wrapper.find('[data-pro-table-record-creator]').exists()).toBe(false)
     expect(wrapper.emitted('update:value')?.at(-1)?.[0]).toEqual([{ id: 2, name: 'Grace' }])
   })
 })
@@ -419,7 +422,7 @@ describe('SchemaForm browser QA matrix', () => {
       { label: 'Administrator', value: 'admin', disabled: false },
     ])
 
-    await buttonByText('Submit').trigger('click')
+    await buttonByText('提交').trigger('click')
     await flushPromises()
     expect(wrapper.get('.ant-form-item-explain-error').text()).toContain('Role is required')
 
@@ -433,7 +436,7 @@ describe('SchemaForm browser QA matrix', () => {
     await flushPromises()
     expect(select.props('value')).toBe('admin')
 
-    await buttonByText('Submit').trigger('click')
+    await buttonByText('提交').trigger('click')
     await flushPromises()
     expect(wrapper.emitted('finish')?.at(-1)?.[0]).toEqual({ role: 'admin' })
   })
@@ -489,10 +492,19 @@ describe('SchemaForm browser QA matrix', () => {
       await flushPromises()
 
       expect(wrapper.get('.antdv-next-pro-schema-body').classes()).toContain(bodyClass)
-      expect(wrapper.find('[data-testid="keyword"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="hidden"]').exists()).toBe(false)
-      expect(wrapper.find('.antdv-next-pro-schema-grid').exists()).toBe(usesGrid)
-      expect(buttonByText('Search').exists()).toBe(true)
+      expect(wrapper.find('[data-pro-query-row]').exists()).toBe(usesGrid)
+      if (layoutType === 'LightFilter') {
+        expect(wrapper.find('[data-testid="keyword"]').exists()).toBe(false)
+        const trigger = wrapper.findAll('button').find((item) => item.text().includes('Keyword'))!
+        await trigger.trigger('click')
+        await flushPromises()
+        expect(document.querySelector('[data-testid="keyword"]')).not.toBeNull()
+        expect(document.querySelector('[data-testid="hidden"]')).toBeNull()
+      } else {
+        expect(wrapper.find('[data-testid="keyword"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="hidden"]').exists()).toBe(false)
+        expect(buttonByText('查询').exists()).toBe(true)
+      }
     },
   )
 
@@ -542,13 +554,13 @@ describe('SchemaForm browser QA matrix', () => {
     await flushPromises()
     expect(new URL(window.location.href).searchParams.get('name')).toBe(JSON.stringify('Grace'))
 
-    await buttonByText('Next').trigger('click')
+    await buttonByText('下一步').trigger('click')
     await flushPromises()
     expect(wrapper.emitted('update:current')?.at(-1)).toEqual([1])
-    expect(wrapper.find('[data-testid="step-name"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="step-bio"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="step-name"]').isVisible()).toBe(false)
+    expect(wrapper.get('[data-testid="step-bio"]').isVisible()).toBe(true)
 
-    await buttonByText('Previous').trigger('click')
+    await buttonByText('上一步').trigger('click')
     await flushPromises()
     expect(wrapper.emitted('update:current')?.at(-1)).toEqual([0])
   })

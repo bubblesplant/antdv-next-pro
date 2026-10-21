@@ -30,7 +30,7 @@ import App from './App.vue'
 createApp(App).use(Antd).use(AntdvNextPro).mount('#app')
 ```
 
-Plugin installation registers `ProTable`, `EditableProTable`, `SchemaForm`, the layout components, and all 19 template-friendly field names such as `ProFormText`, `ProFormSelect`, and `ProFormTreeSelect`. See [ProFormFields](/en/components/pro-form-fields) for the complete list.
+Plugin installation registers tables, ProForm, SchemaForm, providers, lists, and standalone fields such as ProFormText, ProFormSelect, and ProFormTreeSelect. See [ProFormFields](/en/components/pro-form-fields) and [v3 migration](./pro-components-v3).
 
 Named imports work without installing the `AntdvNextPro` plugin. The stylesheet still needs to be loaded once:
 
@@ -64,7 +64,7 @@ Replace `from 'antdv-next-pro'` with `from '@bubblesjs/antv-next-pro'` and chang
 
 ## Start with the components
 
-- [ProFormFields](/en/components/pro-form-fields): 19 standalone fields with shared FormItem, bare-control, option-request, readonly, and `v-model` bridge behavior.
+- [ProFormFields](/en/components/pro-form-fields): standalone fields with shared FormItem, bare-control, option-request, readonly, and `v-model` bridge behavior.
 - [ProTable](/en/components/pro-table): local/remote data, search, pagination, column state, and row editing.
 - [EditableProTable](/en/components/editable-pro-table): a complete table controlled as one editable field.
 - [SchemaForm](/en/components/schema-form): standard, overlay, filter, and step forms generated from `columns`.

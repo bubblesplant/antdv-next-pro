@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
 import type { EditableConfig, ProColumns, ProKey } from '../src/types'
-import { useEditableTable } from '../src/table/editable'
+import { useEditableTable, validateEditableRecord } from '../src/table/editable'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -56,6 +56,37 @@ function createController(
 }
 
 describe('editable table controller', () => {
+  it('resolves fallback validation messages through the active locale without replacing explicit errors', async () => {
+    const messages: Record<string, string> = {
+      'form.required': 'Required',
+      'form.validationFailed': 'Validation failed',
+    }
+    const getMessage = vi.fn((key: string, fallback: string) => messages[key] ?? fallback)
+    const required: ProColumns<Row> = {
+      dataIndex: 'name',
+      formItemProps: { rules: [{ required: true }] },
+    }
+    expect(
+      (await validateEditableRecord({ id: 1, name: '' }, [required], getMessage)).get('name'),
+    ).toBe('Required')
+    const validator: ProColumns<Row> = {
+      dataIndex: 'name',
+      formItemProps: { rules: [{ validator: () => false }] },
+    }
+    expect(
+      (await validateEditableRecord({ id: 1, name: 'Ada' }, [validator], getMessage)).get('name'),
+    ).toBe('Validation failed')
+    const explicit: ProColumns<Row> = {
+      dataIndex: 'name',
+      formItemProps: { rules: [{ required: true, message: 'Explicit error' }] },
+    }
+    getMessage.mockClear()
+    expect(
+      (await validateEditableRecord({ id: 1, name: '' }, [explicit], getMessage)).get('name'),
+    ).toBe('Explicit error')
+    expect(getMessage).not.toHaveBeenCalled()
+  })
+
   it('handles disabled, single-row and cell editability states', () => {
     const context = createController()
     const { controller, editableKeys, rows, state } = context
@@ -94,9 +125,13 @@ describe('editable table controller', () => {
       ),
     ).toBe(false)
 
+    expect(controller.start(2)).toBe(false)
+    expect(editableKeys.value).toEqual([1])
+    expect(controller.displayRecord(rows.value[0]!).name).toBe('Updated')
+    expect(controller.isCellEditable(rows.value[0]!, { dataIndex: 'name' }, 0)).toBe(true)
+    controller.cancel(1)
     expect(controller.start(2)).toBe(true)
     expect(editableKeys.value).toEqual([2])
-    expect(controller.isCellEditable(rows.value[0]!, { dataIndex: 'name' }, 0)).toBe(false)
     expect(controller.displayRecord({ id: 3, name: 'No draft' })).toEqual({
       id: 3,
       name: 'No draft',
