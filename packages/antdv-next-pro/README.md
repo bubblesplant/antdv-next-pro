@@ -1,8 +1,8 @@
 # @bubblesjs/antv-next-pro
 
-Community-maintained Vue 3 ProCard, ProTable, EditableProTable, SchemaForm, and ProFormFields powered by Antdv Next.
+Community-maintained Vue 3 ProCard, ProTable, EditableProTable, ProForm, SchemaForm, fields, lists, and descriptions powered by Antdv Next.
 
-The API follows the major workflows of `@ant-design/pro-components@2.8.10`, expressed through idiomatic Vue `v-model`, events, slots, and component refs.
+The current alignment references `@ant-design/pro-components@3.1.15-7` at commit `3bf43278d39f2d31489749132982488f57a9eb5e`, expressed through Vue `v-model`, events, slots, and component refs. See the [v3 migration guide](https://bubblesplant.github.io/antv-next-pro/en/guide/pro-components-v3) for changed defaults, classes, and callbacks.
 
 ## Install
 
@@ -45,7 +45,7 @@ import {
 </ProCard>
 ```
 
-ProCard follows the basic card in ProComponents `3.1.15-7`, using native Card theme tokens, title/action slots, loading skeletons, controlled/uncontrolled collapse, ghost mode, and semantic `styles` / `classNames`. ProTable reuses it for both its query form and table container. Tabs, split grids, StatisticCard, and CheckCard are outside this implementation's scope. See the [ProCard docs](https://bubblesplant.github.io/antv-next-pro/en/components/pro-card).
+ProCard uses native Card theme tokens, title/action slots, loading, collapse, ghost mode, semantic `classes` / `styles`, responsive columns, split layout, tabs, Group, and Divider. ProTable reuses it for query and table containers. See the [ProCard docs](https://bubblesplant.github.io/antv-next-pro/en/components/pro-card).
 
 ## ProTable
 
@@ -99,6 +99,8 @@ Available layouts are `Form`, `Embed`, `ModalForm`, `DrawerForm`, `QueryFilter`,
 
 `convertValue` transforms inbound values; `transform` shapes submitted values.
 
+Use `ProForm` to compose field children without columns; `BetaSchemaForm` is the schema entry. Structure components include Group, FieldSet, List, Dependency, and Item. ModalForm and DrawerForm await `onFinish` and close only when it returns `true`; `false`, `undefined`, and rejection preserve the popup and values. Pass `:on-finish="save"` when its return value matters.
+
 SchemaForm and the table search/edit controls share the same field registry. In addition to the existing types, `treeSelect`, `slider`, and `segmented` are available across these consumers; SchemaForm also supports `timeRange`.
 
 ## ProFormFields
@@ -129,18 +131,28 @@ async function loadOwners() {
 </template>
 ```
 
-The 19 template-friendly field exports are:
+The original template-friendly fields include:
 
 - Text and numeric: `ProFormText`, `ProFormTextPassword`, `ProFormTextArea`, `ProFormDigit`, `ProFormMoney`, `ProFormCaptcha`.
 - Date/time: `ProFormDatePicker`, `ProFormDateTimePicker`, `ProFormDateRangePicker`, `ProFormDateTimeRangePicker`.
 - Choice and state: `ProFormSelect`, `ProFormTreeSelect`, `ProFormCheckbox`, `ProFormRadioGroup`, `ProFormSlider`, `ProFormSwitch`, `ProFormSegmented`.
 - Upload: `ProFormUploadButton`, `ProFormUploadDragger`.
 
-`ProFormText.Password` aliases `ProFormTextPassword`, and `ProFormRadio.Group` aliases `ProFormRadioGroup`. Captcha only manages callback/loading/countdown state and never sends a code by itself. Upload fields bridge `fileList` to `v-model` but do not provide an upload backend; configure `action` or `customRequest` in `fieldProps`. Captcha and both Upload fields are standalone components rather than Schema/table `valueType` values.
+Additional fields include Cascader, ColorPicker, Rate, DigitRange, TimePicker/TimeRangePicker, and week/month/quarter/year date and range variants. `ProFormText.Password` aliases `ProFormTextPassword`; the renderable ProFormRadio provides `.Group`, as does ProFormCheckbox. DatePicker exposes Week/Month/Quarter/Year members.
+
+Captcha validates `phoneName` and passes the phone number to `onGetCaptcha`; applications provide the sending operation. Upload fields bridge `fileList` to `v-model`; configure `action` or `customRequest` in `fieldProps`.
+
+## Configuration and display
+
+ProConfigProvider / ProProvider inherit native ConfigProvider locale, direction, prefix, theme algorithms, global tokens, and native component tokens. Pro extensions use `ProConfigProvider.token`; native `theme.components.Card` continues to customize Card. Register custom field display/edit behavior with `valueTypeMap.render` / `formItemRender`.
+
+Public classes use `ant-pro-*` and follow the native prefix dynamically. Prefer `classes` / `styles` with objects or `({ props }) => object`; `classNames` is a compatibility alias. Column callbacks use `render(dom, record, index, action, schema)`.
+
+ProList/BaseProList, ProDescriptions, DragSortTable, RowEditorTable, CellEditorTable, and table helpers provide additional display workflows. This alignment excludes ProSkeleton, LoginForm/LoginFormPage, PageContainer/ProLayout, StatisticCard/CheckCard and their new component families.
 
 ## 中文简介
 
-`@bubblesjs/antv-next-pro` 是社区维护的组件库，为 Vue 3 + Antdv Next 提供高阶表格、Schema 表单和 19 个独立 ProFormFields。表格与表单共享字段核心，支持通用 Promise 请求、受控双向绑定、异步选项/编辑以及普通、查询、弹层和步骤表单。
+`@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 + Antdv Next 高阶组件库，提供表格、组合与 Schema 表单、统一字段、列表、描述项和 Pro 配置。表格与表单共享字段核心，支持 Promise 请求、双向绑定、异步提交与原生 ConfigProvider 配置继承。
 
 - [完整中文文档](https://bubblesplant.github.io/antv-next-pro/)
 - [English documentation](https://bubblesplant.github.io/antv-next-pro/en/)

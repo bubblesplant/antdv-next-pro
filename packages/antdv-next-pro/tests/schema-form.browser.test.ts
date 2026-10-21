@@ -60,7 +60,7 @@ describe('SchemaForm browser interactions', () => {
     await expect(form.submit()).resolves.toEqual({ normalizedKind: 'ADVANCED' })
   })
 
-  it('themes form list titles and rows from Antdv dark tokens', async () => {
+  it('themes list labels and controls from Antdv dark tokens', async () => {
     const DarkThemeHost = defineComponent({
       setup() {
         return () =>
@@ -96,15 +96,16 @@ describe('SchemaForm browser interactions', () => {
     await flushPromises()
 
     const body = wrapper.get('.antdv-next-pro-schema-body').element as HTMLElement
-    const listTitle = wrapper.get('.antdv-next-pro-form-list-title').element as HTMLElement
-    const listRow = wrapper.get('.antdv-next-pro-form-list-row').element as HTMLElement
+    const listTitle = wrapper.get('[data-pro-form-list] .ant-form-item-label label')
+      .element as HTMLElement
+    const listControl = wrapper.get('[data-pro-form-list] input').element as HTMLElement
 
     expect(body.style.getPropertyValue('--antdv-next-pro-color-text')).not.toBe('')
     expect(getComputedStyle(listTitle).color).toBe(
       resolveCssVariableColor(body, '--antdv-next-pro-color-text'),
     )
-    expect(getComputedStyle(listRow).backgroundColor).toBe(
-      resolveCssVariableColor(body, '--antdv-next-pro-color-fill-alter'),
+    expect(getComputedStyle(listControl).backgroundColor).toBe(
+      resolveCssVariableColor(body, '--antdv-next-pro-color-bg-container'),
     )
   })
 })

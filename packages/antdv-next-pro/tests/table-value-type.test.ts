@@ -1,4 +1,4 @@
-import { config, flushPromises, mount, shallowMount } from '@vue/test-utils'
+import { config, flushPromises, mount } from '@vue/test-utils'
 import {
   Checkbox,
   CheckboxGroup,
@@ -21,7 +21,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
 import { h, type Component } from 'vue'
 
 import ProTable from '../src/ProTable.vue'
-import ProFormField from '../src/pro-form-fields/ProFormField.vue'
+import FieldControl from '../src/pro-form-fields/FieldControl.vue'
 import type { ProValueType } from '../src/types'
 import {
   formatProValue,
@@ -34,6 +34,19 @@ const originalRenderStubDefaultSlot = config.global.renderStubDefaultSlot
 // Keep field controls visible inside shallowly stubbed layout containers such as ProCard.
 beforeAll(() => {
   config.global.renderStubDefaultSlot = true
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  )
 })
 afterAll(() => {
   config.global.renderStubDefaultSlot = originalRenderStubDefaultSlot
@@ -190,7 +203,7 @@ describe('table value type controls', () => {
     expect(formatProValue(['enabled', 'missing'], options, 'checkbox')).toBe('Enabled, missing')
     expect(formatProValue(['start', 'end'], [], 'dateRange')).toBe('start ~ end')
     expect(formatProValue('secret', [], 'password')).toBe('••••••')
-    expect(formatProValue(12, [], 'money')).toBe('¥12')
+    expect(formatProValue(12, [], 'money')).toBe('¥12.00')
     expect(formatProValue(80, [], 'percent')).toBe('80%')
     expect(formatProValue(dateLike, [], 'date')).toBe('2026-08-23')
     expect(formatProValue({ nested: true }, [], 'text')).toBe('-')
@@ -205,7 +218,8 @@ describe('table value type controls', () => {
       { label: 'Enabled', value: 'enabled' },
       { text: 'Disabled', key: 'disabled', disabled: true },
     ])
-    const wrapper = shallowMount(ProTable, {
+    const wrapper = mount(ProTable, {
+      global: { stubs: { NativeTable: true, ProCard: true, ListToolBar: true } },
       props: {
         columns: [
           {
@@ -224,17 +238,18 @@ describe('table value type controls', () => {
     await vi.waitFor(() => expect(request).toHaveBeenCalledWith({ scope: 'active' }))
     await flushPromises()
 
-    const control = wrapper.findComponent(ProFormField)
-    expect(control.props('options')).toEqual([
+    const control = wrapper.findComponent(FieldControl)
+    expect((control.props('fieldProps') as Record<string, unknown>).options).toEqual([
       expect.objectContaining({ label: 'Enabled', value: 'enabled', disabled: false }),
       expect.objectContaining({ label: 'Disabled', value: 'disabled', disabled: true }),
     ])
-    expect(control.props('loading')).toBe(false)
+    expect((control.props('fieldProps') as Record<string, unknown>).loading).toBe(false)
   })
 
   it('treats an empty remote option result as authoritative', async () => {
     const request = vi.fn(async () => [])
-    const wrapper = shallowMount(ProTable, {
+    const wrapper = mount(ProTable, {
+      global: { stubs: { NativeTable: true, ProCard: true, ListToolBar: true } },
       props: {
         columns: [
           {
@@ -252,7 +267,13 @@ describe('table value type controls', () => {
     await vi.waitFor(() => expect(request).toHaveBeenCalledOnce())
     await flushPromises()
 
-    expect(wrapper.findComponent(ProFormField).props('options')).toEqual([])
+    expect(
+      (
+        wrapper.findComponent(FieldControl).props('fieldProps') as
+          | Record<string, unknown>
+          | undefined
+      )?.options,
+    ).toEqual([])
     wrapper.unmount()
   })
 
@@ -263,7 +284,8 @@ describe('table value type controls', () => {
       .fn()
       .mockResolvedValueOnce([{ label: 'Remote', value: 'remote' }])
       .mockRejectedValueOnce(requestError)
-    const wrapper = shallowMount(ProTable, {
+    const wrapper = mount(ProTable, {
+      global: { stubs: { NativeTable: true, ProCard: true, ListToolBar: true } },
       props: {
         columns: [
           {
@@ -282,9 +304,13 @@ describe('table value type controls', () => {
 
     await vi.waitFor(() => expect(request).toHaveBeenCalledOnce())
     await flushPromises()
-    expect(wrapper.findComponent(ProFormField).props('options')).toEqual([
-      expect.objectContaining({ label: 'Remote', value: 'remote' }),
-    ])
+    expect(
+      (
+        wrapper.findComponent(FieldControl).props('fieldProps') as
+          | Record<string, unknown>
+          | undefined
+      )?.options,
+    ).toEqual([expect.objectContaining({ label: 'Remote', value: 'remote' })])
 
     await wrapper.setProps({
       columns: [
@@ -301,9 +327,13 @@ describe('table value type controls', () => {
     await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(2))
     await flushPromises()
 
-    expect(wrapper.findComponent(ProFormField).props('options')).toEqual([
-      expect.objectContaining({ label: 'Remote', value: 'remote' }),
-    ])
+    expect(
+      (
+        wrapper.findComponent(FieldControl).props('fieldProps') as
+          | Record<string, unknown>
+          | undefined
+      )?.options,
+    ).toEqual([expect.objectContaining({ label: 'Remote', value: 'remote' })])
     expect(onFieldRequestError).toHaveBeenCalledExactlyOnceWith(requestError)
     wrapper.unmount()
   })

@@ -118,7 +118,9 @@ const columns = [
 
 ### 列状态与列设置
 
-工具栏中的内建列设置面板只提供列显隐开关。列顺序和固定位置由 `columnsState` 中每个列 key（优先使用列 `key`，否则使用 `dataIndex`）对应的 `order`、`fixed` 编程控制：
+工具栏的列设置使用原生 `Popover`，支持列显隐（含操作列）、全选、重置和同一分组内拖动排序；聚焦拖动手柄后也可用上下方向键调整顺序。重置会恢复 `columnsState.defaultValue`，未配置时恢复列定义。密度按钮通过 `Popover` 提供“宽松 / 中等 / 紧凑”选项，并标记当前选项。
+
+列状态也可由 `columnsState` 中每个列 key（优先使用列 `key`，否则使用 `dataIndex`）对应的 `show`、`order`、`fixed` 编程控制：
 
 ```ts
 const columnsState = ref<Record<string, ProColumnsState>>({
@@ -141,7 +143,7 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 <ProTable :columns-state="tableColumnsState" />
 ```
 
-完全受控时将 `value` 与 `onChange` 配对；非受控初值使用 `defaultValue`。设置 `persistenceKey` 后，状态可写入 `localStorage` 或 `sessionStorage`，包括面板产生的 `show` 变化以及编程设置的 `order`、`fixed`。
+完全受控时将 `value` 与 `onChange` 配对；非受控初值使用 `defaultValue`。设置 `persistenceKey` 后，状态可写入 `localStorage` 或 `sessionStorage`，包括面板产生的 `show`、`order` 变化以及编程设置的 `fixed`。
 
 ### ProTable 内建编辑
 

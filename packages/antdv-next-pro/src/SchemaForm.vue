@@ -3,6 +3,7 @@ import type { VNodeChild } from 'vue'
 import type { FormRecord } from './schema-form/utils'
 import type {
   SchemaFormColumn,
+  ProDataIndex,
   SchemaFormInstance,
   SchemaFormLayoutType,
   SchemaFormProps,
@@ -10,12 +11,17 @@ import type {
 } from './types'
 
 import { Drawer, Modal } from 'antdv-next'
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, useAttrs, watch } from 'vue'
+import { useSemanticStyles } from './shared/semantic'
+import { useFormPrefix, assignRef } from './pro-form/utils'
+import { useThemeVars } from './shared/useThemeVars'
+import { useOverlaySubmitLock } from './pro-form/useOverlaySubmitLock'
 
 import SchemaFormBody from './schema-form/SchemaFormBody.vue'
 import {
   buildSchemaSteps,
   buildSubmitValues,
+  formatSchemaValues,
   cloneValue,
   convertInboundValues,
   mergeValues,
@@ -25,12 +31,17 @@ import {
   replaceRecord,
   schemaFieldNames,
   setValue,
+  getValue,
+  normalizePath,
   writeUrlValues,
 } from './schema-form/utils'
 
 interface BodyApi {
-  validateFields?: () => Promise<void>
+  getNativeForm?: () => import('antdv-next').FormInstance | undefined
+  validateFields?: (names?: ProDataIndex[], all?: boolean) => Promise<void>
   resetFields?: () => void
+  clearValidate?: (names?: ProDataIndex[]) => void
+  scrollToField?: (name: ProDataIndex, options?: ScrollIntoViewOptions) => void
 }
 
 type RuntimeSchemaSlots = Record<
@@ -38,15 +49,30 @@ type RuntimeSchemaSlots = Record<
   ((props: Record<string, unknown>) => VNodeChild) | undefined
 >
 
+defineOptions({ inheritAttrs: false })
 const props = withDefaults(defineProps<SchemaFormProps<T>>(), {
   submitter: () => ({}),
+  syncToUrl: undefined,
+  syncToInitialValues: true,
+  title: undefined,
+  searchText: undefined,
+  resetText: undefined,
+  optionRender: undefined,
+  collapseRender: undefined,
+  collapseLabel: undefined,
+  footerRender: undefined,
+  collapsed: undefined,
+  defaultCollapsed: undefined,
+  disabled: undefined,
+  collapse: undefined,
 })
 const emit = defineEmits<{
   'update:modelValue': [values: Partial<T>]
   'update:open': [open: boolean]
   'update:current': [current: number]
   change: [values: Partial<T>]
-  valuesChange: [changed: { path: Array<string | number>; value: unknown }, values: Partial<T>]
+  valuesChange: [changed: Partial<T>, values: Partial<T>]
+  fieldChange: [changed: { path: Array<string | number>; value: unknown }, values: Partial<T>]
   submit: [values: Partial<T>]
   finish: [values: Partial<T>]
   reset: [values: Partial<T>]
@@ -55,20 +81,82 @@ const emit = defineEmits<{
   currentChange: [current: number]
   error: [error: unknown]
   requestError: [error: unknown]
+  'update:collapsed': [collapsed: boolean]
+  collapse: [collapsed: boolean]
 }>()
-
 const slots = defineSlots<SchemaFormSlots<T>>()
+const attrs = useAttrs()
+const { prefix: defaultPrefix } = useFormPrefix('', () => undefined)
+const { prefix, direction, t } = useFormPrefix(
+  'form',
+  () =>
+    props.prefixCls ??
+    `${defaultPrefix.value}-${props.layoutType === 'QueryFilter' ? 'query-filter' : props.layoutType === 'LightFilter' ? 'form-light-filter' : props.layoutType === 'StepsForm' || props.layoutType === 'StepForm' ? 'steps-form' : 'form'}`,
+)
+const rootStyle = useThemeVars()
+const semantic = useSemanticStyles(props, {
+  classes: () => props.classes,
+  classNames: () => props.classNames,
+  styles: () => props.styles,
+})
+const rootAttrs = computed(() => ({
+  ...attrs,
+  class: ['antdv-next-pro-schema-form', prefix.value, attrs.class, semantic.classes.value.root],
+  style: [
+    rootStyle.value,
+    { direction: direction.value },
+    props.style,
+    attrs.style,
+    semantic.styles.value.root,
+  ],
+}))
 const bodyRef = ref<BodyApi>()
 const formState = reactive<FormRecord>({})
 const initialSnapshot = ref<FormRecord>({})
 const requestLoading = ref(false)
 const submitting = ref(false)
+const closeLock = useOverlaySubmitLock(() => props.submitTimeout)
 const internalOpen = ref(props.open ?? false)
 const internalCurrent = ref(props.current ?? 0)
 const initialized = ref(false)
 let requestSequence = 0
 let urlWriteQueued = false
 let nextNavigation: Promise<boolean> | undefined
+let pendingSubmit: Promise<Partial<T>> | undefined
+let openRevision = 0
+let alive = true
+watch(
+  internalOpen,
+  () => {
+    openRevision++
+  },
+  { flush: 'sync' },
+)
+const effectiveUrlSync = computed(() =>
+  props.syncToUrl === undefined ? props.urlSync : Boolean(props.syncToUrl),
+)
+const bodyOptions = computed(() => ({
+  formProps: { ...props.formProps, layout: props.layout, disabled: props.disabled },
+  prefixCls: prefix.value,
+  classes: semantic.classes.value,
+  styles: semantic.styles.value,
+  collapsed: props.collapsed,
+  defaultCollapsed: props.defaultCollapsed,
+  defaultColsNumber: props.defaultColsNumber,
+  span: props.span,
+  labelWidth: props.labelWidth,
+  split: props.split,
+  optionRender: props.optionRender,
+  collapseRender: props.collapseRender,
+  searchText: props.searchText,
+  resetText: props.resetText,
+  collapse: props.collapse,
+  collapseLabel: props.collapseLabel,
+  placement: props.placement,
+  footerRender: props.footerRender,
+  stepsProps: props.stepsProps,
+  finish: submit,
+}))
 
 const layoutType = computed<SchemaFormLayoutType>(() => props.layoutType ?? 'Form')
 const bodyColumns = computed(() => props.columns as unknown as SchemaFormColumn<FormRecord>[])
@@ -81,13 +169,77 @@ const isDialog = computed(
 )
 const dialogTitle = computed(() => props.title as unknown as string | undefined)
 const dialogFooter = computed(() => (slots.footer ? undefined : null))
-const dialogSubmitter = computed(() => (slots.footer ? false : props.submitter))
+const dialogSubmitter = computed(() => {
+  if (slots.footer || props.submitter === false) return false
+  const source = props.submitter ?? {}
+  const sourceReset = source.resetButtonProps
+  return {
+    ...source,
+    searchConfig: {
+      resetText: source.resetText ?? t('editableTable.action.cancel', '取消'),
+      ...source.searchConfig,
+    },
+    resetButtonProps:
+      sourceReset === false
+        ? (false as const)
+        : {
+            ...sourceReset,
+            disabled: closeLock.locked.value || sourceReset?.disabled,
+            onClick: (event: MouseEvent) => {
+              event.preventDefault()
+              if (closeLock.locked.value) return
+              if (sourceReset?.onClick) sourceReset.onClick(event)
+              else {
+                closeForm()
+                if (layoutType.value === 'ModalForm') props.modalProps?.onCancel?.(event)
+                else props.drawerProps?.onClose?.(event)
+              }
+            },
+          },
+  }
+})
+const modalOptions = computed(() => ({
+  ...props.modalProps,
+  onCancel: undefined,
+  afterClose: () => {
+    if (
+      !internalOpen.value &&
+      (props.modalProps?.destroyOnHidden ?? props.modalProps?.destroyOnClose)
+    )
+      reset()
+    props.modalProps?.afterClose?.()
+  },
+}))
+const drawerOptions = computed(() => ({
+  ...props.drawerProps,
+  onClose: undefined,
+  afterOpenChange: (next: boolean) => {
+    if (
+      !next &&
+      !internalOpen.value &&
+      (props.drawerProps?.destroyOnHidden ?? props.drawerProps?.destroyOnClose)
+    )
+      reset()
+    props.drawerProps?.afterOpenChange?.(next)
+  },
+}))
+function cancelModal(event: MouseEvent | KeyboardEvent): void {
+  if (closeLock.locked.value) return
+  props.modalProps?.onCancel?.(event)
+  closeForm()
+}
+function closeDrawer(event: MouseEvent | KeyboardEvent): void {
+  if (closeLock.locked.value) return
+  props.drawerProps?.onClose?.(event)
+  closeForm()
+}
 
 watch(
   () => props.open,
   (open) => {
     if (open !== undefined) internalOpen.value = open
   },
+  { flush: 'sync' },
 )
 
 watch(
@@ -108,8 +260,23 @@ watch(
 )
 
 watch(
-  [() => props.request, () => props.params, () => props.initialValues, () => props.urlSync],
-  () => void initialize(),
+  () =>
+    [
+      props.request,
+      cloneValue(props.params),
+      cloneValue(props.initialValues),
+      cloneValue(effectiveUrlSync.value),
+    ] as const,
+  (next, previous) => {
+    if (
+      !previous ||
+      next[0] !== previous[0] ||
+      !recordsEqual(next[1], previous[1]) ||
+      !recordsEqual(next[2], previous[2]) ||
+      !recordsEqual(next[3], previous[3])
+    )
+      void initialize()
+  },
   { deep: true, immediate: true },
 )
 
@@ -131,11 +298,14 @@ async function initialize(): Promise<void> {
     if (props.request) requested = await props.request(props.params)
     if (sequence !== requestSequence) return
 
-    const fromUrl = readUrlValues(
-      props.urlSync as SchemaFormProps<FormRecord>['urlSync'],
-      fieldNames.value,
-    )
-    const merged = mergeValues(props.initialValues, requested, fromUrl, props.modelValue)
+    const fromUrl = readUrlValues(effectiveUrlSync.value, fieldNames.value)
+    const hydrated =
+      props.syncToInitialValues === false
+        ? {}
+        : typeof props.syncToUrl === 'function'
+          ? props.syncToUrl(fromUrl, 'get')
+          : fromUrl
+    const merged = mergeValues(props.initialValues, requested, hydrated, props.modelValue)
     const converted = convertInboundValues(props.columns, merged)
     replaceRecord(formState, converted)
     initialSnapshot.value = cloneValue(converted)
@@ -162,8 +332,41 @@ function handleFieldChange(path: Array<string | number>, value: unknown): void {
   const snapshot = getFieldsValue()
   emit('update:modelValue', snapshot)
   emit('change', snapshot)
-  emit('valuesChange', { path: [...path], value: cloneValue(value) }, snapshot)
+  emit('fieldChange', { path: [...path], value: cloneValue(value) }, snapshot)
+  const changed: FormRecord = {}
+  setValue(changed, path, cloneValue(value))
+  emit('valuesChange', changed as Partial<T>, snapshot)
+  props.onValuesChange?.(changed as Partial<T>, snapshot)
   scheduleUrlWrite()
+}
+
+function handleModelChange(values: FormRecord): void {
+  if (recordsEqual(formState, values)) return
+  const changed = changedValues(formState, values)
+  replaceRecord(formState, values)
+  const snapshot = getFieldsValue()
+  emit('update:modelValue', snapshot)
+  emit('change', snapshot)
+  emit('valuesChange', changed as Partial<T>, snapshot)
+  props.onValuesChange?.(changed as Partial<T>, snapshot)
+  scheduleUrlWrite()
+}
+
+function changedValues(previous: FormRecord, next: FormRecord): FormRecord {
+  const result: FormRecord = {}
+  for (const key of new Set([...Object.keys(previous), ...Object.keys(next)])) {
+    if (recordsEqual(previous[key], next[key])) continue
+    const oldValue = previous[key]
+    const value = next[key]
+    result[key] =
+      oldValue &&
+      value &&
+      Object.getPrototypeOf(oldValue) === Object.prototype &&
+      Object.getPrototypeOf(value) === Object.prototype
+        ? changedValues(oldValue as FormRecord, value as FormRecord)
+        : cloneValue(value)
+  }
+  return result
 }
 
 function getFieldsValue(): Partial<T> {
@@ -179,9 +382,9 @@ function setFieldsValue(values: Partial<T>): void {
   scheduleUrlWrite()
 }
 
-async function validate(): Promise<Partial<T>> {
+async function validate(names?: ProDataIndex[]): Promise<Partial<T>> {
   try {
-    await bodyRef.value?.validateFields?.()
+    await bodyRef.value?.validateFields?.(names, true)
     return getFieldsValue()
   } catch (error) {
     emit('error', error)
@@ -189,23 +392,44 @@ async function validate(): Promise<Partial<T>> {
   }
 }
 
-async function submit(): Promise<Partial<T>> {
+function getFieldsFormatValue(): Partial<T> {
+  const values = formatSchemaValues(props.columns, formState, props.dateFormatter)
+  return buildSubmitValues(props.columns, values) as Partial<T>
+}
+
+async function performSubmit(): Promise<Partial<T>> {
+  const submittedRevision = openRevision
   submitting.value = true
   try {
-    const validated = await validate()
-    const values = buildSubmitValues(props.columns, validated)
+    await validate()
+    const values = getFieldsFormatValue()
     emit('submit', values)
-    emit('finish', values)
+    if (isDialog.value) closeLock.start()
+    const result = await props.onFinish?.(values)
+    if (!props.onFinish) emit('finish', values)
+    if (alive && result === true && isDialog.value && openRevision === submittedRevision)
+      closeForm()
     return values
+  } catch (error) {
+    emit('error', error)
+    throw error
   } finally {
+    closeLock.stop()
     submitting.value = false
   }
+}
+
+function submit(): Promise<Partial<T>> {
+  if (!pendingSubmit)
+    pendingSubmit = performSubmit().finally(() => {
+      pendingSubmit = undefined
+    })
+  return pendingSubmit
 }
 
 async function handleSubmit(): Promise<void> {
   try {
     await submit()
-    if (isDialog.value) closeForm()
   } catch {
     // Validation and request errors are surfaced through the error event.
   }
@@ -278,24 +502,23 @@ function normalizeCurrent(current: number): number {
 }
 
 function scheduleUrlWrite(): void {
-  if (!props.urlSync || urlWriteQueued) return
+  if (!effectiveUrlSync.value || urlWriteQueued) return
   urlWriteQueued = true
   queueMicrotask(() => {
     urlWriteQueued = false
     writeUrlValues(
-      props.urlSync as SchemaFormProps<FormRecord>['urlSync'],
-      formState,
+      effectiveUrlSync.value,
+      typeof props.syncToUrl === 'function'
+        ? props.syncToUrl(cloneValue(formState), 'set')
+        : formState,
       fieldNames.value,
     )
   })
 }
 
 function hydrateFromUrl(): void {
-  if (!props.urlSync) return
-  const fromUrl = readUrlValues(
-    props.urlSync as SchemaFormProps<FormRecord>['urlSync'],
-    fieldNames.value,
-  )
+  if (!effectiveUrlSync.value) return
+  const fromUrl = readUrlValues(effectiveUrlSync.value, fieldNames.value)
   const converted = convertInboundValues(props.columns, fromUrl)
   const reconciled = reconcileUrlValues(formState, converted, fieldNames.value)
   if (recordsEqual(formState, reconciled)) return
@@ -317,16 +540,40 @@ onBeforeUnmount(() => {
   window.removeEventListener('hashchange', hydrateFromUrl)
 })
 
-defineExpose<SchemaFormInstance<T>>({
+const formApi: SchemaFormInstance<T> = {
+  get nativeForm() {
+    return bodyRef.value?.getNativeForm?.()
+  },
   validate,
+  validateFields: validate,
+  validateFieldsReturnFormatValue: async (names) => {
+    await validate(names)
+    return getFieldsFormatValue()
+  },
   reset,
+  resetFields: reset,
+  clearValidate: (names) => bodyRef.value?.clearValidate?.(names),
   getFieldsValue,
+  getFieldValue: (name) => getValue(formState, normalizePath(name)),
+  getFieldsFormatValue,
+  getFieldFormatValue: (name) => getValue(getFieldsFormatValue(), normalizePath(name)),
   setFieldsValue,
+  setFieldValue: (name, value) => handleFieldChange(normalizePath(name), value),
   submit,
   open: openForm,
   close: closeForm,
   next,
   prev,
+  scrollToField: (name, options) => bodyRef.value?.scrollToField?.(name, options),
+  loading: submitting,
+}
+defineExpose<SchemaFormInstance<T>>(formApi)
+onMounted(() => assignRef(props.formRef, formApi))
+onBeforeUnmount(() => {
+  alive = false
+  openRevision++
+  requestSequence++
+  assignRef(props.formRef, undefined)
 })
 </script>
 
@@ -341,12 +588,12 @@ defineExpose<SchemaFormInstance<T>>({
 
   <Modal
     v-if="layoutType === 'ModalForm'"
+    v-bind="modalOptions"
     :open="internalOpen"
     :title="dialogTitle"
     :width="width"
     :footer="dialogFooter"
-    :destroy-on-hidden="false"
-    @cancel="closeForm"
+    @cancel="cancelModal"
   >
     <template v-if="slots.title" #title>
       <slot
@@ -358,8 +605,9 @@ defineExpose<SchemaFormInstance<T>>({
       />
     </template>
 
-    <div :style="style">
+    <div v-bind="rootAttrs">
       <SchemaFormBody
+        v-bind="bodyOptions"
         ref="bodyRef"
         :columns="bodyColumns"
         :model="formState"
@@ -374,6 +622,9 @@ defineExpose<SchemaFormInstance<T>>({
         :submitting="submitting"
         :schema-slots="schemaSlots"
         @field-change="handleFieldChange"
+        @model-change="handleModelChange"
+        @collapse="emit('collapse', $event)"
+        @update:collapsed="emit('update:collapsed', $event)"
         @submit="handleSubmit"
         @reset="reset"
         @next="next"
@@ -396,11 +647,11 @@ defineExpose<SchemaFormInstance<T>>({
 
   <Drawer
     v-else-if="layoutType === 'DrawerForm'"
+    v-bind="drawerOptions"
     :open="internalOpen"
     :title="dialogTitle"
     :width="width"
-    :destroy-on-close="false"
-    @close="closeForm"
+    @close="closeDrawer"
   >
     <template v-if="slots.title" #title>
       <slot
@@ -412,8 +663,9 @@ defineExpose<SchemaFormInstance<T>>({
       />
     </template>
 
-    <div :style="style">
+    <div v-bind="rootAttrs">
       <SchemaFormBody
+        v-bind="bodyOptions"
         ref="bodyRef"
         :columns="bodyColumns"
         :model="formState"
@@ -428,6 +680,9 @@ defineExpose<SchemaFormInstance<T>>({
         :submitting="submitting"
         :schema-slots="schemaSlots"
         @field-change="handleFieldChange"
+        @model-change="handleModelChange"
+        @collapse="emit('collapse', $event)"
+        @update:collapsed="emit('update:collapsed', $event)"
         @submit="handleSubmit"
         @reset="reset"
         @next="next"
@@ -448,8 +703,9 @@ defineExpose<SchemaFormInstance<T>>({
     </template>
   </Drawer>
 
-  <div v-else class="antdv-next-pro-schema-form" :style="style">
+  <div v-else v-bind="rootAttrs">
     <SchemaFormBody
+      v-bind="bodyOptions"
       ref="bodyRef"
       :columns="bodyColumns"
       :model="formState"
@@ -464,6 +720,9 @@ defineExpose<SchemaFormInstance<T>>({
       :submitting="submitting"
       :schema-slots="schemaSlots"
       @field-change="handleFieldChange"
+      @model-change="handleModelChange"
+      @collapse="emit('collapse', $event)"
+      @update:collapsed="emit('update:collapsed', $event)"
       @submit="handleSubmit"
       @reset="reset"
       @next="next"

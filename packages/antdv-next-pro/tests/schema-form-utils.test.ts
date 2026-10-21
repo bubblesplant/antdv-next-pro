@@ -246,7 +246,8 @@ describe('schema form value utilities', () => {
   it('resolves functional and fallback step titles and derives field names', () => {
     const grouped: SchemaFormColumn<FormRecord>[] = [
       {
-        title: (column) => `Dynamic ${String(column.valueType)}`,
+        title: (column) =>
+          `Dynamic ${typeof column.valueType === 'string' ? column.valueType : 'custom'}`,
         valueType: 'group',
         columns: [{ dataIndex: ['profile', 'name'] }],
       },

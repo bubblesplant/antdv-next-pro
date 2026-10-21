@@ -1,7 +1,42 @@
 import type { ProDataIndex, SchemaFormColumn, SchemaFormProps, SchemaFormStep } from '../types'
 import type { VNodeChild } from 'vue'
+import { resolveColumnValueType } from '../table/valueType'
+import { formatDates } from '../pro-form/utils'
 
 export type FormRecord = Record<string, unknown>
+
+export function schemaChildren<T extends FormRecord>(
+  column: SchemaFormColumn<T>,
+): SchemaFormColumn<T>[] {
+  return column.children ?? column.columns ?? []
+}
+
+export function formatSchemaValues<T extends FormRecord>(
+  columns: SchemaFormColumn<T>[],
+  values: FormRecord,
+  formatter: SchemaFormProps<T>['dateFormatter'],
+): FormRecord {
+  const result = cloneValue(values)
+  for (const column of columns) {
+    const path = normalizePath(column.dataIndex)
+    const type = resolveColumnValueType(column.valueType, values as T, 0).type
+    const children = schemaChildren(column)
+    const value = getValue(result, path)
+    if (type === 'formList' && Array.isArray(value)) {
+      setValue(
+        result,
+        path,
+        value.map((row) =>
+          isPlainRecord(row) ? formatSchemaValues(children, row, formatter) : row,
+        ),
+      )
+    } else if (children.length) {
+      Object.assign(result, formatSchemaValues(children, result, formatter))
+    } else if (path.length && value !== undefined)
+      setValue(result, path, formatDates(value, formatter, type))
+  }
+  return result
+}
 
 export function normalizePath(dataIndex?: ProDataIndex): Array<string | number> {
   if (dataIndex === undefined) return []
@@ -97,8 +132,9 @@ export function buildSchemaSteps<T extends FormRecord>(
   const visible = columns.filter((column) => !column.hideInForm)
   const grouped = visible.filter(
     (column) =>
-      (column.valueType === 'group' || column.valueType === 'formSet') &&
-      Boolean(column.columns?.length),
+      (resolveColumnValueType(column.valueType, {} as T, 0).type === 'group' ||
+        resolveColumnValueType(column.valueType, {} as T, 0).type === 'formSet') &&
+      Boolean(schemaChildren(column).length),
   )
 
   if (grouped.length !== visible.length || grouped.length === 0) {
@@ -107,7 +143,7 @@ export function buildSchemaSteps<T extends FormRecord>(
 
   return grouped.map((column, index) => ({
     title: resolveTitle(column, index),
-    columns: (column.columns ?? []) as SchemaFormColumn<T>[],
+    columns: schemaChildren(column),
   }))
 }
 
@@ -116,12 +152,12 @@ export function schemaFieldNames<T extends FormRecord>(columns: SchemaFormColumn
   const visit = (items: SchemaFormColumn<T>[], prefix: Array<string | number>) => {
     for (const column of items) {
       const path = [...prefix, ...normalizePath(column.dataIndex)]
-      if (column.valueType === 'formList') {
+      if (resolveColumnValueType(column.valueType, {} as T, 0).type === 'formList') {
         if (path.length > 0) names.add(path.join('.'))
         continue
       }
-      if (column.columns?.length) {
-        visit(column.columns as SchemaFormColumn<T>[], prefix)
+      if (schemaChildren(column).length) {
+        visit(schemaChildren(column), prefix)
         continue
       }
       if (path.length > 0) names.add(path.join('.'))
@@ -199,15 +235,16 @@ function convertColumns<T extends FormRecord>(
   prefix: Array<string | number>,
 ): void {
   for (const column of columns) {
-    const type = column.valueType
+    const type = resolveColumnValueType(column.valueType, root as T, 0).type
+    const children = schemaChildren(column)
     const path = [...prefix, ...normalizePath(column.dataIndex)]
 
     if (type === 'formList') {
       const list = getValue(container, path)
-      if (Array.isArray(list) && column.columns?.length) {
+      if (Array.isArray(list) && children.length) {
         const converted = list.map((item) => {
           const record = isPlainRecord(item) ? cloneValue(item) : {}
-          convertColumns(column.columns as SchemaFormColumn<T>[], record, record, [])
+          convertColumns(children, record, record, [])
           return record
         })
         setValue(container, path, converted)
@@ -215,8 +252,8 @@ function convertColumns<T extends FormRecord>(
       continue
     }
 
-    if (column.columns?.length) {
-      convertColumns(column.columns as SchemaFormColumn<T>[], root, container, prefix)
+    if (children.length) {
+      convertColumns(children, root, container, prefix)
       continue
     }
 
@@ -235,7 +272,8 @@ function collectSubmitValues<T extends FormRecord>(
 ): void {
   for (const column of columns) {
     if (column.hideInForm) continue
-    const type = column.valueType
+    const type = resolveColumnValueType(column.valueType, source as T, 0).type
+    const children = schemaChildren(column)
     const path = [...prefix, ...normalizePath(column.dataIndex)]
 
     if (type === 'divider' || type === 'option' || type === 'index' || type === 'indexBorder') {
@@ -250,17 +288,17 @@ function collectSubmitValues<T extends FormRecord>(
       }
 
       const transformed = list.map((item) => {
-        if (!isPlainRecord(item) || !column.columns?.length) return cloneValue(item)
+        if (!isPlainRecord(item) || !children.length) return cloneValue(item)
         const row: FormRecord = {}
-        collectSubmitValues(column.columns as SchemaFormColumn<T>[], item, row, [])
+        collectSubmitValues(children, item, row, [])
         return row
       })
       if (path.length > 0) setValue(target, path, transformed)
       continue
     }
 
-    if (column.columns?.length) {
-      collectSubmitValues(column.columns as SchemaFormColumn<T>[], source, target, prefix)
+    if (children.length) {
+      collectSubmitValues(children, source, target, prefix)
       continue
     }
 

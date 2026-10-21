@@ -62,7 +62,8 @@
     "verify:package": "vp pack && tsc -p tests/consumer/tsconfig.json && node scripts/verify-package.mjs"
   },
   "dependencies": {
-    "@antdv-next/icons": "catalog:"
+    "@antdv-next/icons": "catalog:",
+    "dayjs": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

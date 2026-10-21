@@ -4,6 +4,8 @@ import { Row } from 'antdv-next'
 import { mergeProps } from 'vue'
 import VNodeContent from '../shared/VNodeContent'
 import SchemaFormChildren from './SchemaFormChildren.vue'
+import { schemaChildren } from './utils'
+import { useFormPrefix } from '../pro-form/utils'
 
 defineOptions({ inheritAttrs: false })
 defineProps<{
@@ -11,12 +13,13 @@ defineProps<{
   state: CompositeState
   rootAttrs: Record<string, unknown>
 }>()
+const { prefix } = useFormPrefix('form-group', () => undefined)
 </script>
 
 <template>
   <div
     v-if="state.hasContent"
-    v-bind="mergeProps({ class: 'antdv-next-pro-dependency' }, rootAttrs)"
+    v-bind="mergeProps({ class: ['antdv-next-pro-dependency', `${prefix}-dependency`] }, rootAttrs)"
   >
     <VNodeContent :content="state.content" />
   </div>
@@ -27,6 +30,7 @@ defineProps<{
         {
           class: [
             'antdv-next-pro-schema-group',
+            prefix,
             `antdv-next-pro-schema-${context.column.valueType ?? 'group'}`,
           ],
         },
@@ -34,12 +38,22 @@ defineProps<{
       )
     "
   >
-    <legend v-if="context.column.title" class="antdv-next-pro-schema-group-title">
+    <legend
+      v-if="context.column.title"
+      class="antdv-next-pro-schema-group-title"
+      :class="`${prefix}-title`"
+    >
       <VNodeContent :content="state.title" />
     </legend>
-    <Row v-if="context.grid" v-bind="{ gutter: 16, ...context.column.rowProps }">
-      <SchemaFormChildren :columns="context.column.columns ?? []" :context="context" />
+    <Row
+      v-if="context.grid"
+      v-bind="{ gutter: 16, ...context.column.rowProps }"
+      :class="`${prefix}-container`"
+    >
+      <SchemaFormChildren :columns="schemaChildren(context.column)" :context="context" />
     </Row>
-    <SchemaFormChildren v-else :columns="context.column.columns ?? []" :context="context" />
+    <div v-else :class="`${prefix}-container`">
+      <SchemaFormChildren :columns="schemaChildren(context.column)" :context="context" />
+    </div>
   </fieldset>
 </template>

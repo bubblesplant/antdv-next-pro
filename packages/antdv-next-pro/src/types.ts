@@ -1,4 +1,16 @@
-import type { CardProps, InputSearchProps } from 'antdv-next'
+import type {
+  CardProps,
+  InputSearchProps,
+  TableProps,
+  TableColumnType,
+  TableRowSelection,
+  PaginationProps,
+  TabsProps,
+  TooltipProps,
+  FormInstance,
+  FormProps,
+  ButtonProps,
+} from 'antdv-next'
 import type { CSSProperties, Component, VNodeChild } from 'vue'
 
 export type ProCardSemanticName =
@@ -10,11 +22,33 @@ export type ProCardSemanticName =
   | 'actions'
   | 'cover'
 
+export type ProResponsiveKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
+export type ProResponsiveValue<T> = T | Partial<Record<ProResponsiveKey, T>>
+export type ProSemanticClasses<N extends string, P> =
+  | Partial<Record<N, string>>
+  | ((context: { props: P }) => Partial<Record<N, string>>)
+export type ProSemanticStyles<N extends string, P> =
+  | Partial<Record<N, CSSProperties>>
+  | ((context: { props: P }) => Partial<Record<N, CSSProperties>>)
+
 export interface ProCardProps {
   title?: VNodeChild
   subTitle?: VNodeChild
   extra?: VNodeChild
-  tooltip?: string
+  tooltip?: string | TooltipProps
+  prefixCls?: string
+  layout?: 'default' | 'center'
+  direction?: 'column' | 'row'
+  wrap?: boolean
+  colSpan?: ProResponsiveValue<number | string>
+  colStyle?: CSSProperties
+  gutter?: ProResponsiveValue<number> | ProResponsiveValue<number>[]
+  split?: 'vertical' | 'horizontal'
+  checked?: boolean
+  disabled?: boolean
+  boxShadow?: boolean
+  tabs?: TabsProps & { cardProps?: ProCardProps }
+  collapsibleIconRender?: (context: { collapsed: boolean }) => VNodeChild
   cover?: CardProps['cover']
   actions?: CardProps['actions']
   size?: 'default' | 'small'
@@ -30,7 +64,8 @@ export interface ProCardProps {
   defaultCollapsed?: boolean
   headStyle?: CSSProperties
   bodyStyle?: CSSProperties
-  styles?: Partial<Record<ProCardSemanticName, CSSProperties>>
+  styles?: ProSemanticStyles<ProCardSemanticName, ProCardProps>
+  classes?: ProSemanticClasses<ProCardSemanticName, ProCardProps>
   classNames?: Partial<Record<ProCardSemanticName, string>>
 }
 
@@ -75,6 +110,28 @@ export type ProValueType =
   | 'formSet'
   | 'divider'
   | 'dependency'
+  | 'cascader'
+  | 'color'
+  | 'colorPicker'
+  | 'rate'
+  | 'digitRange'
+  | 'dateWeek'
+  | 'dateMonth'
+  | 'dateQuarter'
+  | 'dateYear'
+  | 'dateWeekRange'
+  | 'dateMonthRange'
+  | 'dateQuarterRange'
+  | 'dateYearRange'
+  | 'progress'
+  | 'avatar'
+  | 'image'
+  | 'code'
+  | 'jsonCode'
+  | 'fromNow'
+  | 'second'
+  | 'radioButton'
+  | (string & {})
 
 export interface ProValueEnumItem<Value = unknown> {
   text: string
@@ -97,11 +154,25 @@ export interface ProRenderContext<T extends Record<string, unknown>> {
   update: (value: unknown) => void
 }
 
-export interface ProColumns<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface ProValueTypeDefinitionValue {
+  type: ProValueType
+  [key: string]: unknown
+}
+export type ProColumnValueType<T extends Record<string, unknown> = Record<string, unknown>> =
+  | ProValueType
+  | ProValueTypeDefinitionValue
+  | ((record: T, index: number) => ProValueType | ProValueTypeDefinitionValue)
+
+export interface ProColumns<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> extends Omit<
+  TableColumnType<T>,
+  'title' | 'dataIndex' | 'render' | 'children' | 'key' | 'filters' | 'sorter' | 'ellipsis'
+> {
   key?: ProKey
   dataIndex?: ProDataIndex
   title?: VNodeChild | ((column: ProColumns<T>) => VNodeChild)
-  valueType?: ProValueType
+  valueType?: ProColumnValueType<T>
   valueEnum?: ProValueEnum | (() => ProValueEnum)
   request?: (params?: Record<string, unknown>) => Promise<Array<Record<string, unknown>>>
   onFieldRequestError?: (error: unknown) => void
@@ -110,9 +181,9 @@ export interface ProColumns<T extends Record<string, unknown> = Record<string, u
   minWidth?: number
   fixed?: 'left' | 'right'
   align?: 'left' | 'center' | 'right'
-  ellipsis?: boolean
+  ellipsis?: TableColumnType<T>['ellipsis']
   copyable?: boolean
-  sorter?: boolean | ((a: T, b: T) => number)
+  sorter?: TableColumnType<T>['sorter']
   filters?: Array<{ text: string; value: ProKey }>
   search?: boolean | { transform?: (value: unknown) => Record<string, unknown> }
   editable?: boolean | ((record: T, index: number) => boolean)
@@ -126,8 +197,23 @@ export interface ProColumns<T extends Record<string, unknown> = Record<string, u
   transform?: (value: unknown, record: Partial<T>) => unknown
   dependencies?: ProDataIndex[]
   columns?: ProColumns<T>[]
-  render?: (value: unknown, context: ProRenderContext<T>) => VNodeChild
-  renderText?: (value: unknown, record: T, index: number) => unknown
+  children?: ProColumns<T>[]
+  initialValue?: unknown
+  order?: number
+  colSize?: number
+  render?: (
+    dom: VNodeChild,
+    record: T,
+    index: number,
+    action: ProTableInstance<T>,
+    schema: ProColumns<T>,
+  ) => VNodeChild
+  renderText?: (value: unknown, record: T, index: number, action: ProTableInstance<T>) => unknown
+  formItemRender?: (
+    schema: ProColumns<T>,
+    config: ProRenderContext<T>,
+    form: FormInstance | undefined,
+  ) => VNodeChild
   renderFormItem?: (column: ProColumns<T>, context: ProRenderContext<T>) => VNodeChild
 }
 
@@ -135,18 +221,19 @@ export type ProSort = Record<string, 'ascend' | 'descend' | null>
 export type ProFilter = Record<string, Array<ProKey> | null>
 
 export interface ProRequestResult<T> {
+  nextToken?: string
   data: T[]
   total?: number
   success?: boolean
 }
 
 export type ProRequest<T, P extends Record<string, unknown>> = (
-  params: P & { current?: number; pageSize?: number },
+  params: P & { current?: number; pageSize?: number; nextToken?: string },
   sort: ProSort,
   filter: ProFilter,
 ) => Promise<ProRequestResult<T>>
 
-export interface ProTableSearchConfig {
+export interface ProTableSearchConfig<T extends Record<string, unknown> = Record<string, unknown>> {
   labelWidth?: number | 'auto'
   span?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
   defaultCollapsed?: boolean
@@ -154,6 +241,15 @@ export interface ProTableSearchConfig {
   onCollapse?: (collapsed: boolean) => void
   searchText?: string
   resetText?: string
+  filterType?: 'query' | 'light'
+  optionRender?:
+    | false
+    | ((
+        search: ProTableSearchConfig<T>,
+        form: SchemaFormInstance<T> | undefined,
+        dom: VNodeChild[],
+      ) => VNodeChild)
+  collapseRender?: false | ((collapsed: boolean) => VNodeChild)
 }
 
 export type ProTableToolbarSearchConfig = Omit<InputSearchProps, 'onSearch'> & {
@@ -161,11 +257,35 @@ export type ProTableToolbarSearchConfig = Omit<InputSearchProps, 'onSearch'> & {
   onSearch?: (value: string) => void | false | Promise<void | false>
 }
 
+export type ProTableSearchForm<T extends Record<string, unknown> = Record<string, unknown>> =
+  FormProps & {
+    initialValues?: Partial<T>
+    submitter?: false | import('./pro-form/types').SubmitterProps
+  }
+
 export interface ProTableToolbarConfig {
   title?: VNodeChild
   actions?: VNodeChild | (() => VNodeChild)
   search?: boolean | ProTableToolbarSearchConfig
   onSearch?: (value: string) => void
+  subTitle?: VNodeChild
+  tooltip?: string | TooltipProps
+  tabs?: {
+    activeKey?: string
+    defaultActiveKey?: string
+    items?: Array<{ key: string; label: VNodeChild; disabled?: boolean }>
+    onChange?: (key: string) => void
+  }
+  menu?: {
+    type?: 'inline' | 'dropdown' | 'tab'
+    activeKey?: string
+    defaultActiveKey?: string
+    items?: Array<{ key: string; label: VNodeChild; disabled?: boolean }>
+    onChange?: (key: string) => void
+  }
+  filter?: VNodeChild
+  settings?: VNodeChild[]
+  multipleLine?: boolean
 }
 
 export interface ProTableLocaleText {
@@ -173,17 +293,31 @@ export interface ProTableLocaleText {
   reset: string
   expand: string
   collapse: string
+  density?: string
   densityDefault: string
   densityCompact: string
   densityLoose: string
   fullScreen: string
   reload: string
   setting: string
+  columnDisplay?: string
+  columnDrag?: string
 }
 
 export type ProTableScrollTarget = ProKey | { key: ProKey } | { top: number }
 
-export interface ProTablePagination {
+export interface ProTableRowSelection<
+  T extends Record<string, unknown>,
+> extends TableRowSelection<T> {
+  alwaysShowAlert?: boolean
+}
+
+export interface ProTablePagination extends Omit<
+  PaginationProps,
+  'current' | 'pageSize' | 'total' | 'pageSizeOptions'
+> {
+  type?: 'offset' | 'cursor'
+  nextToken?: string
   current?: number
   pageSize?: number
   total?: number
@@ -193,12 +327,24 @@ export interface ProTablePagination {
   pageSizeOptions?: Array<number | string>
 }
 
-export interface ProTableOptions {
+export interface ProTableOptions<T extends Record<string, unknown> = Record<string, unknown>> {
   search?: boolean | ProTableToolbarSearchConfig
   density?: boolean
-  fullScreen?: boolean
-  reload?: boolean
-  setting?: boolean
+  fullScreen?: boolean | ((event: MouseEvent, action: ProTableInstance<T>) => void)
+  reload?: boolean | ((event: MouseEvent, action: ProTableInstance<T>) => void)
+  setting?:
+    | boolean
+    | {
+        draggable?: boolean
+        checkable?: boolean
+        showListItemOption?: boolean
+        checkedReset?: boolean
+        listsHeight?: number
+        extra?: VNodeChild
+        children?: VNodeChild
+        settingIcon?: VNodeChild
+        listItemTitleRender?: (title: VNodeChild, column: ProColumns<T>) => VNodeChild
+      }
 }
 
 export interface ProColumnsState {
@@ -220,7 +366,24 @@ export interface EditableConfig<T extends Record<string, unknown>> {
   onSave?: (key: ProKey, record: T, origin: T) => void | boolean | Promise<void | boolean>
   onCancel?: (key: ProKey, record: T, origin: T) => void | Promise<void>
   onDelete?: (key: ProKey, record: T) => void | boolean | Promise<void | boolean>
-  actionRender?: (record: T, actions: EditableAction<T>) => VNodeChild
+  actionRender?: (
+    record: T,
+    config: EditableAction<T>,
+    defaultDom: { save: VNodeChild; cancel: VNodeChild; delete: VNodeChild },
+  ) => VNodeChild
+  /** @deprecated 原生 Form 不支持注入已有实例；使用 formRef 获取实际编辑表单。 */
+  form?: FormInstance
+  formRef?: import('vue').Ref<FormInstance | undefined>
+  formProps?: FormProps
+  editableKeys?: ProKey[]
+  onChange?: (keys: ProKey[], rows: T[]) => void
+  onValuesChange?: (record: T, rows: T[]) => void
+  onlyOneLineEditorAlertMessage?: VNodeChild
+  onlyAddOneLineAlertMessage?: VNodeChild
+  saveText?: VNodeChild
+  cancelText?: VNodeChild
+  deleteText?: VNodeChild
+  deletePopconfirmMessage?: VNodeChild
 }
 
 export interface EditableAction<T extends Record<string, unknown>> {
@@ -232,18 +395,37 @@ export interface EditableAction<T extends Record<string, unknown>> {
   editing: boolean
 }
 
-export interface RecordCreatorProps<T extends Record<string, unknown>> {
-  record: T | (() => T)
+export interface RecordCreatorProps<T extends Record<string, unknown>> extends Omit<
+  ButtonProps,
+  'onClick' | 'position'
+> {
+  record?: T | ((index: number, dataSource: T[]) => T)
   position?: 'top' | 'bottom'
   parentKey?: ProKey
   newRecordType?: 'cache' | 'dataSource'
-  creatorButtonText?: string
+  creatorButtonText?: VNodeChild
 }
 
 export interface ProTableProps<
   T extends Record<string, unknown> = Record<string, unknown>,
   P extends Record<string, unknown> = Record<string, unknown>,
+> extends Omit<
+  TableProps<T>,
+  | 'columns'
+  | 'dataSource'
+  | 'rowKey'
+  | 'loading'
+  | 'pagination'
+  | 'rowSelection'
+  | 'scroll'
+  | 'size'
+  | 'onChange'
+  | 'classes'
+  | 'styles'
+  | 'prefixCls'
+  | 'title'
 > {
+  prefixCls?: string
   columns: ProColumns<T>[]
   dataSource?: T[]
   defaultDataSource?: T[]
@@ -251,14 +433,55 @@ export interface ProTableProps<
   params?: P
   postData?: (data: T[]) => T[]
   rowKey?: keyof T | string | ((record: T) => ProKey)
-  loading?: boolean
-  search?: false | ProTableSearchConfig
+  loading?: TableProps<T>['loading']
+  headerTitle?: VNodeChild
+  tooltip?: string | TooltipProps
+  form?: ProTableSearchForm<T>
+  formRef?: import('vue').Ref<SchemaFormInstance<T> | undefined>
+  onSubmit?: (params: P) => void
+  onReset?: () => void
+  onLoadingChange?: (loading: boolean) => void
+  beforeSearchSubmit?: (params: Record<string, unknown>) => Record<string, unknown>
+  dateFormatter?: 'string' | 'number' | false | ((value: unknown, valueType: string) => unknown)
+  debounceTime?: number
+  toolBarRender?: false | ((action: ProTableInstance<T>, rows: T[]) => VNodeChild)
+  optionsRender?: (props: ProTableProps<T, P>, defaults: VNodeChild[]) => VNodeChild
+  tableRender?: (
+    props: ProTableProps<T, P>,
+    dom: VNodeChild,
+    domList: { toolbar: VNodeChild; alert: VNodeChild; table: VNodeChild },
+  ) => VNodeChild
+  tableViewRender?: (props: ProTableProps<T, P>, dom: VNodeChild) => VNodeChild
+  ErrorBoundary?: false | Component
+  tableExtraRender?: (props: ProTableProps<T, P>, rows: T[]) => VNodeChild
+  searchFormRender?: (props: ProTableProps<T, P>, dom: VNodeChild) => VNodeChild
+  tableAlertRender?:
+    | false
+    | ((context: {
+        selectedRowKeys: ProKey[]
+        selectedRows: T[]
+        onCleanSelected: () => void
+      }) => VNodeChild)
+  tableAlertOptionRender?:
+    | false
+    | ((context: {
+        selectedRowKeys: ProKey[]
+        selectedRows: T[]
+        onCleanSelected: () => void
+      }) => VNodeChild)
+  cardProps?: false | ProCardProps
+  cardBordered?: boolean | { search?: boolean; table?: boolean }
+  tableClassName?: string
+  tableStyle?: CSSProperties
+  classes?: TableProps<T>['classes']
+  styles?: TableProps<T>['styles']
+  search?: false | ProTableSearchConfig<T>
   localeText?: Partial<ProTableLocaleText>
   pagination?: false | ProTablePagination
-  options?: false | ProTableOptions
+  options?: false | ProTableOptions<T>
   toolbar?: false | ProTableToolbarConfig
-  rowSelection?: false | Record<string, unknown>
-  polling?: number
+  rowSelection?: false | ProTableRowSelection<T>
+  polling?: number | ((data: T[]) => number | false)
   revalidateOnFocus?: boolean
   manualRequest?: boolean
   columnsState?: ProColumnsStateConfig
@@ -291,7 +514,7 @@ export interface ProTableInstance<T extends Record<string, unknown> = Record<str
 export interface EditableProTableProps<
   T extends Record<string, unknown> = Record<string, unknown>,
   P extends Record<string, unknown> = Record<string, unknown>,
-> {
+> extends Omit<ProTableProps<T, P>, 'search' | 'pagination' | 'dataSource' | 'defaultDataSource'> {
   columns: ProColumns<T>[]
   value?: T[]
   defaultValue?: T[]
@@ -299,10 +522,10 @@ export interface EditableProTableProps<
   params?: P
   postData?: (data: T[]) => T[]
   rowKey?: keyof T | string | ((record: T) => ProKey)
-  loading?: boolean
+  loading?: TableProps<T>['loading']
   toolbar?: false | ProTableToolbarConfig
-  rowSelection?: false | Record<string, unknown>
-  polling?: number
+  rowSelection?: false | ProTableRowSelection<T>
+  polling?: number | ((data: T[]) => number | false)
   revalidateOnFocus?: boolean
   manualRequest?: boolean
   columnsState?: ProColumnsStateConfig
@@ -347,6 +570,8 @@ export interface SchemaFormColumn<
   tooltip?: VNodeChild
   extra?: VNodeChild
   columns?: SchemaFormColumn<T>[]
+  children?: SchemaFormColumn<T>[]
+  secondary?: boolean
 }
 
 export interface SchemaFormFieldSlotProps<T extends Record<string, unknown>> {
@@ -439,19 +664,93 @@ export interface SchemaFormProps<T extends Record<string, unknown> = Record<stri
   wrapperCol?: Record<string, unknown>
   grid?: boolean
   readonly?: boolean
+  disabled?: boolean
+  layout?: FormProps['layout']
+  formProps?: Omit<FormProps, 'model' | 'onFinish'>
+  onFinish?: (values: Partial<T>) => boolean | void | Promise<boolean | void>
+  onValuesChange?: (changed: Partial<T>, values: Partial<T>) => void
   urlSync?: boolean | { key?: string; mode?: 'query' | 'hash' }
-  submitter?: false | { submitText?: string; resetText?: string }
+  syncToUrl?:
+    | boolean
+    | ((values: Record<string, unknown>, type: 'get' | 'set') => Record<string, unknown>)
+  syncToInitialValues?: boolean
+  dateFormatter?: import('./pro-form/types').ProFormProps['dateFormatter']
+  submitter?: false | import('./pro-form/types').SubmitterProps
+  submitTimeout?: number
+  modalProps?: import('antdv-next').ModalProps
+  drawerProps?: import('antdv-next').DrawerProps
+  prefixCls?: string
+  classes?: import('./pro-form/types').SemanticValue<
+    import('./pro-form/types').FormClasses,
+    SchemaFormProps<T>
+  >
+  classNames?: import('./pro-form/types').FormClasses
+  styles?: import('./pro-form/types').SemanticValue<
+    import('./pro-form/types').FormStyles,
+    SchemaFormProps<T>
+  >
+  collapsed?: boolean
+  defaultCollapsed?: boolean
+  defaultColsNumber?: number
+  span?: number | Record<string, number>
+  labelWidth?: number | 'auto'
+  split?: boolean
+  searchText?: VNodeChild
+  resetText?: VNodeChild
+  optionRender?:
+    | false
+    | ((
+        props: import('./pro-form/types').QueryFilterProps,
+        form: import('./pro-form/types').ProFormInstance,
+        doms: VNodeChild[],
+      ) => VNodeChild)
+  collapseRender?: false | ((collapsed: boolean) => VNodeChild)
+  collapse?: boolean
+  collapseLabel?: VNodeChild
+  placement?: import('antdv-next').PopoverProps['placement']
+  footerRender?: import('./pro-form/types').LightFilterProps['footerRender']
+  stepsProps?: import('antdv-next').StepsProps
+  formRef?:
+    | import('vue').Ref<SchemaFormInstance<T> | undefined>
+    | ((instance: SchemaFormInstance<T> | undefined) => void)
   style?: CSSProperties
 }
 
 export interface SchemaFormInstance<T extends Record<string, unknown> = Record<string, unknown>> {
+  readonly nativeForm?: FormInstance
   validate: () => Promise<Partial<T>>
+  validateFields: (names?: ProDataIndex[]) => Promise<Partial<T>>
+  validateFieldsReturnFormatValue: (names?: ProDataIndex[]) => Promise<Partial<T>>
   reset: () => void
+  resetFields: () => void
+  clearValidate: (names?: ProDataIndex[]) => void
   getFieldsValue: () => Partial<T>
+  getFieldValue: (name: ProDataIndex) => unknown
+  getFieldsFormatValue: () => Partial<T>
+  getFieldFormatValue: (name: ProDataIndex) => unknown
   setFieldsValue: (values: Partial<T>) => void
+  setFieldValue: (name: ProDataIndex, value: unknown) => void
   submit: () => Promise<Partial<T>>
   open: () => void
   close: () => void
   next: () => Promise<boolean>
   prev: () => void
+  formMap?: () => Map<string, import('./pro-form/types').ProFormInstance>
+  scrollToField: (name: ProDataIndex, options?: ScrollIntoViewOptions) => void
+  loading: Readonly<import('vue').Ref<boolean>>
+}
+
+/** Layouts accept either a columns schema or ordinary composed field slots. */
+export interface SchemaLayoutProps<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> extends Omit<SchemaFormProps<T>, 'columns'> {
+  'onUpdate:open'?: (open: boolean) => void
+  'onUpdate:current'?: (current: number) => void
+  'onUpdate:collapsed'?: (collapsed: boolean) => void
+  'onUpdate:modelValue'?: (values: Partial<T>) => void
+  columns?: SchemaFormColumn<T>[]
+  trigger?: VNodeChild
+  name?: string
+  stepProps?: Record<string, unknown>
+  formMapRef?: import('vue').Ref<Map<string, import('./pro-form/types').ProFormInstance>>
 }

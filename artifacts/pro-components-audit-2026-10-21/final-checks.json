@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-21T07:56:50.9692988Z",
+  "localReportLinks": 18,
+  "brokenLocalLinks": [],
+  "fieldWrappers": 19,
+  "missingFieldWrapperCoverage": [],
+  "statusDifferencesOutsideAudit": [],
+  "browserErrors": [],
+  "temporaryReferenceDirectory": "C:\\Users\\Administrator\\Documents\\Codex\\scratch-tests\\pro-components-audit-20261021-01a15d5a",
+  "temporaryReferenceRemoved": false,
+  "cleanupStatus": "blocked_by_tool_policy"
+}

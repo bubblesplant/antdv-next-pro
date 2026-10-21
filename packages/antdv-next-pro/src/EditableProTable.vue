@@ -20,14 +20,17 @@ import type {
 } from './types'
 
 import { Button, FormItem } from 'antdv-next'
-import { computed, ref, shallowRef, toRaw, useSlots, watch } from 'vue'
+import { computed, ref, shallowRef, toRaw, useSlots, watch, getCurrentInstance } from 'vue'
 
 import ProTable from './ProTable.vue'
-import { recordsInTree } from './table/utils'
+import RenderNode from './table/RenderNode.vue'
+import { useIntl, useProPrefix } from './provider'
 
+defineOptions({ inheritAttrs: false })
 const props = withDefaults(defineProps<EditableProTableProps<T, P>>(), {
-  editable: () => ({ type: 'multiple' }),
+  editable: () => ({ type: 'single' }),
   toolbar: undefined,
+  recordCreatorProps: undefined,
 })
 
 const emit = defineEmits<{
@@ -45,21 +48,54 @@ type ExtendedTableInstance = ProTableInstance<T> & {
   setRowData: (indexOrKey: number | ProKey, value: Partial<T>) => boolean
 }
 
+const intl = useIntl()
+const prefix = useProPrefix('table', () => props.prefixCls)
+const instance = getCurrentInstance()
+const tableBindings = computed(() => {
+  Object.values(props)
+  return Object.fromEntries(
+    Object.entries(instance?.vnode.props ?? {})
+      .map(([raw, value]) => {
+        const key = raw.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())
+        return [key, (props as Record<string, unknown>)[key] ?? value]
+      })
+      .filter(
+        ([key]) =>
+          ![
+            'value',
+            'defaultValue',
+            'recordCreatorProps',
+            'maxLength',
+            'formItemProps',
+            'onValuesChange',
+            'onTableChange',
+            'ref',
+          ].includes(String(key)),
+      ),
+  )
+})
 const slots = useSlots()
 const tableRef = ref<ExtendedTableInstance>()
 const internalValue = shallowRef<T[]>([...(props.value ?? props.defaultValue ?? [])])
-const activeEditableKeys = ref<ProKey[]>([...(props.editableKeys ?? [])])
+const activeEditableKeys = ref<ProKey[]>([
+  ...(props.editableKeys ?? (props.editable ? props.editable.editableKeys : undefined) ?? []),
+])
 const pendingDraftValue = shallowRef<T[]>()
 
 const effectiveEditable = computed<false | EditableConfig<T>>(() =>
-  props.editable === false ? false : (props.editable ?? { type: 'multiple' }),
+  props.editable === false ? false : { ...props.editable, type: props.editable?.type ?? 'single' },
 )
 
 const creator = computed(() =>
-  props.recordCreatorProps === false ? undefined : props.recordCreatorProps,
+  props.recordCreatorProps === false ? undefined : (props.recordCreatorProps ?? {}),
 )
+const creatorBindings = computed(() => {
+  const { record, position, parentKey, newRecordType, creatorButtonText, ...rest } =
+    creator.value ?? {}
+  return rest
+})
 const reachedMaxLength = computed(
-  () => props.maxLength !== undefined && recordsInTree(getRowsData()).length >= props.maxLength,
+  () => props.maxLength !== undefined && getRowsData().length >= props.maxLength,
 )
 const showCreatorAtTop = computed(
   () => !reachedMaxLength.value && creator.value?.position === 'top',
@@ -124,7 +160,13 @@ function handleTableChange(
 function createRecord(): boolean {
   const config = creator.value
   if (!config || reachedMaxLength.value) return false
-  const record = typeof config.record === 'function' ? config.record() : { ...config.record }
+  const generatedKey = `pro-created-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  const record =
+    typeof config.record === 'function'
+      ? config.record(getRowsData().length, getRowsData())
+      : config.record
+        ? { ...config.record }
+        : ({ [typeof props.rowKey === 'string' ? props.rowKey : 'id']: generatedKey } as T)
   return (
     tableRef.value?.addEditRecord(record, {
       position: config.position,
@@ -176,7 +218,7 @@ function cancelEditable(key: ProKey): void {
 }
 
 function addEditRecord(record: T, options?: Omit<RecordCreatorProps<T>, 'record'>): boolean {
-  if (props.maxLength !== undefined && recordsInTree(getRowsData()).length >= props.maxLength) {
+  if (props.maxLength !== undefined && getRowsData().length >= props.maxLength) {
     return false
   }
   return tableRef.value?.addEditRecord(record, options) ?? false
@@ -215,38 +257,25 @@ defineExpose<EditableProTableInstance<T>>({
 <template>
   <component
     :is="props.formItemProps ? FormItem : 'div'"
-    class="antdv-next-pro-editable-table"
     v-bind="props.formItemProps"
+    :class="`${prefix}-editable`"
+    data-pro-editable-table
   >
-    <div v-if="showCreatorAtTop" class="antdv-next-pro__creator">
-      <Button block type="dashed" @click="createRecord">
-        {{ creator?.creatorButtonText ?? '添加一行数据' }}
-      </Button>
-    </div>
-
+    <!-- @vue-generic {T, P} -->
     <ProTable
       ref="tableRef"
       :columns="props.columns"
+      v-bind="{ ...tableBindings, ...$attrs }"
       :data-source="internalValue"
-      :request="props.request"
-      :params="props.params"
-      :post-data="props.postData"
-      :row-key="props.rowKey"
-      :loading="props.loading"
-      :toolbar="props.toolbar"
-      :row-selection="props.rowSelection"
-      :polling="props.polling"
-      :revalidate-on-focus="props.revalidateOnFocus ?? false"
-      :manual-request="props.manualRequest"
-      :columns-state="props.columnsState"
       :editable="effectiveEditable"
-      :editable-keys="props.editableKeys"
-      :scroll="props.scroll"
-      :size="props.size"
-      :bordered="props.bordered"
+      :editable-keys="
+        props.editableKeys ??
+        (props.editable ? props.editable.editableKeys : undefined) ??
+        activeEditableKeys
+      "
       :search="false"
       :pagination="false"
-      :options="false"
+      :options="props.options ?? false"
       @update:data-source="handleValueUpdate"
       @update:editable-keys="handleEditableKeysUpdate"
       @data-source-change="handleValuesChange"
@@ -255,15 +284,50 @@ defineExpose<EditableProTableInstance<T>>({
       @request-error="emit('requestError', $event)"
       @editable-error="emit('editableError', $event)"
     >
-      <template v-for="(_, name) in slots" #[name]="slotProps">
-        <slot :name="name" v-bind="slotProps ?? {}" />
-      </template>
+      <template #before-table
+        ><slot name="before-table" />
+        <div
+          v-if="showCreatorAtTop"
+          :class="`${prefix}-record-creator`"
+          data-pro-table-record-creator
+        >
+          <Button block type="dashed" v-bind="creatorBindings" @click="createRecord"
+            ><slot name="creator-button"
+              ><RenderNode
+                :content="
+                  creator?.creatorButtonText ??
+                  intl.getMessage('editableTable.action.add', '添加一行数据')
+                " /></slot
+          ></Button></div
+      ></template>
+      <template #after-table
+        ><div
+          v-if="showCreatorAtBottom"
+          :class="`${prefix}-record-creator`"
+          data-pro-table-record-creator
+        >
+          <Button block type="dashed" v-bind="creatorBindings" @click="createRecord"
+            ><slot name="creator-button"
+              ><RenderNode
+                :content="
+                  creator?.creatorButtonText ??
+                  intl.getMessage('editableTable.action.add', '添加一行数据')
+                " /></slot
+          ></Button>
+        </div>
+        <slot name="after-table"
+      /></template>
+      <template v-for="(_, name) in slots" #[name]="slotProps"
+        ><slot
+          v-if="name !== 'before-table' && name !== 'after-table' && name !== 'creator-button'"
+          :name="name"
+          v-bind="slotProps ?? {}"
+      /></template>
     </ProTable>
-
-    <div v-if="showCreatorAtBottom" class="antdv-next-pro__creator">
-      <Button block type="dashed" @click="createRecord">
-        {{ creator?.creatorButtonText ?? '添加一行数据' }}
-      </Button>
-    </div>
   </component>
 </template>
+<style>
+[data-pro-table-record-creator] {
+  padding: 16px 0;
+}
+</style>

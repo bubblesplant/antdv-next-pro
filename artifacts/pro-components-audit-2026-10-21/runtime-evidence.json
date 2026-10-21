@@ -1,0 +1,624 @@
+{
+  "checkedAt": "2026-10-21T07:43:46.632Z",
+  "local": {
+    "exports": [
+      "AntdvNextPro",
+      "DrawerForm",
+      "EditableProTable",
+      "Embed",
+      "FieldControl",
+      "Form",
+      "LightFilter",
+      "ModalForm",
+      "ProCard",
+      "ProFormCaptcha",
+      "ProFormCheckbox",
+      "ProFormDatePicker",
+      "ProFormDateRangePicker",
+      "ProFormDateTimePicker",
+      "ProFormDateTimeRangePicker",
+      "ProFormDigit",
+      "ProFormField",
+      "ProFormMoney",
+      "ProFormRadio",
+      "ProFormRadioGroup",
+      "ProFormSegmented",
+      "ProFormSelect",
+      "ProFormSlider",
+      "ProFormSwitch",
+      "ProFormText",
+      "ProFormTextArea",
+      "ProFormTextPassword",
+      "ProFormTreeSelect",
+      "ProFormUploadButton",
+      "ProFormUploadDragger",
+      "ProTable",
+      "QueryFilter",
+      "ReadonlyField",
+      "SchemaForm",
+      "StepForm",
+      "StepsForm",
+      "default",
+      "fieldRegistry",
+      "findFieldOption",
+      "formatReadonlyValue",
+      "getValueEnumOptions",
+      "hasExplicitProp",
+      "normalizeFieldOption",
+      "normalizeFieldOptions",
+      "pickExplicitProps",
+      "proFormFieldComponents",
+      "resolveFieldDescriptor",
+      "resolveLocalFieldOptions",
+      "stableSerialize",
+      "useFieldOptions"
+    ],
+    "cardGlobalPrefix": {
+      "rootClass": "demo-card demo-card-bordered audit-user-class css-var-root antdv-next-pro-card",
+      "proClasses": [
+        "antdv-next-pro-card",
+        "antdv-next-pro-card__header",
+        "antdv-next-pro-card__title",
+        "antdv-next-pro-card__heading",
+        "antdv-next-pro__render-node",
+        "antdv-next-pro-card__body",
+        "antdv-next-pro-card__content"
+      ],
+      "hasDemoCard": true,
+      "hasOfficialProClass": false,
+      "warnings": []
+    },
+    "cardCustomPrefix": {
+      "rootClass": "demo-pro-card demo-pro-card-bordered css-var-root antdv-next-pro-card",
+      "proClasses": [
+        "demo-pro-card",
+        "demo-pro-card-bordered",
+        "antdv-next-pro-card",
+        "demo-pro-card-head",
+        "antdv-next-pro-card__header",
+        "demo-pro-card-head-wrapper",
+        "demo-pro-card-head-title",
+        "antdv-next-pro-card__title",
+        "antdv-next-pro-card__heading",
+        "antdv-next-pro__render-node",
+        "demo-pro-card-body",
+        "antdv-next-pro-card__body",
+        "antdv-next-pro-card__content"
+      ],
+      "warnings": []
+    },
+    "table": {
+      "rootClass": "antdv-next-pro audit-table-class",
+      "proClasses": [
+        "antdv-next-pro",
+        "antdv-next-pro__search",
+        "antdv-next-pro-card",
+        "antdv-next-pro-card__body",
+        "antdv-next-pro-card__content",
+        "antdv-next-pro__search-fields",
+        "antdv-next-pro__search-field",
+        "antdv-next-pro__search-actions",
+        "antdv-next-pro__search-collapse",
+        "antdv-next-pro__table-card",
+        "antdv-next-pro__toolbar",
+        "antdv-next-pro__toolbar-actions",
+        "antdv-next-pro__cell-value",
+        "antdv-next-pro__render-node"
+      ],
+      "initialSearchInputs": 5,
+      "defaultFullScreenButton": true,
+      "rowClassReachedRow": false,
+      "rowClassAttributeOnOuterDiv": "() => 'audit-row-class'",
+      "requestsBeforeEmptyRequiredSubmit": 1,
+      "requestsAfterEmptyRequiredSubmit": 2,
+      "validationErrorsAfterSubmit": 0,
+      "warnings": []
+    },
+    "Form": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-horizontal css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Submit", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "Embed": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-horizontal css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Submit", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "QueryFilter": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-grid",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-inline css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Search", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "LightFilter": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-inline css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Search", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "StepForm": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-horizontal css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Submit", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "StepsForm": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-horizontal css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Submit", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "SchemaForm": {
+      "proClasses": [
+        "antdv-next-pro-schema-form",
+        "antdv-next-pro-schema-body",
+        "antdv-next-pro-schema-submitter"
+      ],
+      "formClass": "ant-form ant-form-horizontal css-var-root ant-form-css-var",
+      "userClassAttached": false,
+      "buttons": ["Submit", "Reset"],
+      "warnings": [
+        "Extraneous non-props attributes (class) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes."
+      ]
+    },
+    "fieldPublicProps": {
+      "textInputPlaceholder": null,
+      "placeholderOnFormItem": "DIV",
+      "digitInputMaximum": null,
+      "warnings": []
+    },
+    "modalAsyncFinish": {
+      "duringFinishPromise": {
+        "finishState": "pending",
+        "modalVisible": true,
+        "modalClass": "ant-modal ant-zoom-appear-active ant-zoom-enter-active ant-zoom ant-zoom-enter ant-zoom-appear",
+        "submitLoading": false
+      },
+      "closeEvents": [
+        {
+          "open": false,
+          "finishState": "pending"
+        }
+      ],
+      "afterFinishState": "resolved-false",
+      "modalVisibleAfterFalse": false,
+      "warnings": []
+    },
+    "readonly": {
+      "text": "12345.6¥12345.62026-10-21T12:34:56.000Z成功12345.6",
+      "fields": ["12345.6", "¥12345.6", "2026-10-21T12:34:56.000Z", "成功", "12345.6"],
+      "badges": 0,
+      "proClasses": ["antdv-next-pro-readonly-field"],
+      "warnings": []
+    },
+    "editableDefaultMode": {
+      "first": true,
+      "second": true,
+      "editingInputs": 2,
+      "proClasses": [
+        "antdv-next-pro-editable-table",
+        "antdv-next-pro",
+        "antdv-next-pro__table-card",
+        "antdv-next-pro-card",
+        "antdv-next-pro-card__body",
+        "antdv-next-pro-card__content",
+        "antdv-next-pro__editable-cell"
+      ],
+      "warnings": []
+    },
+    "browserErrors": []
+  },
+  "official": [
+    {
+      "page": "card",
+      "url": "https://pro-components.antdigital.dev/components/card.html",
+      "status": 200,
+      "title": "ProCard 高级卡片 - ProComponents",
+      "proClasses": [
+        "ant-pro-card",
+        "ant-pro-card-actions",
+        "ant-pro-card-body",
+        "ant-pro-card-body-center",
+        "ant-pro-card-body-direction-column",
+        "ant-pro-card-body-wrap",
+        "ant-pro-card-border",
+        "ant-pro-card-box-shadow",
+        "ant-pro-card-col",
+        "ant-pro-card-col-0",
+        "ant-pro-card-col-10",
+        "ant-pro-card-col-12",
+        "ant-pro-card-col-24",
+        "ant-pro-card-col-4",
+        "ant-pro-card-col-6",
+        "ant-pro-card-collapse",
+        "ant-pro-card-collapse-shell",
+        "ant-pro-card-collapsible",
+        "ant-pro-card-collapsible-icon",
+        "ant-pro-card-contain-card",
+        "ant-pro-card-divider",
+        "ant-pro-card-divider-horizontal",
+        "ant-pro-card-extra",
+        "ant-pro-card-ghost",
+        "ant-pro-card-header",
+        "ant-pro-card-header-border",
+        "ant-pro-card-header-collapsible",
+        "ant-pro-card-hoverable",
+        "ant-pro-card-legacy",
+        "ant-pro-card-loading",
+        "ant-pro-card-loading-block",
+        "ant-pro-card-loading-content",
+        "ant-pro-card-size-default",
+        "ant-pro-card-size-small",
+        "ant-pro-card-split",
+        "ant-pro-card-split-horizontal",
+        "ant-pro-card-split-vertical",
+        "ant-pro-card-tabs",
+        "ant-pro-card-title",
+        "ant-pro-card-type-default",
+        "ant-pro-card-type-inner",
+        "ant-pro-core-label-tip",
+        "ant-pro-core-label-tip-icon",
+        "ant-pro-core-label-tip-title",
+        "ant-pro-form-group",
+        "ant-pro-form-group-container"
+      ],
+      "formLayouts": []
+    },
+    {
+      "page": "table/api",
+      "url": "https://pro-components.antdigital.dev/components/table/api.html",
+      "status": 200,
+      "title": "Demos - ProComponents",
+      "proClasses": [
+        "ant-pro-card",
+        "ant-pro-card-body",
+        "ant-pro-card-border",
+        "ant-pro-card-col",
+        "ant-pro-card-collapse-shell",
+        "ant-pro-card-contain-card",
+        "ant-pro-card-ghost",
+        "ant-pro-card-header",
+        "ant-pro-card-legacy",
+        "ant-pro-card-split",
+        "ant-pro-card-split-vertical",
+        "ant-pro-card-title",
+        "ant-pro-core-field-dropdown-label",
+        "ant-pro-core-field-label",
+        "ant-pro-core-field-label-active",
+        "ant-pro-core-field-label-allow-clear",
+        "ant-pro-core-field-label-arrow",
+        "ant-pro-core-field-label-borderless",
+        "ant-pro-core-field-label-borderless-active",
+        "ant-pro-core-field-label-close",
+        "ant-pro-core-field-label-icon",
+        "ant-pro-core-field-label-middle",
+        "ant-pro-core-field-label-text",
+        "ant-pro-core-label-tip",
+        "ant-pro-core-label-tip-icon",
+        "ant-pro-core-label-tip-subtitle",
+        "ant-pro-core-label-tip-title",
+        "ant-pro-core-label-tip-title-ellipsis",
+        "ant-pro-form",
+        "ant-pro-form-light-filter",
+        "ant-pro-form-light-filter-container",
+        "ant-pro-form-light-filter-item",
+        "ant-pro-form-light-filter-middle",
+        "ant-pro-query-filter",
+        "ant-pro-query-filter-actions",
+        "ant-pro-query-filter-collapse-button",
+        "ant-pro-query-filter-container",
+        "ant-pro-query-filter-row",
+        "ant-pro-query-filter-row-split",
+        "ant-pro-table",
+        "ant-pro-table-alert",
+        "ant-pro-table-alert-container",
+        "ant-pro-table-alert-info",
+        "ant-pro-table-alert-info-content",
+        "ant-pro-table-alert-info-option",
+        "ant-pro-table-extra",
+        "ant-pro-table-list-toolbar",
+        "ant-pro-table-list-toolbar-container",
+        "ant-pro-table-list-toolbar-container-mobile",
+        "ant-pro-table-list-toolbar-extra-line",
+        "ant-pro-table-list-toolbar-filter",
+        "ant-pro-table-list-toolbar-left",
+        "ant-pro-table-list-toolbar-left-has-tabs",
+        "ant-pro-table-list-toolbar-right",
+        "ant-pro-table-list-toolbar-search",
+        "ant-pro-table-list-toolbar-setting-item",
+        "ant-pro-table-list-toolbar-setting-items",
+        "ant-pro-table-list-toolbar-title",
+        "ant-pro-table-search",
+        "ant-pro-table-search-light-filter",
+        "ant-pro-table-search-query-filter"
+      ],
+      "formLayouts": ["ant-form-vertical", "ant-form-horizontal", ""]
+    },
+    {
+      "page": "query-filter",
+      "url": "https://pro-components.antdigital.dev/components/query-filter.html",
+      "status": 200,
+      "title": "Query/LightFilter 筛选表单 - ProComponents",
+      "proClasses": [
+        "ant-pro-core-field-dropdown-label",
+        "ant-pro-core-field-label",
+        "ant-pro-core-field-label-active",
+        "ant-pro-core-field-label-allow-clear",
+        "ant-pro-core-field-label-arrow",
+        "ant-pro-core-field-label-borderless",
+        "ant-pro-core-field-label-borderless-active",
+        "ant-pro-core-field-label-close",
+        "ant-pro-core-field-label-icon",
+        "ant-pro-core-field-label-middle",
+        "ant-pro-core-field-label-text",
+        "ant-pro-field-cascader",
+        "ant-pro-field-checkbox-horizontal",
+        "ant-pro-field-radio-horizontal",
+        "ant-pro-field-select-light-select",
+        "ant-pro-field-select-light-select-container-bottomLeft",
+        "ant-pro-field-select-light-select-searchable",
+        "ant-pro-field-tree-select",
+        "ant-pro-filed-search-select",
+        "ant-pro-filed-search-select-option",
+        "ant-pro-form",
+        "ant-pro-form-group",
+        "ant-pro-form-group-container",
+        "ant-pro-form-group-title",
+        "ant-pro-form-light-filter",
+        "ant-pro-form-light-filter-collapse-icon",
+        "ant-pro-form-light-filter-container",
+        "ant-pro-form-light-filter-effective",
+        "ant-pro-form-light-filter-item",
+        "ant-pro-form-light-filter-middle",
+        "ant-pro-query-filter",
+        "ant-pro-query-filter-actions",
+        "ant-pro-query-filter-collapse-button",
+        "ant-pro-query-filter-container",
+        "ant-pro-query-filter-row",
+        "ant-pro-query-filter-row-split",
+        "ant-pro-query-filter-row-split-line"
+      ],
+      "formLayouts": ["ant-form-vertical", "ant-form-horizontal"]
+    },
+    {
+      "page": "steps-form",
+      "url": "https://pro-components.antdigital.dev/components/steps-form.html",
+      "status": 200,
+      "title": "StepsForm 分步表单 - ProComponents",
+      "proClasses": [
+        "ant-pro-card",
+        "ant-pro-card-body",
+        "ant-pro-card-collapsible",
+        "ant-pro-card-collapsible-icon",
+        "ant-pro-card-header",
+        "ant-pro-card-header-border",
+        "ant-pro-card-header-collapsible",
+        "ant-pro-card-title",
+        "ant-pro-field-checkbox-horizontal",
+        "ant-pro-filed-search-select",
+        "ant-pro-filed-search-select-option",
+        "ant-pro-form",
+        "ant-pro-form-group",
+        "ant-pro-form-group-container",
+        "ant-pro-form-group-title",
+        "ant-pro-steps-form",
+        "ant-pro-steps-form-container",
+        "ant-pro-steps-form-step",
+        "ant-pro-steps-form-step-active",
+        "ant-pro-steps-form-steps-container"
+      ],
+      "formLayouts": ["ant-form-vertical"]
+    },
+    {
+      "page": "field-set",
+      "url": "https://pro-components.antdigital.dev/components/field-set.html",
+      "status": 200,
+      "title": "ProFormFields 表单项 - ProComponents",
+      "proClasses": [
+        "ant-pro-field-cascader",
+        "ant-pro-field-checkbox-horizontal",
+        "ant-pro-field-color-picker",
+        "ant-pro-field-radio-horizontal",
+        "ant-pro-field-radio-vertical",
+        "ant-pro-field-readonly",
+        "ant-pro-field-tree-select",
+        "ant-pro-filed-search-select",
+        "ant-pro-filed-search-select-option",
+        "ant-pro-form",
+        "ant-pro-form-group",
+        "ant-pro-form-group-container",
+        "ant-pro-form-group-title",
+        "ant-pro-form-light-filter",
+        "ant-pro-form-light-filter-container",
+        "ant-pro-form-light-filter-effective",
+        "ant-pro-form-light-filter-item",
+        "ant-pro-form-light-filter-middle",
+        "ant-pro-form-list",
+        "ant-pro-form-list-container",
+        "ant-pro-form-list-item",
+        "ant-pro-form-list-item-default"
+      ],
+      "formLayouts": ["ant-form-vertical", "ant-form-horizontal"]
+    }
+  ],
+  "fieldWrappers": [
+    {
+      "name": "ProFormText",
+      "filename": "ProFormText.vue",
+      "fieldType": "text",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormDigit",
+      "filename": "ProFormDigit.vue",
+      "fieldType": "digit",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormTextPassword",
+      "filename": "ProFormTextPassword.vue",
+      "fieldType": "password",
+      "routesToProFormField": true,
+      "sourceLines": 31
+    },
+    {
+      "name": "ProFormTextArea",
+      "filename": "ProFormTextArea.vue",
+      "fieldType": "textarea",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormCaptcha",
+      "filename": "ProFormCaptcha.vue",
+      "fieldType": "captcha",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    },
+    {
+      "name": "ProFormDatePicker",
+      "filename": "ProFormDatePicker.vue",
+      "fieldType": "date",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormDateTimePicker",
+      "filename": "ProFormDateTimePicker.vue",
+      "fieldType": "dateTime",
+      "routesToProFormField": true,
+      "sourceLines": 31
+    },
+    {
+      "name": "ProFormDateRangePicker",
+      "filename": "ProFormDateRangePicker.vue",
+      "fieldType": "dateRange",
+      "routesToProFormField": true,
+      "sourceLines": 31
+    },
+    {
+      "name": "ProFormDateTimeRangePicker",
+      "filename": "ProFormDateTimeRangePicker.vue",
+      "fieldType": "dateTimeRange",
+      "routesToProFormField": true,
+      "sourceLines": 31
+    },
+    {
+      "name": "ProFormSelect",
+      "filename": "ProFormSelect.vue",
+      "fieldType": "select",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    },
+    {
+      "name": "ProFormTreeSelect",
+      "filename": "ProFormTreeSelect.vue",
+      "fieldType": "treeSelect",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    },
+    {
+      "name": "ProFormCheckbox",
+      "filename": "ProFormCheckbox.vue",
+      "fieldType": "checkbox",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    },
+    {
+      "name": "ProFormRadioGroup",
+      "filename": "ProFormRadioGroup.vue",
+      "fieldType": "radio",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    },
+    {
+      "name": "ProFormSlider",
+      "filename": "ProFormSlider.vue",
+      "fieldType": "slider",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormSwitch",
+      "filename": "ProFormSwitch.vue",
+      "fieldType": "switch",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormUploadButton",
+      "filename": "ProFormUploadButton.vue",
+      "fieldType": "uploadButton",
+      "routesToProFormField": true,
+      "sourceLines": 33
+    },
+    {
+      "name": "ProFormUploadDragger",
+      "filename": "ProFormUploadDragger.vue",
+      "fieldType": "uploadDragger",
+      "routesToProFormField": true,
+      "sourceLines": 33
+    },
+    {
+      "name": "ProFormMoney",
+      "filename": "ProFormMoney.vue",
+      "fieldType": "money",
+      "routesToProFormField": true,
+      "sourceLines": 29
+    },
+    {
+      "name": "ProFormSegmented",
+      "filename": "ProFormSegmented.vue",
+      "fieldType": "segmented",
+      "routesToProFormField": true,
+      "sourceLines": 35
+    }
+  ]
+}

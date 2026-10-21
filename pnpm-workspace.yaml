@@ -17,8 +17,10 @@ catalog:
   '@vitest/coverage-v8': 5.0.5
   '@vue/test-utils': ^2.4.11
   antdv-next: ^1.5.2
+  dayjs: ^1.11.23
   esbuild: ^0.28.0
   eslint: ^10.9.0
+  fflate: ^0.8.3
   jsdom: ^30.0.1
   playwright: ^1.62.1
   typescript: ^5.9.3
@@ -28,6 +30,7 @@ catalog:
   vitest: 5.0.5
   vitest-browser-vue: ^3.1.0
   vue: ^3.5.41
+  vue-router: ^4.6.4
   vue-tsc: ^3.3.11
 
 overrides:

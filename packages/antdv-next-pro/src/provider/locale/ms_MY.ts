@@ -1,0 +1,89 @@
+// Copyright Ant Design Pro Components contributors. MIT license.
+import type { ProLocale } from './zh_CN'
+
+const msMY: ProLocale = {
+  moneySymbol: 'RM',
+  deleteThisLine: 'Padam baris ini',
+  copyThisLine: 'Salin baris ini',
+  form: {
+    lightFilter: {
+      more: 'Lebih banyak',
+      clear: 'Jelas',
+      confirm: 'Mengesahkan',
+      itemUnit: 'Item',
+    },
+  },
+  field: {
+    colorPicker: {
+      recommended: 'Disyorkan',
+    },
+  },
+  tableForm: {
+    search: 'Cari',
+    reset: 'Menetapkan semula',
+    submit: 'Hantar',
+    collapsed: 'Kembang',
+    expand: 'Kuncup',
+    inputPlaceholder: 'Sila masuk',
+    selectPlaceholder: 'Sila pilih',
+  },
+  alert: {
+    clear: 'Padam',
+    selected: 'Dipilih',
+    item: 'Item',
+  },
+  pagination: {
+    total: {
+      range: ' ',
+      total: 'daripada',
+      item: 'item',
+    },
+  },
+  tableToolBar: {
+    leftPin: 'Pin ke kiri',
+    rightPin: 'Pin ke kanan',
+    noPin: 'Tidak pin',
+    leftFixedTitle: 'Tetap ke kiri',
+    rightFixedTitle: 'Tetap ke kanan',
+    noFixedTitle: 'Tidak Tetap',
+    reset: 'Menetapkan semula',
+    columnDisplay: 'Lajur',
+    columnSetting: 'Tetapan',
+    fullScreen: 'Skrin penuh',
+    exitFullScreen: 'Keluar skrin penuh',
+    reload: 'Muat Semula',
+    density: 'Densiti',
+    densityDefault: 'Biasa',
+    densityLarger: 'Besar',
+    densityMiddle: 'Tengah',
+    densitySmall: 'Kecil',
+  },
+  stepsForm: {
+    next: 'Seterusnya',
+    prev: 'Sebelumnya',
+    submit: 'Selesai',
+  },
+  loginForm: {
+    submitText: 'Log Masuk',
+  },
+  editableTable: {
+    onlyOneLineEditor: 'Hanya satu baris boleh disunting pada satu masa',
+    onlyAddOneLine: 'Hanya satu baris boleh ditambah pada satu masa',
+    action: {
+      save: 'Simpan',
+      cancel: 'Membatalkan',
+      delete: 'Menghapuskan',
+      add: 'tambah baris data',
+    },
+  },
+  switch: {
+    open: 'Terbuka',
+    close: 'Tutup',
+  },
+  captcha: {
+    getCaptcha: 'Dapatkan kod pengesahan',
+    retryAfter: 'Cuba semula dalam {count}s',
+  },
+}
+
+export default msMY

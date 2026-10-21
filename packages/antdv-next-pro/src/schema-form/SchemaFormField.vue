@@ -3,7 +3,10 @@ import type { Component, VNodeChild } from 'vue'
 import type { ProColumns, ProRenderContext, SchemaFormColumn, SchemaFormLayoutType } from '../types'
 import type { FormRecord } from './utils'
 
-import { Divider } from 'antdv-next'
+import { Divider, useFormInstance } from 'antdv-next'
+import { computed } from 'vue'
+import { resolveColumnValueType } from '../table/valueType'
+import { useFormPrefix } from '../pro-form/utils'
 
 import FieldControl from '../pro-form-fields/FieldControl.vue'
 import DirectSlotRenderer from '../shared/DirectSlotRenderer'
@@ -31,6 +34,15 @@ const props = withDefaults(defineProps<FieldProps>(), {
 })
 
 const ADivider = Divider as Component
+const nativeForm = useFormInstance()
+const { t } = useFormPrefix('form', () => undefined)
+const valueType = computed(() => resolveColumnValueType(props.column.valueType, props.model, 0))
+
+function renderFormItem(context: ProRenderContext<FormRecord>): VNodeChild {
+  return props.column.formItemRender
+    ? props.column.formItemRender(props.column, context, nativeForm)
+    : props.column.renderFormItem?.(props.column, context)
+}
 
 function resolvePath(): Array<string | number> {
   return [...props.prefix, ...normalizePath(props.column.dataIndex)]
@@ -68,7 +80,9 @@ function resolveFormListState(): FormListState {
   return {
     rows,
     fieldProps,
-    creatorText: toDisplayText(fieldProps.creatorButtonText ?? 'Add item'),
+    creatorText: toDisplayText(
+      fieldProps.creatorButtonText ?? t('editableTable.action.add', '添加一行数据'),
+    ),
     path: currentPath,
     title: props.column.title ? resolveTitle(props.column) : undefined,
   }
@@ -79,7 +93,7 @@ function resolveCompositeRenderState(): CompositeState {
   const dependencies = resolveDependencyValues()
   const update = createUpdate(currentPath)
   const context = createRenderContext(dependencies, update)
-  const content = props.column.renderFormItem?.(props.column, context)
+  const content = renderFormItem(context)
   const hasContent = content !== undefined && content !== null
   return {
     content,
@@ -92,7 +106,11 @@ function resolveDefaultControlState(
   currentValue: unknown,
   update: (next: unknown) => void,
 ): DefaultControlState {
-  const fieldProps = resolveObjectProps(props.column.fieldProps, props.model)
+  const { type, ...configuration } = valueType.value
+  const fieldProps = {
+    ...configuration,
+    ...resolveObjectProps(props.column.fieldProps, props.model),
+  }
   const valueEnum =
     typeof props.column.valueEnum === 'function' ? props.column.valueEnum() : props.column.valueEnum
   const readonly = props.readonly || props.column.readonly === true
@@ -114,7 +132,7 @@ function resolveDefaultControlState(
   }
 
   const componentProps: Record<string, unknown> = {
-    fieldType: props.column.valueType ?? 'text',
+    fieldType: type,
     modelValue: currentValue,
     fieldProps,
     readonly,
@@ -153,7 +171,7 @@ function resolveFieldRenderState(): FormItemState {
   })
   // Keep the original render order and call both public callbacks on every component render,
   // even when the field slot wins by nullish precedence.
-  const renderedByColumn = props.column.renderFormItem?.(props.column, context)
+  const renderedByColumn = renderFormItem(context)
   const content = fieldSlotContent ?? renderedByColumn
   const defaultControl =
     content === undefined || content === null
@@ -177,19 +195,19 @@ function resolveFieldRenderState(): FormItemState {
   }
 }
 
-function isCompositeColumn(column: SchemaFormColumn<FormRecord>): boolean {
+function isCompositeColumn(): boolean {
   return (
-    column.valueType === 'group' ||
-    column.valueType === 'formSet' ||
-    column.valueType === 'dependency'
+    valueType.value.type === 'group' ||
+    valueType.value.type === 'formSet' ||
+    valueType.value.type === 'dependency'
   )
 }
 
-function isRenderableFieldColumn(column: SchemaFormColumn<FormRecord>): boolean {
+function isRenderableFieldColumn(): boolean {
   return (
-    column.valueType !== 'option' &&
-    column.valueType !== 'index' &&
-    column.valueType !== 'indexBorder' &&
+    valueType.value.type !== 'option' &&
+    valueType.value.type !== 'index' &&
+    valueType.value.type !== 'indexBorder' &&
     resolvePath().length > 0
   )
 }
@@ -217,26 +235,26 @@ function isHidden(column: SchemaFormColumn<FormRecord>, layoutType: SchemaFormLa
 <template>
   <template v-if="!isHidden(column, layoutType)">
     <DirectSlotRenderer
-      v-if="column.valueType === 'divider'"
+      v-if="valueType.type === 'divider'"
       :component="ADivider"
       :content="resolveTitle(column)"
       :root-attrs="$attrs"
       use-content
     />
     <SchemaFormList
-      v-else-if="column.valueType === 'formList' && resolvePath().length > 0"
+      v-else-if="valueType.type === 'formList' && resolvePath().length > 0"
       :context="props"
       :state="resolveFormListState()"
       :root-attrs="$attrs"
     />
     <SchemaFormGroup
-      v-else-if="isCompositeColumn(column)"
+      v-else-if="isCompositeColumn()"
       :context="props"
       :state="resolveCompositeRenderState()"
       :root-attrs="$attrs"
     />
     <SchemaFormFieldItem
-      v-else-if="isRenderableFieldColumn(column)"
+      v-else-if="isRenderableFieldColumn()"
       :state="resolveFieldRenderState()"
       :grid="grid"
       :col-props="column.colProps"

@@ -15,7 +15,10 @@ const instance = getCurrentInstance()
 const fieldRef = ref<ProFormCaptchaInstance>()
 const explicitProps = () => pickExplicitProps(props, instance?.vnode.props)
 const resetCountdown = () => fieldRef.value?.resetCountdown()
-defineExpose<ProFormCaptchaInstance>({ resetCountdown })
+const startTiming = () => fieldRef.value?.startTiming()
+const endTiming = () => fieldRef.value?.endTiming()
+const focus = () => fieldRef.value?.focus()
+defineExpose<ProFormCaptchaInstance>({ resetCountdown, startTiming, endTiming, focus })
 </script>
 
 <template>

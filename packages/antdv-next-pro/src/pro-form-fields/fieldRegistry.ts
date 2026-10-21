@@ -3,6 +3,10 @@ import type { Component } from 'vue'
 import {
   Checkbox,
   CheckboxGroup,
+  Cascader,
+  ColorPicker,
+  Rate,
+  Radio,
   DatePicker,
   DateRangePicker,
   Input,
@@ -22,8 +26,15 @@ import {
 } from 'antdv-next'
 
 import type { ProValueType } from '../types'
+import DigitRange from './DigitRange'
 
-export type ProFormControlType = ProValueType | 'captcha' | 'uploadButton' | 'uploadDragger'
+export type ProFormControlType =
+  | ProValueType
+  | 'captcha'
+  | 'uploadButton'
+  | 'uploadDragger'
+  | 'radioGroup'
+  | 'checkboxGroup'
 
 export interface ProFormFieldDescriptor {
   component: Component
@@ -34,6 +45,22 @@ export interface ProFormFieldDescriptor {
 
 const valueDescriptors: Partial<Record<ProFormControlType, ProFormFieldDescriptor>> = {
   text: { component: Input as Component, valueProp: 'value', readonlyType: 'text' },
+  cascader: {
+    component: Cascader as Component,
+    valueProp: 'value',
+    optionProp: 'options',
+    readonlyType: 'cascader',
+  },
+  color: { component: ColorPicker as Component, valueProp: 'value', readonlyType: 'color' },
+  colorPicker: { component: ColorPicker as Component, valueProp: 'value', readonlyType: 'color' },
+  rate: { component: Rate as Component, valueProp: 'value', readonlyType: 'rate' },
+  progress: { component: InputNumber as Component, valueProp: 'value', readonlyType: 'progress' },
+  second: { component: InputNumber as Component, valueProp: 'value', readonlyType: 'second' },
+  code: { component: TextArea as Component, valueProp: 'value', readonlyType: 'code' },
+  jsonCode: { component: TextArea as Component, valueProp: 'value', readonlyType: 'jsonCode' },
+  image: { component: Input as Component, valueProp: 'value', readonlyType: 'image' },
+  fromNow: { component: DatePicker as Component, valueProp: 'value', readonlyType: 'fromNow' },
+  digitRange: { component: DigitRange, valueProp: 'value', readonlyType: 'digitRange' },
   textarea: { component: TextArea as Component, valueProp: 'value', readonlyType: 'textarea' },
   password: {
     component: InputPassword as Component,
@@ -55,7 +82,7 @@ const valueDescriptors: Partial<Record<ProFormControlType, ProFormFieldDescripto
     optionProp: 'treeData',
     readonlyType: 'treeSelect',
   },
-  radio: {
+  radioGroup: {
     component: RadioGroup as Component,
     valueProp: 'value',
     optionProp: 'options',
@@ -104,6 +131,20 @@ const valueDescriptors: Partial<Record<ProFormControlType, ProFormFieldDescripto
   },
 }
 
+for (const picker of ['Week', 'Month', 'Quarter', 'Year']) {
+  valueDescriptors[`date${picker}`] = {
+    component: DatePicker as Component,
+    valueProp: 'value',
+    readonlyType: `date${picker}`,
+  }
+  valueDescriptors[`date${picker}Range`] = {
+    component: DateRangePicker as Component,
+    valueProp: 'value',
+    readonlyType: `date${picker}Range`,
+  }
+}
+valueDescriptors.radioButton = valueDescriptors.radioGroup
+
 const checkboxDescriptor: ProFormFieldDescriptor = {
   component: Checkbox as Component,
   valueProp: 'checked',
@@ -126,6 +167,11 @@ export function resolveFieldDescriptor(
   hasOptions = false,
 ): ProFormFieldDescriptor {
   if (fieldType === 'checkbox') return hasOptions ? checkboxGroupDescriptor : checkboxDescriptor
+  if (fieldType === 'checkboxGroup') return checkboxGroupDescriptor
+  if (fieldType === 'radio')
+    return hasOptions
+      ? valueDescriptors.radioGroup!
+      : { component: Radio as Component, valueProp: 'checked', readonlyType: 'radio' }
   return valueDescriptors[fieldType ?? 'text'] ?? fallbackDescriptor
 }
 

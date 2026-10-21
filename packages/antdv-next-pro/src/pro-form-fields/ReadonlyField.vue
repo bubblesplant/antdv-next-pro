@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { VNodeChild } from 'vue'
 
-import VNodeContent from '../shared/VNodeContent'
-import { formatReadonlyValue, type ProReadonlyValueType } from './readonly'
+import ProField from '../pro-field/ProField'
+import type { ProReadonlyValueType } from './readonly'
 import type { ProFormFieldOption } from './types'
+import { useProPrefix } from '../provider/context'
 
 defineOptions({ name: 'AntdvNextProReadonlyField', inheritAttrs: false })
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     value?: unknown
     options?: ProFormFieldOption[]
@@ -15,27 +16,26 @@ const props = withDefaults(
     emptyText?: VNodeChild
     moneyPrefix?: VNodeChild | false
     readonlyRender?: (value: unknown) => VNodeChild
+    fieldProps?: Record<string, unknown>
   }>(),
   {
     options: () => [],
     emptyText: '-',
   },
 )
-
-function resolveContent(): VNodeChild {
-  const custom = props.readonlyRender?.(props.value)
-  if (custom !== undefined && custom !== null) return custom
-  return formatReadonlyValue(props.value, {
-    options: props.options,
-    type: props.type,
-    emptyText: props.emptyText,
-    moneyPrefix: props.moneyPrefix,
-  })
-}
+const prefix = useProPrefix('field')
 </script>
 
 <template>
-  <span class="antdv-next-pro-readonly-field" v-bind="$attrs">
-    <VNodeContent :content="resolveContent()" />
-  </span>
+  <ProField
+    :class="`${prefix}-readonly`"
+    v-bind="$attrs"
+    :text="value"
+    :value-type="type"
+    mode="read"
+    :options="options"
+    :empty-text="emptyText"
+    :field-props="{ ...fieldProps, ...(moneyPrefix === undefined ? {} : { prefix: moneyPrefix }) }"
+    :render="(text, _context, dom) => readonlyRender?.(text) ?? dom"
+  />
 </template>

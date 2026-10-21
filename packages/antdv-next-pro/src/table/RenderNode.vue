@@ -7,5 +7,5 @@ defineProps<{ content?: VNodeChild }>()
 </script>
 
 <template>
-  <span class="antdv-next-pro__render-node"><VNodeContent :content="content" /></span>
+  <VNodeContent :content="content" />
 </template>

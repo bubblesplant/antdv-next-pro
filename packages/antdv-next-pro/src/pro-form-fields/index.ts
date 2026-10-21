@@ -1,9 +1,19 @@
 import type { Component } from 'vue'
+import { RadioButton } from 'antdv-next'
 
 import FieldControl from './FieldControl.vue'
 import ProFormCaptcha from './ProFormCaptcha.vue'
-import ProFormCheckbox from './ProFormCheckbox.vue'
-import ProFormDatePicker from './ProFormDatePicker.vue'
+import ProFormCheckboxRaw from './ProFormCheckbox.vue'
+import {
+  additionalFieldComponents,
+  ProFormCheckboxGroup,
+  ProFormRadioSingle,
+  ProFormDateWeekPicker,
+  ProFormDateMonthPicker,
+  ProFormDateQuarterPicker,
+  ProFormDateYearPicker,
+} from './additionalFields'
+import ProFormDatePickerRaw from './ProFormDatePicker.vue'
 import ProFormDateRangePicker from './ProFormDateRangePicker.vue'
 import ProFormDateTimePicker from './ProFormDateTimePicker.vue'
 import ProFormDateTimeRangePicker from './ProFormDateTimeRangePicker.vue'
@@ -12,7 +22,8 @@ import ProFormField from './ProFormField.vue'
 import ProFormMoney from './ProFormMoney.vue'
 import ProFormRadioGroup from './ProFormRadioGroup.vue'
 import ProFormSegmented from './ProFormSegmented.vue'
-import ProFormSelect from './ProFormSelect.vue'
+import ProFormSelectRaw from './ProFormSelect.vue'
+import ProFormSearchSelect from './ProFormSearchSelect'
 import ProFormSlider from './ProFormSlider.vue'
 import ProFormSwitch from './ProFormSwitch.vue'
 import ProFormTextRaw from './ProFormText.vue'
@@ -27,9 +38,18 @@ export const ProFormText = Object.assign(ProFormTextRaw, {
   Password: ProFormTextPassword,
 }) as typeof ProFormTextRaw & { readonly Password: typeof ProFormTextPassword }
 
-export const ProFormRadio = Object.freeze({
+export const ProFormRadio = Object.assign(ProFormRadioSingle, {
   Group: ProFormRadioGroup,
+  Button: RadioButton,
 })
+export const ProFormCheckbox = Object.assign(ProFormCheckboxRaw, { Group: ProFormCheckboxGroup })
+export const ProFormDatePicker = Object.assign(ProFormDatePickerRaw, {
+  Week: ProFormDateWeekPicker,
+  Month: ProFormDateMonthPicker,
+  Quarter: ProFormDateQuarterPicker,
+  Year: ProFormDateYearPicker,
+})
+export const ProFormSelect = Object.assign(ProFormSelectRaw, { SearchSelect: ProFormSearchSelect })
 
 export const proFormFieldComponents: Array<readonly [publicName: string, component: Component]> = [
   ['ProFormText', ProFormText],
@@ -42,6 +62,7 @@ export const proFormFieldComponents: Array<readonly [publicName: string, compone
   ['ProFormDateRangePicker', ProFormDateRangePicker],
   ['ProFormDateTimeRangePicker', ProFormDateTimeRangePicker],
   ['ProFormSelect', ProFormSelect],
+  ['ProFormSearchSelect', ProFormSearchSelect],
   ['ProFormTreeSelect', ProFormTreeSelect],
   ['ProFormCheckbox', ProFormCheckbox],
   ['ProFormRadioGroup', ProFormRadioGroup],
@@ -51,13 +72,13 @@ export const proFormFieldComponents: Array<readonly [publicName: string, compone
   ['ProFormUploadDragger', ProFormUploadDragger],
   ['ProFormMoney', ProFormMoney],
   ['ProFormSegmented', ProFormSegmented],
+  ['ProFormRadio', ProFormRadio],
+  ...Object.entries(additionalFieldComponents),
 ]
 
 export {
   FieldControl,
   ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormDatePicker,
   ProFormDateRangePicker,
   ProFormDateTimePicker,
   ProFormDateTimeRangePicker,
@@ -66,7 +87,7 @@ export {
   ProFormMoney,
   ProFormRadioGroup,
   ProFormSegmented,
-  ProFormSelect,
+  ProFormSearchSelect,
   ProFormSlider,
   ProFormSwitch,
   ProFormTextArea,
@@ -81,3 +102,4 @@ export * from './options'
 export * from './readonly'
 export type * from './types'
 export * from './useFieldOptions'
+export * from './additionalFields'

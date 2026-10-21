@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-10-21T11:30:20.944Z",
+  "checks": [
+    {
+      "route": "/pro-table/search-light-filter",
+      "name": "正式 LightFilter 弹层与取消",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/search-required-fields",
+      "name": "内建必填校验阻止请求，填值后查询一次",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/feature-batch-actions",
+      "name": "内建 tableAlert 与批量操作、受控清除",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/list-toolbar-tabs",
+      "name": "toolbar.tabs 切换并提交过滤参数",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/list-toolbar-title-menu",
+      "name": "toolbar.menu 原生下拉并提交过滤参数",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/list-toolbar-multiple-line",
+      "name": "正式双行工具栏与设置回调",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/toolbar-custom-table-body",
+      "name": "tableViewRender 包装与空态恢复",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/value-type-custom",
+      "name": "Provider 自定义类型的展示、编辑和保存",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/feature-date-formatter",
+      "name": "dateFormatter 对查询值执行 string/number/custom 转换",
+      "passed": true
+    },
+    {
+      "route": "/pro-table/custom-error-boundary",
+      "name": "ProTable 自定义错误边界捕获并恢复",
+      "passed": true
+    }
+  ],
+  "passed": true
+}
