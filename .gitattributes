@@ -1,1 +1,14 @@
+# 默认统一使用 LF 行尾，避免 Windows core.autocrlf 导致跨平台格式检查失败
+* text=auto eol=lf
+
+# 二进制资源不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zip binary
+
+# Git hooks 脚本必须使用 LF
 .vite-hooks/* text eol=lf
