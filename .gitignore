@@ -38,3 +38,6 @@ coverage
 # VitePress generated files
 **/.vitepress/cache/
 **/.vitepress/dist/
+
+# AGENT
+.workbuddy/
