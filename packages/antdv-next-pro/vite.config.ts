@@ -10,10 +10,16 @@ export default defineConfig({
     deps: {
       neverBundle: ['vue', 'antdv-next', '@antdv-next/icons'],
     },
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     fromVite: true,
     platform: 'neutral',
     sourcemap: true,
+    outputOptions: {
+      preserveModules: true,
+      preserveModulesRoot: 'packages/antdv-next-pro',
+      entryFileNames: '[name].mjs',
+      chunkFileNames: 'chunks/[name].mjs',
+    },
   },
   test: {
     coverage: {
