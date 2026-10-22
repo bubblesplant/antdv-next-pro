@@ -414,6 +414,13 @@ for (const bundle of [parseBundle('dist/index.js', 'ESM'), parseBundle('dist/ind
   for (const name of expectedRuntimeExports) {
     assert.ok(bundle.exportBindings.has(name), `${bundle.format} 缺少导出 ${name}`)
   }
+}
+
+// ESM preserves modules; CJS keeps field alias initializers in the entry bundle.
+for (const bundle of [
+  parseBundle('dist/pro-form-fields/index.js', 'ESM'),
+  parseBundle('dist/index.cjs', 'CJS'),
+]) {
   assertBundledAlias(bundle, 'ProFormText', 'Password', 'ProFormTextPassword', 'assign')
   assertBundledAlias(bundle, 'ProFormRadio', 'Group', 'ProFormRadioGroup', 'assign')
   assertBundledAlias(bundle, 'ProFormCheckbox', 'Group', 'ProFormCheckboxGroup', 'assign')
