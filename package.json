@@ -21,7 +21,7 @@
     "test:browser": "vp run @bubblesjs/antv-next-pro#test:browser",
     "test:coverage": "vp run @bubblesjs/antv-next-pro#test:coverage",
     "typecheck": "vp run -r typecheck",
-    "version-packages": "changeset version && pnpm install --lockfile-only --no-frozen-lockfile"
+    "version-packages": "changeset version && pnpm install --lockfile-only --no-frozen-lockfile && pnpm format"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:",
