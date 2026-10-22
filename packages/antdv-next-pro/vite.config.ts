@@ -14,6 +14,12 @@ export default defineConfig({
     fromVite: true,
     platform: 'neutral',
     sourcemap: true,
+    outputOptions: (options, format) => ({
+      ...options,
+      // CJS must stay bundled so CSS extraction does not leave unresolved require() calls.
+      preserveModules: format === 'es',
+      preserveModulesRoot: 'packages/antdv-next-pro',
+    }),
   },
   test: {
     coverage: {

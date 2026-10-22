@@ -4,18 +4,18 @@
 [![npm](https://img.shields.io/npm/v/%40bubblesjs%2Fantv-next-pro.svg)](https://www.npmjs.com/package/@bubblesjs/antv-next-pro)
 [![license](https://img.shields.io/badge/license-MIT-1768d3.svg)](./LICENSE)
 
-`@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 与 Antdv Next 高阶数据组件库。本轮以 `@ant-design/pro-components@3.1.15-7` 为行为参考，以 Vue 的 `v-model`、事件、插槽和组件 `ref` 提供：
+`@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 与 Antdv Next 高阶组件库。本轮以 `@ant-design/pro-components@3.1.15-7` 为行为参考，以 Vue 的 `v-model`、事件、插槽和组件 `ref` 提供：
 
 - `ProCard`：主题卡片、标题与操作区、骨架加载、受控/非受控折叠和语义样式。
 - `ProTable`：搜索、分页、排序、筛选、列设置、远程请求与可编辑行。
 - `EditableProTable`：整表受控编辑、新建记录、单行/多行编辑与异步保存。
-- `SchemaForm`：通过 `columns` 生成普通、查询、轻量、弹层和步骤表单。
-- `ProForm`：组合字段、分组、动态列表、依赖，以及查询、轻量、弹层和步骤布局；`BetaSchemaForm` 保留 schema 入口。
+- `SchemaForm`：通过 `columns` 生成 `Form`、`Embed`、`QueryFilter`、`LightFilter`、`ModalForm`、`DrawerForm`、`StepForm`、`StepsForm` 等布局表单。
+- `ProForm`：组合字段，配合 `ProFormGroup`、`ProFormFieldSet`、`ProFormList`、`ProFormDependency`、`ProFormItem` 等结构组件，并支持查询、轻量、弹层和步骤布局；`BetaSchemaForm` 保留 schema 入口。
 - `ProFormFields` / `ProField`：统一输入、只读展示、异步选项与自定义 valueType，覆盖文本、数字、日期、选择、验证码和上传等场景。
 - `ProList` / `ProDescriptions`：列表 meta、请求、选择、描述项及字段展示。
 - `ProConfigProvider`：继承原生 ConfigProvider 的语言、方向、前缀和主题，提供 Pro token、intl 与 valueType 注册。
 
-本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](./apps/docs/guide/pro-components-v3.md)。本轮不新增 ProSkeleton、登录表单、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。
+本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](https://bubblesplant.github.io/antv-next-pro/guide/pro-components-v3)。本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。
 
 [中文文档](https://bubblesplant.github.io/antv-next-pro/) · [English docs](https://bubblesplant.github.io/antv-next-pro/en/) · [Playground](https://bubblesplant.github.io/antv-next-pro/playground/)
 
@@ -53,7 +53,7 @@ import {
 
 ProFormFields 默认包含 FormItem，设置 `fieldMode="field"` 可只渲染裸控件。字段导出、组合命名和 Captcha/Upload 边界见 [ProFormFields 文档](https://bubblesplant.github.io/antv-next-pro/components/pro-form-fields)。
 
-ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<ProCard title="用户信息" variant="borderless">内容</ProCard>`；详细 API 与示例见 [ProCard 文档](./apps/docs/components/pro-card.md)。
+ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<ProCard title="用户信息" variant="borderless">内容</ProCard>`；详细 API 与示例见 [ProCard 文档](https://bubblesplant.github.io/antv-next-pro/components/pro-card)。
 
 原有字段包括：
 
