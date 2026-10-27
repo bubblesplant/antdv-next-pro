@@ -138,6 +138,31 @@ pnpm build
 
 ## 发布
 
+构建组件包时会依次生成 npm 工程模块和浏览器 ESM 整包，两者随同一个 npm 包发布：
+
+```bash
+pnpm --filter @bubblesjs/antv-next-pro build          # 同时构建两种产物
+pnpm --filter @bubblesjs/antv-next-pro build:modules  # 仅构建 npm 模块
+pnpm --filter @bubblesjs/antv-next-pro build:browser  # 仅构建浏览器整包
+```
+
+普通项目继续从包名导入，并使用 `@bubblesjs/antv-next-pro/style.css`。
+TinyEngine 等直接加载 ESM 的环境使用 `dist/browser/antdv-next-pro.esm.js` 和
+`dist/browser/style.css`。浏览器整包包含 Antdv Next、图标和 dayjs，Vue 由宿主 importmap 提供；
+`ProForm`、字段与 Provider 应从同一个整包加载，以共享表单上下文。
+单独执行 `build:modules` 会清理 `dist`，发布时应执行完整 `build`。
+
+发布包含这些产物的新版本后，将下列地址中的 `VERSION` 替换为该版本号：
+
+```text
+https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
+https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/style.css
+```
+
+TinyEngine 物料的 `packages[].script` / `css` 指向上述文件，组件的 `npm.exportName`
+填写 `ProFormField` 等具名导出，并设置 `npm.destructuring: true`。
+字段使用 `modelValue` / `onUpdate:modelValue`。
+
 用户可见变更需要执行 `pnpm changeset`。合并到 `main` 后，GitHub Actions 自动维护版本 PR；版本 PR 合并且仓库已配置 `NPM_TOKEN` 时发布 npm provenance。文档与 Playground 一起部署到 GitHub Pages。
 
 ### GitHub Pages 设置

@@ -6,11 +6,12 @@ export default defineConfig({
   plugins: [vue()],
   pack: {
     entry: ['src/index.ts'],
+    format: ['esm', 'cjs'],
     dts: { sourcemap: true, vue: true },
     deps: {
       neverBundle: ['vue', 'antdv-next', '@antdv-next/icons'],
+      onlyBundle: false,
     },
-    format: ['esm', 'cjs'],
     fromVite: true,
     platform: 'neutral',
     sourcemap: true,

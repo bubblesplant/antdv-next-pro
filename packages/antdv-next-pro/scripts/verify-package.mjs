@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -282,7 +282,7 @@ function parseBundle(file, format) {
     }
   }
 
-  return { exportBindings, format, sourceFile }
+  return { exportBindings, format, sourceFile, source }
 }
 
 function getTopLevelVariable(sourceFile, binding, format) {
@@ -410,11 +410,55 @@ function assertBundledAlias(bundle, owner, property, target, factory) {
   assertNoAliasOverwrite(sourceFile, declaration, format, ownerBinding, property)
 }
 
-for (const bundle of [parseBundle('dist/index.js', 'ESM'), parseBundle('dist/index.cjs', 'CJS')]) {
+const browserBundleFile = 'dist/browser/antdv-next-pro.esm.js'
+const browserBundle = parseBundle(browserBundleFile, 'ESM')
+browserBundle.format = 'Browser ESM'
+
+for (const bundle of [
+  parseBundle('dist/index.js', 'ESM'),
+  parseBundle('dist/index.cjs', 'CJS'),
+  browserBundle,
+]) {
   for (const name of expectedRuntimeExports) {
     assert.ok(bundle.exportBindings.has(name), `${bundle.format} 缺少导出 ${name}`)
   }
 }
+
+const browserImports = new Set()
+function verifyBrowserImports(node) {
+  if (
+    (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+    node.moduleSpecifier &&
+    ts.isStringLiteral(node.moduleSpecifier)
+  ) {
+    browserImports.add(node.moduleSpecifier.text)
+  }
+  if (ts.isCallExpression(node)) {
+    if (node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      const [specifier] = node.arguments
+      assert.ok(
+        specifier && ts.isStringLiteral(specifier) && specifier.text === './antdv-next-pro.esm.js',
+        '浏览器整包的动态导入不能依赖其他 chunk',
+      )
+    }
+    assert.ok(
+      !ts.isIdentifier(node.expression) || node.expression.text !== 'require',
+      '浏览器整包不能残留 require() 调用',
+    )
+  }
+  ts.forEachChild(node, verifyBrowserImports)
+}
+verifyBrowserImports(browserBundle.sourceFile)
+assert.deepEqual([...browserImports], ['vue'], '浏览器整包的外部依赖必须只有 Vue')
+assert.ok(
+  !browserBundle.source.includes('process.env.NODE_ENV'),
+  '浏览器整包必须替换 process.env.NODE_ENV',
+)
+assert.deepEqual(
+  readdirSync(resolve(packageRoot, 'dist/browser')).filter((file) => file.endsWith('.js')),
+  ['antdv-next-pro.esm.js'],
+  '浏览器构建应只生成一个 JS 文件',
+)
 
 // ESM preserves modules; CJS keeps field alias initializers in the entry bundle.
 for (const bundle of [
@@ -505,9 +549,11 @@ for (const file of [
   'dist/index.js',
   'dist/index.js.map',
   'dist/style.css',
+  browserBundleFile,
+  'dist/browser/style.css',
   'package.json',
 ]) {
   assert.ok(packedFiles.has(file), `npm 包缺少 ${file}`)
 }
 
-console.log(`已验证 ${packageJson.name} 的 ESM、CJS、类型、样式和 npm pack 文件清单。`)
+console.log(`已验证 ${packageJson.name} 的 ESM、CJS、浏览器整包、类型、样式和 npm pack 文件清单。`)
