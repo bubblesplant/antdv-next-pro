@@ -36,6 +36,28 @@ import {
 } from '@bubblesjs/antv-next-pro'
 ```
 
+## Browser ESM / CDN
+
+The package also includes `dist/browser/antdv-next-pro.esm.js` and `dist/browser/style.css`
+for TinyEngine and other environments that load ESM directly. The browser bundle includes
+Antdv Next, icons, and dayjs; provide Vue through the host's import map.
+Load forms, fields, and providers from the same bundle so they share their contexts.
+
+After publishing a version containing these files, replace `VERSION` with that version:
+
+```text
+https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
+https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/style.css
+```
+
+For TinyEngine, set the material package's `script` / `css` to these URLs, use a named
+`exportName` such as `ProFormField`, and set `destructuring: true`.
+Fields use `modelValue` and `onUpdate:modelValue`.
+
+From the repository root, `pnpm --filter @bubblesjs/antv-next-pro build` builds both the
+module distribution and the browser bundle. Use `build:browser` to rebuild only the browser files.
+`build:modules` cleans `dist`, so run the complete build before publishing.
+
 ## ProCard
 
 ```vue

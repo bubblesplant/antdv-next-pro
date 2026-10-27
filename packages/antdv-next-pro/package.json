@@ -53,13 +53,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "vp pack",
+    "build": "pnpm build:modules && pnpm build:browser",
+    "build:browser": "vp build --config vite.browser.config.ts",
+    "build:modules": "vp pack",
     "dev": "vp pack --watch",
     "test": "vp test run --project unit",
     "test:browser": "vp test run --project browser",
     "test:coverage": "vp test run --project unit --coverage",
     "typecheck": "vue-tsc -p tsconfig.json --noEmit",
-    "verify:package": "vp pack && tsc -p tests/consumer/tsconfig.json && node scripts/verify-package.mjs"
+    "verify:package": "pnpm build && tsc -p tests/consumer/tsconfig.json && node scripts/verify-package.mjs"
   },
   "dependencies": {
     "@antdv-next/icons": "catalog:",
