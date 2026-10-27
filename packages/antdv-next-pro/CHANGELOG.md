@@ -1,5 +1,11 @@
 # @bubblesjs/antv-next-pro
 
+## 0.3.1
+
+### Patch Changes
+
+- [#16](https://github.com/bubblesplant/antv-next-pro/pull/16) [`07c6aac`](https://github.com/bubblesplant/antv-next-pro/commit/07c6aacd6233edb9abb7b668ab573c24b85d7cfa) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 新增适用于 TinyEngine 与 CDN 直接加载的浏览器 ESM 整包及独立样式，除 Vue 外的依赖均包含在整包中。普通 npm 模块继续提供 ESM、CJS 与类型声明。
+
 ## 0.3.0
 
 ### Minor Changes
