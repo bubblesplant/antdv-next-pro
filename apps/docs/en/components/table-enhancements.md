@@ -19,7 +19,7 @@ DragSortTable, RowEditorTable and CellEditorTable share ProTable schemas, reques
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DragSortTable, type ProColumns } from '@bubblesjs/antv-next-pro'
+import { DragSortTable, type ProColumns } from '@bubblesjs/antdv-next-pro'
 
 type Task = { id: number; title: string }
 const rows = ref<Task[]>([

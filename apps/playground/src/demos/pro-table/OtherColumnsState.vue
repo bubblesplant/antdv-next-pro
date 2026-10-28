@@ -4,8 +4,8 @@ import type {
   ProColumnsState,
   ProTableInstance,
   ProTableProps,
-} from '@bubblesjs/antv-next-pro'
-import { ProTable } from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
+import { ProTable } from '@bubblesjs/antdv-next-pro'
 import { computed, ref } from 'vue'
 import { createDemoRequest, type DemoQuery, type DemoRow } from './demoData'
 const emit = defineEmits<{

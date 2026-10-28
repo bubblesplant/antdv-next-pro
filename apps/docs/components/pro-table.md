@@ -45,7 +45,7 @@ import ProTableDemo from '../examples/ProTableDemo.vue'
 远程模式使用固定请求契约：
 
 ```ts
-import type { ProRequest } from '@bubblesjs/antv-next-pro'
+import type { ProRequest } from '@bubblesjs/antdv-next-pro'
 
 const request: ProRequest<User, Query> = async (params, sort, filter) => {
   const result = await api.list({ ...params, sort, filter })
@@ -62,6 +62,8 @@ const request: ProRequest<User, Query> = async (params, sort, filter) => {
 `manualRequest` 可阻止首次自动请求，之后通过组件 ref 的 `reload()` 发起。`postData` 在展示前同步转换成功数据。
 
 ### 搜索区与折叠
+
+默认折叠按钮沿用 ProComponents 的实现：复用同一个向下箭头，展开时旋转半圈，并以 0.3 秒过渡切换方向。文案遵循国际化及 `localeText`。`search.collapseRender` 可自定义按钮内容，设为 `false` 可隐藏按钮。
 
 `search: false` 关闭查询区。默认情况下，包含 `dataIndex` 且没有 `hideInSearch` / `search: false` 的列会生成搜索项；`search.transform` 可将一个字段转换为多个请求参数。
 
@@ -252,7 +254,7 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 ### 组件实例
 
 ```ts
-import type { ProTableInstance } from '@bubblesjs/antv-next-pro'
+import type { ProTableInstance } from '@bubblesjs/antdv-next-pro'
 
 const tableRef = ref<ProTableInstance<User>>()
 

@@ -7,9 +7,9 @@ import type {
   SchemaFormColumn,
   SchemaFormInstance,
   RecordCreatorProps,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 import { InputNumber, SpaceAddon, SpaceCompact } from 'antdv-next'
-import { EditableProTable, SchemaForm } from '@bubblesjs/antv-next-pro'
+import { EditableProTable, SchemaForm } from '@bubblesjs/antdv-next-pro'
 import { h, nextTick, ref } from 'vue'
 const emit = defineEmits<{
   event: [message: string]

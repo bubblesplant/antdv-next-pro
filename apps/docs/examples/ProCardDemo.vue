@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ProCard } from '@bubblesjs/antv-next-pro'
+import { ProCard } from '@bubblesjs/antdv-next-pro'
 import { Button, Input, Switch } from 'antdv-next'
 import { ref } from 'vue'
 

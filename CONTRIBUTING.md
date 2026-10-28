@@ -4,7 +4,7 @@
 
 ## 提交 Issue
 
-请先阅读[组件文档](https://bubblesplant.github.io/antv-next-pro/)，并搜索[已有 Issue](https://github.com/bubblesplant/antv-next-pro/issues)。然后在 [Issue 创建页](https://github.com/bubblesplant/antv-next-pro/issues/new/choose)选择：
+请先阅读[组件文档](https://bubblesplant.github.io/antdv-next-pro/)，并搜索[已有 Issue](https://github.com/bubblesplant/antdv-next-pro/issues)。然后在 [Issue 创建页](https://github.com/bubblesplant/antdv-next-pro/issues/new/choose)选择：
 
 - **缺陷反馈 / Bug report**：描述预期与实际行为，提供最小复现、操作步骤及依赖版本。文档问题可以提供对应文档链接。
 - **功能建议 / Feature request**：描述使用场景、当前限制、建议的 API 和替代方案。
@@ -15,7 +15,7 @@
 
 项目使用 Node.js 24 和 pnpm 12.4.1，版本分别记录在 `.node-version` 和根目录 `package.json` 的 `devEngines.packageManager` 中。
 
-1. Fork [本仓库](https://github.com/bubblesplant/antv-next-pro)，将自己的 Fork 克隆到本地。
+1. Fork [本仓库](https://github.com/bubblesplant/antdv-next-pro)，将自己的 Fork 克隆到本地。
 2. 从最新的 `main` 创建功能分支。
 3. 安装依赖并启动组件演练场或文档：
 
@@ -26,8 +26,8 @@ pnpm dev
 pnpm docs:dev
 ```
 
-- `packages/antdv-next-pro/src`：组件库实现与公开类型。
-- `packages/antdv-next-pro/tests`：单元测试、浏览器测试和消费者类型检查。
+- `packages/src`：组件库实现与公开类型。
+- `packages/tests`：单元测试、浏览器测试和消费者类型检查。
 - `apps/playground`：组件交互演示。
 - `apps/docs`：中英文文档与示例。
 
@@ -36,7 +36,7 @@ pnpm docs:dev
 根据改动运行相关检查。首次运行浏览器测试前，安装 Chromium：
 
 ```bash
-pnpm --filter @bubblesjs/antv-next-pro exec playwright install chromium
+pnpm --filter @bubblesjs/antdv-next-pro exec playwright install chromium
 ```
 
 完整检查与 CI 对应：
@@ -55,7 +55,7 @@ pnpm typecheck
 pnpm test:coverage
 pnpm test:browser
 pnpm build
-pnpm --filter @bubblesjs/antv-next-pro verify:package
+pnpm --filter @bubblesjs/antdv-next-pro verify:package
 ```
 
 需要自动修正格式时运行 `pnpm format`。修复缺陷或新增行为时，请补充相应测试；涉及公开 API 时同步更新中英文文档。
@@ -75,7 +75,7 @@ ci: 调整贡献检查流程
 
 支持的类型为 `build`、`chore`、`ci`、`docs`、`feat`、`fix`、`perf`、`refactor`、`revert`、`style` 和 `test`；scope 可选，冒号后的描述不能为空，也不能以大写英文字母开头。工作过程允许多次提交，CI 检查 PR 标题；本地提交钩子仍会检查提交信息。维护者建议使用 **Squash and merge**，以 PR 标题作为合并提交信息。
 
-用户可见的组件、类型或行为变更，请运行 `pnpm changeset`，选择 `@bubblesjs/antv-next-pro` 和相应版本级别，并提交生成的 Markdown 文件。纯文档、测试或工程配置改动可以不添加 changeset，在 PR 中说明原因即可。
+用户可见的组件、类型或行为变更，请运行 `pnpm changeset`，选择 `@bubblesjs/antdv-next-pro` 和相应版本级别，并提交生成的 Markdown 文件。纯文档、测试或工程配置改动可以不添加 changeset，在 PR 中说明原因即可。
 
 PR 会自动执行格式、静态检查、类型检查、单元测试、浏览器测试和构建验证。来自 Fork 的 PR 使用只读权限运行这些检查，无需贡献者配置 npm Token 等密钥。首次贡献者的运行可能需要维护者在 Actions 页面批准；标题检查只读取 PR 信息，不执行 PR 中的代码。
 

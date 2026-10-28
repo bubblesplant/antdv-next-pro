@@ -22,7 +22,7 @@ export async function copyText(text: string): Promise<void> {
 }
 
 export function downloadSources(files: SourceFile[], name: string): void {
-  const readme = `# ${name}\n\n保留文件目录结构，通过 ${files[0]?.name ?? '示例组件'} 引入示例。\n\n依赖：Vue 3.5+、antdv-next 1.5+、@bubblesjs/antv-next-pro。\n\n在应用入口全局引入：\n\nimport 'antdv-next/dist/reset.css'\nimport '@bubblesjs/antv-next-pro/style.css'\n`
+  const readme = `# ${name}\n\n保留文件目录结构，通过 ${files[0]?.name ?? '示例组件'} 引入示例。\n\n依赖：Vue 3.5+、antdv-next 1.5+、@bubblesjs/antdv-next-pro。\n\n在应用入口全局引入：\n\nimport 'antdv-next/dist/reset.css'\nimport '@bubblesjs/antdv-next-pro/style.css'\n`
   const entries = Object.fromEntries(
     [...files, { name: 'README.md', code: readme }].map((file) => [file.name, strToU8(file.code)]),
   )

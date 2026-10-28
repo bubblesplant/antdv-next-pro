@@ -11,7 +11,7 @@ import {
   ProFormText,
   StepsForm,
   StepForm,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 const submitted = ref('')
 const initialValues = {

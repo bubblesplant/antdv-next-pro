@@ -19,7 +19,7 @@ import ProListDemo from '../examples/ProListDemo.vue'
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ProList, type ProListMetas } from '@bubblesjs/antv-next-pro'
+import { ProList, type ProListMetas } from '@bubblesjs/antdv-next-pro'
 
 type Project = { id: number; name: string; description: string }
 const rows = ref<Project[]>([

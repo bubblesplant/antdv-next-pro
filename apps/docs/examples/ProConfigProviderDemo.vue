@@ -9,7 +9,7 @@ import {
   ProField,
   ProForm,
   ProFormText,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 const english = ref(false)
 const dark = ref(false)

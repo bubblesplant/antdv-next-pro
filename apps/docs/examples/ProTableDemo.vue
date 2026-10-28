@@ -7,7 +7,7 @@ import {
   type ProKey,
   type ProRequest,
   type ProTableInstance,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 type Project = Record<string, unknown> & {
   id: number

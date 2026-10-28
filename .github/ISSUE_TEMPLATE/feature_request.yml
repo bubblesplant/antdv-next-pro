@@ -37,7 +37,7 @@ body:
     attributes:
       label: 提交前确认 / Checklist
       options:
-        - label: 我已阅读[文档](https://bubblesplant.github.io/antv-next-pro/)和[贡献指南](https://github.com/bubblesplant/antv-next-pro/blob/main/CONTRIBUTING.md)。
+        - label: 我已阅读[文档](https://bubblesplant.github.io/antdv-next-pro/)和[贡献指南](https://github.com/bubblesplant/antdv-next-pro/blob/main/CONTRIBUTING.md)。
           required: true
-        - label: 我已搜索[现有 Issue](https://github.com/bubblesplant/antv-next-pro/issues)，没有发现重复建议。
+        - label: 我已搜索[现有 Issue](https://github.com/bubblesplant/antdv-next-pro/issues)，没有发现重复建议。
           required: true

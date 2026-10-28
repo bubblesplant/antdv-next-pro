@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "jsx": "preserve",
-    "types": ["node", "vite-plus/test/globals"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts", "vite*.config.ts"],
-  "exclude": ["tests/consumer/**"]
-}

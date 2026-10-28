@@ -7,9 +7,9 @@ on:
     paths:
       - apps/docs/**
       - apps/playground/**
-      - packages/antdv-next-pro/src/**
-      - packages/antdv-next-pro/package.json
-      - packages/antdv-next-pro/vite.config.ts
+      - packages/src/**
+      - packages/package.json
+      - packages/vite.config.ts
       - package.json
       - pnpm-lock.yaml
       - pnpm-workspace.yaml

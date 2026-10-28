@@ -6,7 +6,7 @@ import {
   ProConfigProvider,
   ProField,
   type ProValueTypeMap,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 const mode = ref<'read' | 'edit' | 'update'>('read')
 const title = ref('Hello Vue')

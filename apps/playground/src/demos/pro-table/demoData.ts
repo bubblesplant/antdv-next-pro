@@ -1,4 +1,4 @@
-import type { ProFilter, ProRequest, ProSort } from '@bubblesjs/antv-next-pro'
+import type { ProFilter, ProRequest, ProSort } from '@bubblesjs/antdv-next-pro'
 
 export type DemoStatus = 'running' | 'paused' | 'done'
 export type DemoCategory = 'growth' | 'experience' | 'efficiency'

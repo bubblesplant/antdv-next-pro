@@ -7,7 +7,7 @@ import {
   type ProKey,
   type ProListMetas,
   type ProTableInstance,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface Project extends Record<string, unknown> {
   id: number

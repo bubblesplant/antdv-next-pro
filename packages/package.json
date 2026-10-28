@@ -1,0 +1,93 @@
+{
+  "name": "@bubblesjs/antdv-next-pro",
+  "version": "0.3.0",
+  "description": "Vue 3 ProCard, ProTable, EditableProTable and SchemaForm powered by Antdv Next",
+  "keywords": [
+    "antdv-next",
+    "editable-table",
+    "pro-card",
+    "pro-table",
+    "schema-form",
+    "vue"
+  ],
+  "homepage": "https://bubblesplant.github.io/antdv-next-pro/",
+  "bugs": {
+    "url": "https://github.com/bubblesplant/antdv-next-pro/issues"
+  },
+  "license": "MIT",
+  "author": "bubblesplant",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bubblesplant/antdv-next-pro.git"
+  },
+  "style": "./dist/style.css",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "pnpm build:modules && pnpm build:browser",
+    "build:browser": "vp build --config vite.browser.config.ts",
+    "build:modules": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test run --project unit",
+    "test:browser": "vp test run --project browser",
+    "test:coverage": "vp test run --project unit --coverage",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit",
+    "verify:package": "pnpm build && tsc -p tests/consumer/tsconfig.json && node scripts/verify-package.mjs"
+  },
+  "dependencies": {
+    "@antdv-next/icons": "catalog:",
+    "dayjs": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "antdv-next": "catalog:",
+    "jsdom": "catalog:",
+    "playwright": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "peerDependencies": {
+    "antdv-next": "^1.5.2",
+    "vue": "^3.5.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

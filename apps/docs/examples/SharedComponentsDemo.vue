@@ -15,7 +15,7 @@ import {
   Search,
   TableDropdown,
   type ProColumns,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 const DropdownButton = TableDropdown.Button
 const feedback = ref('操作工具栏、筛选标签与错误恢复，结果会显示在这里。')

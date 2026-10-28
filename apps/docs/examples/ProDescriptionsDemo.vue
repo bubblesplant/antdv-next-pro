@@ -6,7 +6,7 @@ import {
   type ProDescriptionsColumn,
   type ProDescriptionsInstance,
   type ProKey,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface ProjectDetails extends Record<string, unknown> {
   name: string

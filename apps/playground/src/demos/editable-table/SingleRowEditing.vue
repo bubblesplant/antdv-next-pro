@@ -8,7 +8,7 @@ import {
   type ProColumns,
   type ProKey,
   type RecordCreatorProps,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface Member extends Record<string, unknown> {
   id: number

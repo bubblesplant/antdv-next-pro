@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antv-next-pro'
+import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antdv-next-pro'
 import { ConfigProvider, theme } from 'antdv-next'
 import zhCN from 'antdv-next/locale/zh_CN'
-import { ProTable } from '@bubblesjs/antv-next-pro'
+import { ProTable } from '@bubblesjs/antdv-next-pro'
 import { computed, ref } from 'vue'
 import { createDemoRequest, type DemoQuery, type DemoRow } from './demoData'
 const emit = defineEmits<{
