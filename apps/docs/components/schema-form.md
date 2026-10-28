@@ -91,6 +91,8 @@ SchemaForm、ProTable 搜索/编辑与[独立 ProFormFields](./pro-form-fields)�
 
 ### 布局类型
 
+查询布局也可以独立使用，支持字段子组件及 `columns`，详见 [QueryFilter](./query-filter) 与 [LightFilter](./light-filter)。
+
 | `layoutType`  | 场景                               |
 | ------------- | ---------------------------------- |
 | `Form`        | 标准表单                           |
@@ -106,7 +108,7 @@ SchemaForm、ProTable 搜索/编辑与[独立 ProFormFields](./pro-form-fields)�
 
 ```vue
 <script setup lang="ts">
-import { ModalForm, StepsForm } from '@bubblesjs/antv-next-pro'
+import { ModalForm, StepsForm } from '@bubblesjs/antdv-next-pro'
 </script>
 
 <template>

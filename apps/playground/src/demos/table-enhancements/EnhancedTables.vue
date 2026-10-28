@@ -9,7 +9,7 @@ import {
   type ProColumns,
   type ProKey,
   type ProTableInstance,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface Task extends Record<string, unknown> {
   id: number

@@ -92,6 +92,8 @@ SchemaForm, ProTable search/edit controls, and the [standalone ProFormFields](./
 
 ### Layout types
 
+Search layouts are also available as standalone components with composed fields or `columns`. See [QueryFilter](./query-filter) and [LightFilter](./light-filter).
+
 | `layoutType`  | Scenario                                |
 | ------------- | --------------------------------------- |
 | `Form`        | Standard form                           |
@@ -107,7 +109,7 @@ Set `layout-type` or import a named layout component:
 
 ```vue
 <script setup lang="ts">
-import { ModalForm, StepsForm } from '@bubblesjs/antv-next-pro'
+import { ModalForm, StepsForm } from '@bubblesjs/antdv-next-pro'
 </script>
 
 <template>

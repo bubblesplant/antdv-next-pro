@@ -1,18 +1,18 @@
-# @bubblesjs/antv-next-pro
+# @bubblesjs/antdv-next-pro
 
 Community-maintained Vue 3 ProCard, ProTable, EditableProTable, ProForm, SchemaForm, fields, lists, and descriptions powered by Antdv Next.
 
-The current alignment references `@ant-design/pro-components@3.1.15-7` at commit `3bf43278d39f2d31489749132982488f57a9eb5e`, expressed through Vue `v-model`, events, slots, and component refs. See the [v3 migration guide](https://bubblesplant.github.io/antv-next-pro/en/guide/pro-components-v3) for changed defaults, classes, and callbacks.
+The current alignment references `@ant-design/pro-components@3.1.15-7` at commit `3bf43278d39f2d31489749132982488f57a9eb5e`, expressed through Vue `v-model`, events, slots, and component refs. See the [v3 migration guide](https://bubblesplant.github.io/antdv-next-pro/en/guide/pro-components-v3) for changed defaults, classes, and callbacks.
 
 ## Install
 
 ```bash
-pnpm add @bubblesjs/antv-next-pro antdv-next vue
+pnpm add @bubblesjs/antdv-next-pro antdv-next vue
 ```
 
 ```ts
-import AntdvNextPro from '@bubblesjs/antv-next-pro'
-import '@bubblesjs/antv-next-pro/style.css'
+import AntdvNextPro from '@bubblesjs/antdv-next-pro'
+import '@bubblesjs/antdv-next-pro/style.css'
 
 app.use(AntdvNextPro)
 ```
@@ -22,18 +22,20 @@ Named imports are available:
 ```ts
 import {
   EditableProTable,
+  LightFilter,
   ProCard,
   ProFormSelect,
   ProFormText,
   ProFormUploadButton,
   ProTable,
+  QueryFilter,
   SchemaForm,
   type EditableProTableInstance,
   type ProColumns,
   type ProTableInstance,
   type SchemaFormColumn,
   type SchemaFormInstance,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 ```
 
 ## Browser ESM / CDN
@@ -46,15 +48,15 @@ Load forms, fields, and providers from the same bundle so they share their conte
 After publishing a version containing these files, replace `VERSION` with that version:
 
 ```text
-https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
-https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/style.css
+https://cdn.jsdelivr.net/npm/@bubblesjs/antdv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
+https://cdn.jsdelivr.net/npm/@bubblesjs/antdv-next-pro@VERSION/dist/browser/style.css
 ```
 
 For TinyEngine, set the material package's `script` / `css` to these URLs, use a named
 `exportName` such as `ProFormField`, and set `destructuring: true`.
 Fields use `modelValue` and `onUpdate:modelValue`.
 
-From the repository root, `pnpm --filter @bubblesjs/antv-next-pro build` builds both the
+From the repository root, `pnpm --filter @bubblesjs/antdv-next-pro build` builds both the
 module distribution and the browser bundle. Use `build:browser` to rebuild only the browser files.
 `build:modules` cleans `dist`, so run the complete build before publishing.
 
@@ -67,7 +69,7 @@ module distribution and the browser bundle. Use `build:browser` to rebuild only 
 </ProCard>
 ```
 
-ProCard uses native Card theme tokens, title/action slots, loading, collapse, ghost mode, semantic `classes` / `styles`, responsive columns, split layout, tabs, Group, and Divider. ProTable reuses it for query and table containers. See the [ProCard docs](https://bubblesplant.github.io/antv-next-pro/en/components/pro-card).
+ProCard uses native Card theme tokens, title/action slots, loading, collapse, ghost mode, semantic `classes` / `styles`, responsive columns, split layout, tabs, Group, and Divider. ProTable reuses it for query and table containers. See the [ProCard docs](https://bubblesplant.github.io/antdv-next-pro/en/components/pro-card).
 
 ## ProTable
 
@@ -125,6 +127,20 @@ Use `ProForm` to compose field children without columns; `BetaSchemaForm` is the
 
 SchemaForm and the table search/edit controls share the same field registry. In addition to the existing types, `treeSelect`, `slider`, and `segmented` are available across these consumers; SchemaForm also supports `timeRange`.
 
+## QueryFilter / LightFilter
+
+`QueryFilter` and `LightFilter` are independently importable search forms, also used by
+ProTable's search area. Compose `ProFormText` / `ProFormSelect` children or pass schema
+`columns`. Both support `v-model`, `onFinish`, and imperative form methods through a ref.
+
+`QueryFilter` provides responsive columns, search and reset actions, and controlled
+expansion through `v-model:collapsed`. `LightFilter` opens fields in popovers and submits
+on confirmation or clearing; `secondary` groups extra fields and `collapse` collects all fields.
+
+See the [QueryFilter docs](https://bubblesplant.github.io/antdv-next-pro/en/components/query-filter)
+and [LightFilter docs](https://bubblesplant.github.io/antdv-next-pro/en/components/light-filter)
+for live examples and API details.
+
 ## ProFormFields
 
 Each field is independently importable, uses standard Vue `v-model`, and includes an Antdv Next FormItem by default. Set `fieldMode="field"` when a table cell, custom grid, or parent component already owns the FormItem.
@@ -133,7 +149,7 @@ Each field is independently importable, uses standard Vue `v-model`, and include
 <script setup lang="ts">
 import { Form } from 'antdv-next'
 import { reactive } from 'vue'
-import { ProFormSelect, ProFormText } from '@bubblesjs/antv-next-pro'
+import { ProFormSelect, ProFormText } from '@bubblesjs/antdv-next-pro'
 
 const form = reactive({ title: '', owner: undefined as string | undefined })
 
@@ -174,11 +190,11 @@ ProList/BaseProList, ProDescriptions, DragSortTable, RowEditorTable, CellEditorT
 
 ## 中文简介
 
-`@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 + Antdv Next 高阶组件库，提供表格、组合与 Schema 表单、统一字段、列表、描述项和 Pro 配置。表格与表单共享字段核心，支持 Promise 请求、双向绑定、异步提交与原生 ConfigProvider 配置继承。
+`@bubblesjs/antdv-next-pro` 是社区维护的 Vue 3 + Antdv Next 高阶组件库，提供表格、组合与 Schema 表单、统一字段、列表、描述项和 Pro 配置。表格与表单共享字段核心，支持 Promise 请求、双向绑定、异步提交与原生 ConfigProvider 配置继承。
 
-- [完整中文文档](https://bubblesplant.github.io/antv-next-pro/)
-- [English documentation](https://bubblesplant.github.io/antv-next-pro/en/)
-- [GitHub](https://github.com/bubblesplant/antv-next-pro)
+- [完整中文文档](https://bubblesplant.github.io/antdv-next-pro/)
+- [English documentation](https://bubblesplant.github.io/antdv-next-pro/en/)
+- [GitHub](https://github.com/bubblesplant/antdv-next-pro)
 
 ## License
 

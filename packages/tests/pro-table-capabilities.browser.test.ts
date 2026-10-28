@@ -472,11 +472,21 @@ describe('ProTable browser capabilities', () => {
     expect(buttonByText('Search').exists()).toBe(true)
     expect(buttonByText('Reset').exists()).toBe(true)
     expect(buttonByText('Expand').exists()).toBe(true)
+    const collapseIcon = buttonByText('Expand').get('[data-icon="down"]').element
+      .parentElement as HTMLElement
+    expect(collapseIcon.style.transform).toBe('rotate(0turn)')
+    expect(collapseIcon.style.marginInlineStart).toBe('0.5em')
+    expect(collapseIcon.style.transitionDuration).toBe('0.3s')
+    expect(collapseIcon.style.transitionProperty).toBe('all')
     expect(buttonByText('Reload').exists()).toBe(true)
     expect(buttonByText('Fullscreen').exists()).toBe(true)
 
     await buttonByText('Expand').trigger('click')
     expect(buttonByText('Collapse').exists()).toBe(true)
+    expect(buttonByText('Collapse').get('[data-icon="down"]').element.parentElement).toBe(
+      collapseIcon,
+    )
+    expect(collapseIcon.style.transform).toBe('rotate(0.5turn)')
 
     await buttonByText('Density').trigger('click')
     await vi.waitFor(() => expect(buttonByText('Compact density').exists()).toBe(true))

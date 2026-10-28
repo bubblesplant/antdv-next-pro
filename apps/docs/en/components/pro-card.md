@@ -26,8 +26,8 @@ import ProCardDemo from '../../examples/ProCardDemo.vue'
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ProCard } from '@bubblesjs/antv-next-pro'
-import '@bubblesjs/antv-next-pro/style.css'
+import { ProCard } from '@bubblesjs/antdv-next-pro'
+import '@bubblesjs/antdv-next-pro/style.css'
 
 const collapsed = ref(false)
 </script>

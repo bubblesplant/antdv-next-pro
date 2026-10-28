@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button } from 'antdv-next'
-import { ProCard } from '@bubblesjs/antv-next-pro'
+import { ProCard } from '@bubblesjs/antdv-next-pro'
 
 const collapsed = ref(false)
 </script>

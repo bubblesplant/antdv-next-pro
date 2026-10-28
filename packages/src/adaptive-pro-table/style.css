@@ -1,0 +1,94 @@
+.adaptive-table[data-pro-table] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  > [data-pro-table-container] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+
+    > .ant-card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+
+      > [data-pro-card-content] {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+
+        > * {
+          flex-shrink: 0;
+        }
+
+        /* ProTable 在普通表格与编辑表格外分别使用 div 和 Form。 */
+        > :is(div, form):has(> .ant-table-wrapper) {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          min-height: 0;
+
+          > .ant-table-wrapper {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+
+            > .ant-spin {
+              display: flex;
+              flex: 1;
+              flex-direction: column;
+              min-height: 0;
+
+              > .ant-spin-container {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                min-height: 0;
+
+                > .ant-table {
+                  display: flex;
+                  flex: 1;
+                  flex-direction: column;
+                  min-height: 0;
+
+                  > .ant-table-title,
+                  > .ant-table-footer {
+                    flex-shrink: 0;
+                  }
+
+                  > .ant-table-container {
+                    display: flex;
+                    flex: 1;
+                    flex-direction: column;
+                    min-height: 0;
+
+                    > .ant-table-header,
+                    > .ant-table-summary {
+                      flex-shrink: 0;
+                    }
+
+                    > .ant-table-body {
+                      flex: 1;
+                      min-height: 0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

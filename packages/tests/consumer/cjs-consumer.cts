@@ -1,4 +1,4 @@
-import packageExports = require('@bubblesjs/antv-next-pro')
+import packageExports = require('@bubblesjs/antdv-next-pro')
 import type {
   EditableAction,
   EditableProTableProps,
@@ -12,7 +12,7 @@ import type {
   ProTableProps,
   SchemaFormColumn,
   SchemaFormProps,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 import type { Component, Plugin } from 'vue'
 
 interface CjsRow extends Record<string, unknown> {

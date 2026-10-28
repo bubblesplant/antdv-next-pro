@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ProTable, type ProColumns, type ProKey } from '@bubblesjs/antv-next-pro'
+import { ProTable, type ProColumns, type ProKey } from '@bubblesjs/antdv-next-pro'
 
 interface Task extends Record<string, unknown> {
   id: string

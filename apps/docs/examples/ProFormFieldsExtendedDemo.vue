@@ -12,7 +12,7 @@ import {
   ProFormRate,
   ProFormSearchSelect,
   ProFormTimePicker,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 const readonly = ref(false)
 const options = [

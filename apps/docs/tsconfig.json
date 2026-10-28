@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@bubblesjs/antv-next-pro": ["../../packages/antdv-next-pro/src/index.ts"]
+      "@bubblesjs/antdv-next-pro": ["../../packages/src/index.ts"]
     },
     "types": ["node", "vite/client"]
   },

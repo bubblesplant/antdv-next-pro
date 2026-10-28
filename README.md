@@ -1,37 +1,38 @@
 # Antdv Next Pro
 
-[![CI](https://github.com/bubblesplant/antv-next-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/bubblesplant/antv-next-pro/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/%40bubblesjs%2Fantv-next-pro.svg)](https://www.npmjs.com/package/@bubblesjs/antv-next-pro)
+[![CI](https://github.com/bubblesplant/antdv-next-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/bubblesplant/antdv-next-pro/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/%40bubblesjs%2Fantdv-next-pro.svg)](https://www.npmjs.com/package/@bubblesjs/antdv-next-pro)
 [![license](https://img.shields.io/badge/license-MIT-1768d3.svg)](./LICENSE)
 
-`@bubblesjs/antv-next-pro` 是社区维护的 Vue 3 与 Antdv Next 高阶组件库。本轮以 `@ant-design/pro-components@3.1.15-7` 为行为参考，以 Vue 的 `v-model`、事件、插槽和组件 `ref` 提供：
+`@bubblesjs/antdv-next-pro` 是社区维护的 Vue 3 与 Antdv Next 高阶组件库。本轮以 `@ant-design/pro-components@3.1.15-7` 为行为参考，以 Vue 的 `v-model`、事件、插槽和组件 `ref` 提供：
 
 - `ProCard`：主题卡片、标题与操作区、骨架加载、受控/非受控折叠和语义样式。
 - `ProTable`：搜索、分页、排序、筛选、列设置、远程请求与可编辑行。
 - `EditableProTable`：整表受控编辑、新建记录、单行/多行编辑与异步保存。
 - `SchemaForm`：通过 `columns` 生成 `Form`、`Embed`、`QueryFilter`、`LightFilter`、`ModalForm`、`DrawerForm`、`StepForm`、`StepsForm` 等布局表单。
 - `ProForm`：组合字段，配合 `ProFormGroup`、`ProFormFieldSet`、`ProFormList`、`ProFormDependency`、`ProFormItem` 等结构组件，并支持查询、轻量、弹层和步骤布局；`BetaSchemaForm` 保留 schema 入口。
+- `QueryFilter` / `LightFilter`：可独立导入的查询表单与轻量筛选，支持组合字段及 `columns`，也由 `ProTable` 的搜索区域复用。
 - `ProFormFields` / `ProField`：统一输入、只读展示、异步选项与自定义 valueType，覆盖文本、数字、日期、选择、验证码和上传等场景。
 - `ProList` / `ProDescriptions`：列表 meta、请求、选择、描述项及字段展示。
 - `ProConfigProvider`：继承原生 ConfigProvider 的语言、方向、前缀和主题，提供 Pro token、intl 与 valueType 注册。
 
-本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](https://bubblesplant.github.io/antv-next-pro/guide/pro-components-v3)。本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。
+本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](https://bubblesplant.github.io/antdv-next-pro/guide/pro-components-v3)。本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。
 
-[中文文档](https://bubblesplant.github.io/antv-next-pro/) · [English docs](https://bubblesplant.github.io/antv-next-pro/en/) · [Playground](https://bubblesplant.github.io/antv-next-pro/playground/)
+[中文文档](https://bubblesplant.github.io/antdv-next-pro/) · [English docs](https://bubblesplant.github.io/antdv-next-pro/en/) · [Playground](https://bubblesplant.github.io/antdv-next-pro/playground/)
 
 ## 安装
 
 ```bash
-pnpm add @bubblesjs/antv-next-pro antdv-next vue
+pnpm add @bubblesjs/antdv-next-pro antdv-next vue
 ```
 
 ```ts
 import { createApp } from 'vue'
 import Antd from 'antdv-next'
-import AntdvNextPro from '@bubblesjs/antv-next-pro'
+import AntdvNextPro from '@bubblesjs/antdv-next-pro'
 
 import 'antdv-next/dist/reset.css'
-import '@bubblesjs/antv-next-pro/style.css'
+import '@bubblesjs/antdv-next-pro/style.css'
 
 createApp(App).use(Antd).use(AntdvNextPro).mount('#app')
 ```
@@ -48,12 +49,12 @@ import {
   ProTable,
   SchemaForm,
   type ProColumns,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 ```
 
-ProFormFields 默认包含 FormItem，设置 `fieldMode="field"` 可只渲染裸控件。字段导出、组合命名和 Captcha/Upload 边界见 [ProFormFields 文档](https://bubblesplant.github.io/antv-next-pro/components/pro-form-fields)。
+ProFormFields 默认包含 FormItem，设置 `fieldMode="field"` 可只渲染裸控件。字段导出、组合命名和 Captcha/Upload 边界见 [ProFormFields 文档](https://bubblesplant.github.io/antdv-next-pro/components/pro-form-fields)。
 
-ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<ProCard title="用户信息" variant="borderless">内容</ProCard>`；详细 API 与示例见 [ProCard 文档](https://bubblesplant.github.io/antv-next-pro/components/pro-card)。
+ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<ProCard title="用户信息" variant="borderless">内容</ProCard>`；详细 API 与示例见 [ProCard 文档](https://bubblesplant.github.io/antdv-next-pro/components/pro-card)。
 
 原有字段包括：
 
@@ -72,7 +73,7 @@ ProTable 的查询区和表格区已统一使用 ProCard。也可独立使用 `<
 
 ```vue
 <script setup lang="ts">
-import { ProTable, type ProColumns, type ProRequest } from '@bubblesjs/antv-next-pro'
+import { ProTable, type ProColumns, type ProRequest } from '@bubblesjs/antdv-next-pro'
 
 type User = Record<string, unknown> & {
   id: number
@@ -118,7 +119,9 @@ apps/
   docs/                 中英双语 VitePress 文档
   playground/           核心组件与字段体系的交互演练场
 packages/
-  antdv-next-pro/       npm 组件包
+  src/                  npm 组件源码
+  tests/                单元、浏览器与消费者测试
+  package.json          npm 组件包配置
 ```
 
 工程固定 Node.js 24、pnpm 12.4.1，并使用 Vite+ 统一运行 Vite、Oxlint、Oxfmt、Vitest、任务编排与组件打包。Vue SFC 额外由 `@antfu/eslint-config` 检查。
@@ -141,12 +144,12 @@ pnpm build
 构建组件包时会依次生成 npm 工程模块和浏览器 ESM 整包，两者随同一个 npm 包发布：
 
 ```bash
-pnpm --filter @bubblesjs/antv-next-pro build          # 同时构建两种产物
-pnpm --filter @bubblesjs/antv-next-pro build:modules  # 仅构建 npm 模块
-pnpm --filter @bubblesjs/antv-next-pro build:browser  # 仅构建浏览器整包
+pnpm --filter @bubblesjs/antdv-next-pro build          # 同时构建两种产物
+pnpm --filter @bubblesjs/antdv-next-pro build:modules  # 仅构建 npm 模块
+pnpm --filter @bubblesjs/antdv-next-pro build:browser  # 仅构建浏览器整包
 ```
 
-普通项目继续从包名导入，并使用 `@bubblesjs/antv-next-pro/style.css`。
+普通项目继续从包名导入，并使用 `@bubblesjs/antdv-next-pro/style.css`。
 TinyEngine 等直接加载 ESM 的环境使用 `dist/browser/antdv-next-pro.esm.js` 和
 `dist/browser/style.css`。浏览器整包包含 Antdv Next、图标和 dayjs，Vue 由宿主 importmap 提供；
 `ProForm`、字段与 Provider 应从同一个整包加载，以共享表单上下文。
@@ -155,8 +158,8 @@ TinyEngine 等直接加载 ESM 的环境使用 `dist/browser/antdv-next-pro.esm.
 发布包含这些产物的新版本后，将下列地址中的 `VERSION` 替换为该版本号：
 
 ```text
-https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
-https://cdn.jsdelivr.net/npm/@bubblesjs/antv-next-pro@VERSION/dist/browser/style.css
+https://cdn.jsdelivr.net/npm/@bubblesjs/antdv-next-pro@VERSION/dist/browser/antdv-next-pro.esm.js
+https://cdn.jsdelivr.net/npm/@bubblesjs/antdv-next-pro@VERSION/dist/browser/style.css
 ```
 
 TinyEngine 物料的 `packages[].script` / `css` 指向上述文件，组件的 `npm.exportName`
@@ -170,9 +173,9 @@ TinyEngine 物料的 `packages[].script` / `css` 指向上述文件，组件的 
 仓库的 `Docs and Playground` 工作流会构建两个应用，将文档放在站点根目录、Playground 放在 `playground/` 子目录，并统一发布到 `gh-pages` 分支。Playground 使用 hash 路由，每个示例的链接都可以直接打开和刷新。
 
 1. 将本次修改合并或推送到 `main`。
-2. 打开仓库的 [Settings → Pages](https://github.com/bubblesplant/antv-next-pro/settings/pages)。在 **Build and deployment** 中将 **Source** 设置为 **Deploy from a branch**，**Branch** 选择 `gh-pages`，目录选择 **/ (root)**，保存。已经这样配置的仓库保持原设置即可。
-3. 打开 [Actions → Docs and Playground](https://github.com/bubblesplant/antv-next-pro/actions/workflows/docs.yml)，等待自动部署。需要手动部署时选择 **Run workflow**，分支选 `main`。如果还没有 `gh-pages` 分支，先运行一次工作流，成功后再回到 Pages 选择该分支。
-4. 工作流与 Pages 发布完成后，访问 [文档](https://bubblesplant.github.io/antv-next-pro/) 或 [Playground](https://bubblesplant.github.io/antv-next-pro/playground/)。中英文文档导航和首页都有 Playground 入口。
+2. 打开仓库的 [Settings → Pages](https://github.com/bubblesplant/antdv-next-pro/settings/pages)。在 **Build and deployment** 中将 **Source** 设置为 **Deploy from a branch**，**Branch** 选择 `gh-pages`，目录选择 **/ (root)**，保存。已经这样配置的仓库保持原设置即可。
+3. 打开 [Actions → Docs and Playground](https://github.com/bubblesplant/antdv-next-pro/actions/workflows/docs.yml)，等待自动部署。需要手动部署时选择 **Run workflow**，分支选 `main`。如果还没有 `gh-pages` 分支，先运行一次工作流，成功后再回到 Pages 选择该分支。
+4. 工作流与 Pages 发布完成后，访问 [文档](https://bubblesplant.github.io/antdv-next-pro/) 或 [Playground](https://bubblesplant.github.io/antdv-next-pro/playground/)。中英文文档导航和首页都有 Playground 入口。
 
 无需新增 Secret，发布使用 GitHub 自动提供的 `GITHUB_TOKEN`，工作流已声明 `contents: write` 权限。若推送 `gh-pages` 时返回 403，请检查仓库或组织是否限制了 Actions 的写入权限，以及 `gh-pages` 的分支规则是否允许该工作流发布。
 
@@ -180,13 +183,13 @@ TinyEngine 物料的 `packages[].script` / `css` 指向上述文件，组件的 
 
 ## 参与贡献
 
-欢迎[报告缺陷或提出功能建议](https://github.com/bubblesplant/antv-next-pro/issues/new/choose)，也欢迎从个人 Fork 向 `main` 提交 PR。请阅读[贡献指南](./CONTRIBUTING.md)，了解本地开发、PR 标题规范、测试与 changeset 要求。PR 会自动运行标题检查、代码检查、测试和构建验证。
+欢迎[报告缺陷或提出功能建议](https://github.com/bubblesplant/antdv-next-pro/issues/new/choose)，也欢迎从个人 Fork 向 `main` 提交 PR。请阅读[贡献指南](./CONTRIBUTING.md)，了解本地开发、PR 标题规范、测试与 changeset 要求。PR 会自动运行标题检查、代码检查、测试和构建验证。
 
 ## Compatibility
 
 The API follows the main workflows of Ant Design Pro Components while remaining idiomatic Vue. ReactNode and React refs map to Vue slots, events, models, and component refs. This project does not ship a React compatibility runtime.
 
-See the full [compatibility matrix](https://bubblesplant.github.io/antv-next-pro/en/guide/compatibility).
+See the full [compatibility matrix](https://bubblesplant.github.io/antdv-next-pro/en/guide/compatibility).
 
 ## License
 

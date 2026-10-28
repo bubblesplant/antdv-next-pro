@@ -1,5 +1,5 @@
 {
-  "name": "@bubblesjs/antv-next-pro",
+  "name": "@bubblesjs/antdv-next-pro",
   "version": "0.3.1",
   "description": "Vue 3 ProCard, ProTable, EditableProTable and SchemaForm powered by Antdv Next",
   "keywords": [
@@ -10,15 +10,15 @@
     "schema-form",
     "vue"
   ],
-  "homepage": "https://bubblesplant.github.io/antv-next-pro/",
+  "homepage": "https://bubblesplant.github.io/antdv-next-pro/",
   "bugs": {
-    "url": "https://github.com/bubblesplant/antv-next-pro/issues"
+    "url": "https://github.com/bubblesplant/antdv-next-pro/issues"
   },
   "license": "MIT",
   "author": "bubblesplant",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bubblesplant/antv-next-pro.git"
+    "url": "git+https://github.com/bubblesplant/antdv-next-pro.git"
   },
   "style": "./dist/style.css",
   "files": [
@@ -80,7 +80,6 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "vitest-browser-vue": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:"
   },

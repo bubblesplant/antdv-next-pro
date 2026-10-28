@@ -23,7 +23,7 @@ import CompositionForm from '../../playground/src/demos/schema-form/CompositionF
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ProForm, ProFormText, type ProFormInstance } from '@bubblesjs/antv-next-pro'
+import { ProForm, ProFormText, type ProFormInstance } from '@bubblesjs/antdv-next-pro'
 
 const form = ref<ProFormInstance>()
 async function save(values: Record<string, unknown>) {
@@ -82,9 +82,9 @@ List 默认插槽提供 `{ field, index, action, fields, record, list }`。`acti
 
 `submitTimeout` 仅用于弹层，单位毫秒：设为正数时，从业务提交开始暂时禁用取消并忽略交互关闭；超时或提交结束解除保护。它不会终止业务 Promise，未完成提交的按钮仍显示 loading。默认不设关闭保护，实例 close() 和外部 open 状态仍由调用者控制。
 
-`QueryFilter` 提供响应式栅格、折叠及操作区：`collapsed/defaultCollapsed`、`span`、`defaultColsNumber`、`labelWidth`、`split`、`optionRender(props, form, doms)`、`collapseRender(collapsed)`、`searchText/resetText`。宽度变化会调整列宽，字段值和校验继续保留。
+[QueryFilter](./query-filter) 可独立导入，提供响应式栅格、折叠及操作区：`collapsed/defaultCollapsed`、`span`、`defaultColsNumber`、`labelWidth`、`split`、`optionRender(props, form, doms)`、`collapseRender(collapsed)`、`searchText/resetText`。宽度变化会调整列宽，字段值和校验继续保留。
 
-`LightFilter` 将普通字段显示为标签和弹层，`secondary` 字段默认进入更多筛选；`collapse=true` 将全部字段收进同一个更多弹层。支持 `collapseLabel/placement/footerRender`。确认先校验再提交；取消恢复打开时的值，清除移除值后提交。更多弹层内直接展示字段行，并对该组字段统一确认、取消和清除。`LightWrapper` 提供同一弹层行为和 `v-model:open`。
+[LightFilter](./light-filter) 可独立导入，将普通字段显示为标签和弹层，`secondary` 字段默认进入更多筛选；`collapse=true` 将全部字段收进同一个更多弹层。支持 `collapseLabel/placement/footerRender`。确认先校验再提交；取消恢复打开时的值，清除移除值后提交。更多弹层内直接展示字段行，并对该组字段统一确认、取消和清除。`LightWrapper` 提供同一弹层行为和 `v-model:open`。
 
 ## 多步骤
 

@@ -1,6 +1,7 @@
 import type { App, Component, Plugin } from 'vue'
 
 import EditableProTable from './EditableProTable.vue'
+import AdaptiveProTable from './adaptive-pro-table/AdaptiveProTable'
 import ProCard, { ProCardGroup, ProCardDivider, ProCardTabPane } from './pro-card'
 import { ProConfigProvider, ProProvider } from './provider'
 import { ProField } from './pro-field'
@@ -41,6 +42,7 @@ const components = [
   ['ProCardDivider', ProCardDivider],
   ['ProCardTabPane', ProCardTabPane],
   ['ProTable', ProTable],
+  ['AdaptiveProTable', AdaptiveProTable],
   ['EditableProTable', EditableProTable],
   ['SchemaForm', SchemaForm],
   ['BetaSchemaForm', SchemaForm],
@@ -105,6 +107,7 @@ export const AntdvNextPro: Plugin = {
 }
 
 export {
+  AdaptiveProTable,
   DrawerForm,
   EditableProTable,
   Embed,

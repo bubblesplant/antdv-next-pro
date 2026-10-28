@@ -56,7 +56,7 @@ body:
       description: 填写实际使用的版本及浏览器信息。
       render: text
       placeholder: |
-        @bubblesjs/antv-next-pro:
+        @bubblesjs/antdv-next-pro:
         antdv-next:
         Vue:
         Node.js:
@@ -84,9 +84,9 @@ body:
     attributes:
       label: 提交前确认 / Checklist
       options:
-        - label: 我已阅读[文档](https://bubblesplant.github.io/antv-next-pro/)和[贡献指南](https://github.com/bubblesplant/antv-next-pro/blob/main/CONTRIBUTING.md)。
+        - label: 我已阅读[文档](https://bubblesplant.github.io/antdv-next-pro/)和[贡献指南](https://github.com/bubblesplant/antdv-next-pro/blob/main/CONTRIBUTING.md)。
           required: true
-        - label: 我已搜索[现有 Issue](https://github.com/bubblesplant/antv-next-pro/issues)，没有发现重复问题。
+        - label: 我已搜索[现有 Issue](https://github.com/bubblesplant/antdv-next-pro/issues)，没有发现重复问题。
           required: true
         - label: 我已提供最小复现；如果是文档问题，已提供对应文档链接。
           required: true

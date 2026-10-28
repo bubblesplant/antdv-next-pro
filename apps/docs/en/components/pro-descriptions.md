@@ -19,7 +19,7 @@ Display a single record with table-compatible field schemas, formatting, request
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ProDescriptions, type ProDescriptionsColumn } from '@bubblesjs/antv-next-pro'
+import { ProDescriptions, type ProDescriptionsColumn } from '@bubblesjs/antdv-next-pro'
 
 type Profile = { name: string; status: string }
 const profile = ref<Profile>({ name: 'Alex', status: 'active' })

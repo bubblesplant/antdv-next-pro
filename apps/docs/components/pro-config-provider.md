@@ -47,7 +47,7 @@ Pro 组件可独立继承最近的 Antdv Next `ConfigProvider`，包括语言、
 内置 34 个基线语言包，`intlMap`、`intlMapKeys` 以及 `enUSIntl`、`zhCNIntl` 等均可导入。原生 `locale.locale` 支持大小写、下划线、连字符和语言前缀匹配。缺失消息依次回退中文与调用方默认文案，显式空字符串保留。
 
 ```ts
-import { createIntl } from '@bubblesjs/antv-next-pro'
+import { createIntl } from '@bubblesjs/antdv-next-pro'
 
 const intl = createIntl('en-US', {
   tableForm: { search: 'Find', reset: 'Clear' },

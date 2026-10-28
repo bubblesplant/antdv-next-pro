@@ -31,8 +31,11 @@ const sourceModules = import.meta.glob<string>('./demos/**/*.{vue,ts}', {
 
 export const exampleComponents = [
   { id: 'pro-table', name: 'ProTable', label: '高级表格' },
+  { id: 'adaptive-pro-table', name: 'AdaptiveProTable', label: '自适应表格' },
   { id: 'editable-pro-table', name: 'EditableProTable', label: '可编辑表格' },
   { id: 'schema-form', name: 'SchemaForm', label: 'Schema 表单' },
+  { id: 'query-filter', name: 'QueryFilter', label: '查询筛选' },
+  { id: 'light-filter', name: 'LightFilter', label: '轻量筛选' },
   { id: 'pro-card', name: 'ProCard', label: '高级卡片' },
   { id: 'pro-list', name: 'ProList', label: '高级列表' },
   { id: 'pro-descriptions', name: 'ProDescriptions', label: '高级详情' },
@@ -75,6 +78,55 @@ function defineExample(definition: ExampleDefinition): PlaygroundExample {
 }
 
 const definitions: ExampleDefinition[] = [
+  {
+    path: '/query-filter/basic',
+    title: '组合字段与展开收起',
+    description: '独立使用 QueryFilter，组合字段并通过 v-model:collapsed 控制查询区折叠。',
+    componentId: 'query-filter',
+    section: '独立查询表单',
+    checks: ['查询和重置条件', '展开收起及箭头旋转', '收起后保留隐藏字段值'],
+    file: 'query-filter/BasicQueryFilter.vue',
+  },
+  {
+    path: '/query-filter/schema',
+    title: 'Schema 字段与实例方法',
+    description: '直接给 QueryFilter 传入 columns，通过 ref 设置、提交和重置查询条件。',
+    componentId: 'query-filter',
+    section: '独立查询表单',
+    checks: ['columns 生成查询字段', 'ref 填入与提交条件', '重置恢复初始值'],
+    file: 'query-filter/SchemaQueryFilter.vue',
+  },
+  {
+    path: '/light-filter/basic',
+    title: '标签筛选与更多条件',
+    description: '独立使用 LightFilter，组合普通字段与 secondary 字段，确认后提交查询。',
+    componentId: 'light-filter',
+    section: '独立轻量筛选',
+    checks: ['打开标签筛选并确认', '关闭弹层恢复编辑前的值', '更多条件及清除查询'],
+    file: 'light-filter/BasicLightFilter.vue',
+  },
+  {
+    path: '/light-filter/collapsed',
+    title: '收起全部筛选条件',
+    description: '使用 collapse 将所有字段收进一个弹层，定制入口文案并通过 ref 重置。',
+    componentId: 'light-filter',
+    section: '独立轻量筛选',
+    checks: ['统一筛选入口', '组合条件确认和清除', 'ref 重置全部条件'],
+    file: 'light-filter/CollapsedLightFilter.vue',
+  },
+  {
+    path: '/adaptive-pro-table/container-height',
+    title: '容器高度自适应',
+    description: '独立封装 ProTable，让表体填满剩余高度，固定查询区、工具栏和分页。',
+    componentId: 'adaptive-pro-table',
+    section: '高度自适应',
+    checks: [
+      '调整容器高度与展开查询区',
+      '空数据、加载中和横向滚动',
+      '插槽、分页事件和 ref 方法透传',
+    ],
+    file: 'adaptive-pro-table/AdaptiveTable.vue',
+  },
   {
     path: '/pro-list/projects',
     title: '项目列表与受控选择',

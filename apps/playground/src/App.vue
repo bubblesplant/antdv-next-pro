@@ -110,10 +110,10 @@ onBeforeUnmount(() => {
         </div>
         <nav class="header-links" aria-label="站点导航">
           <span class="header-current">组件示例</span>
-          <a href="https://bubblesplant.github.io/antv-next-pro/" target="_blank" rel="noreferrer"
+          <a href="https://bubblesplant.github.io/antdv-next-pro/" target="_blank" rel="noreferrer"
             >使用文档 <UiIcon name="external" :size="13"
           /></a>
-          <a href="https://github.com/bubblesplant/antv-next-pro" target="_blank" rel="noreferrer"
+          <a href="https://github.com/bubblesplant/antdv-next-pro" target="_blank" rel="noreferrer"
             >GitHub <UiIcon name="external" :size="13"
           /></a>
         </nav>

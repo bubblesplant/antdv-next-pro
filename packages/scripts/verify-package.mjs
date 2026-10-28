@@ -55,6 +55,7 @@ assert.equal(
 )
 
 const expectedRuntimeExports = [
+  'AdaptiveProTable',
   'AntdvNextPro',
   'DrawerForm',
   'EditableProTable',

@@ -9,7 +9,7 @@
     "typecheck": "vue-tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@bubblesjs/antv-next-pro": "workspace:*",
+    "@bubblesjs/antdv-next-pro": "workspace:*",
     "antdv-next": "catalog:",
     "fflate": "catalog:",
     "vue": "catalog:",

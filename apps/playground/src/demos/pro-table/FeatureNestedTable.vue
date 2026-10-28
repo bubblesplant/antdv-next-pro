@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ProColumns } from '@bubblesjs/antv-next-pro'
-import { ProTable } from '@bubblesjs/antv-next-pro'
+import type { ProColumns } from '@bubblesjs/antdv-next-pro'
+import { ProTable } from '@bubblesjs/antdv-next-pro'
 import { computed, ref } from 'vue'
 import { demoRows, type DemoRow } from './demoData'
 const expandedParent = ref<string | null>('数据产品')

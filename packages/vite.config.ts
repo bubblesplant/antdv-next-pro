@@ -19,7 +19,7 @@ export default defineConfig({
       ...options,
       // CJS must stay bundled so CSS extraction does not leave unresolved require() calls.
       preserveModules: format === 'es',
-      preserveModulesRoot: 'packages/antdv-next-pro',
+      preserveModulesRoot: 'packages',
     }),
   },
   test: {

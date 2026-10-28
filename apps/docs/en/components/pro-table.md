@@ -45,7 +45,7 @@ Pass `dataSource` or `defaultDataSource` for local mode. Search, sorting, filter
 Remote mode uses one fixed request contract:
 
 ```ts
-import type { ProRequest } from '@bubblesjs/antv-next-pro'
+import type { ProRequest } from '@bubblesjs/antdv-next-pro'
 
 const request: ProRequest<User, Query> = async (params, sort, filter) => {
   const result = await api.list({ ...params, sort, filter })
@@ -62,6 +62,8 @@ Search, pagination, sorting, filters, and external `params` all feed this reques
 `manualRequest` skips the initial request; call `reload()` through the component ref later. `postData` synchronously transforms successful data before display.
 
 ### Search and collapse
+
+The default collapse button follows ProComponents: it reuses a single down arrow, rotating it half a turn when expanded with a 0.3-second transition. Labels come from the locale or `localeText`. Use `search.collapseRender` to customize its content, or set it to `false` to hide the button.
 
 `search: false` disables the search area. A column with `dataIndex` becomes searchable unless `hideInSearch` or `search: false` is set. `search.transform` can map one field to different request parameters.
 
@@ -252,7 +254,7 @@ A cell slot takes precedence over the default display and editor. Prefer a heade
 ### Component ref
 
 ```ts
-import type { ProTableInstance } from '@bubblesjs/antv-next-pro'
+import type { ProTableInstance } from '@bubblesjs/antdv-next-pro'
 
 const tableRef = ref<ProTableInstance<User>>()
 

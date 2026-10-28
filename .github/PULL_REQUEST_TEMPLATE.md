@@ -17,7 +17,7 @@
 
 ### 提交前确认 / Checklist
 
-- [ ] 已阅读 [CONTRIBUTING.md](https://github.com/bubblesplant/antv-next-pro/blob/main/CONTRIBUTING.md)。
+- [ ] 已阅读 [CONTRIBUTING.md](https://github.com/bubblesplant/antdv-next-pro/blob/main/CONTRIBUTING.md)。
 - [ ] PR 目标分支为 `main`，标题符合 `fix: ...`、`feat: ...`、`docs: ...` 等约定。
 - [ ] 已为行为变化补充或更新必要的测试；不适用时已说明原因。
 - [ ] 已运行相关检查，并在上方列出结果。

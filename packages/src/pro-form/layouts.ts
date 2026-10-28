@@ -30,6 +30,7 @@ import type {
 import { useProFormContext, useProFormNamePath } from './context'
 import { flattenChildren, resolveSemantic, useFormPrefix } from './utils'
 import { useOverlaySubmitLock } from './useOverlaySubmitLock'
+import { defaultCollapseRender } from './query-filter/Actions'
 
 export function pickFormProps(props: Record<string, unknown>) {
   return Object.fromEntries(Object.keys(proFormProps).map((key) => [key, props[key]]))
@@ -381,7 +382,11 @@ export const QueryFilter = defineComponent({
               () =>
                 typeof props.collapseRender === 'function'
                   ? props.collapseRender(collapsed.value)
-                  : `${collapsed.value ? t('tableForm.collapsed', '展开') : t('tableForm.expand', '收起')} ${collapsed.value ? '⌄' : '⌃'}`,
+                  : defaultCollapseRender(
+                      collapsed.value,
+                      t('tableForm.collapsed', '展开'),
+                      t('tableForm.expand', '收起'),
+                    ),
             )
           : null
       return h(

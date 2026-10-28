@@ -8,7 +8,7 @@ import SharedComponentsDemo from '../examples/SharedComponentsDemo.vue'
 
 # 工具栏与辅助组件
 
-可独立组合的工具栏、操作菜单、查询表单、筛选浮层、字段标签与错误展示组件。全部从 `@bubblesjs/antv-next-pro` 公开导出。
+可独立组合的工具栏、操作菜单、查询表单、筛选浮层、字段标签与错误展示组件。全部从 `@bubblesjs/antdv-next-pro` 公开导出。
 
 <ClientOnly><SharedComponentsDemo /></ClientOnly>
 
@@ -20,7 +20,7 @@ import SharedComponentsDemo from '../examples/SharedComponentsDemo.vue'
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button, Input } from 'antdv-next'
-import { LightWrapper, ListToolBar, TableDropdown } from '@bubblesjs/antv-next-pro'
+import { LightWrapper, ListToolBar, TableDropdown } from '@bubblesjs/antdv-next-pro'
 
 const open = ref(false)
 const keyword = ref('')

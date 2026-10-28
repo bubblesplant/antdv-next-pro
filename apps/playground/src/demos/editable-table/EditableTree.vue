@@ -6,7 +6,7 @@ import {
   type EditableProTableInstance,
   type ProColumns,
   type ProKey,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface Task extends Record<string, unknown> {
   id: string

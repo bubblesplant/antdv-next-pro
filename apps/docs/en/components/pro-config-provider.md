@@ -47,7 +47,7 @@ Every Pro component inherits its nearest Antdv Next `ConfigProvider`: locale, th
 All 34 baseline locale packs are exported through `intlMap`, `intlMapKeys` and named entries such as `enUSIntl`. Native locale matching accepts case variants, underscores, hyphens and language prefixes. Missing messages fall back to Chinese, then the caller's default. An explicit empty string remains empty.
 
 ```ts
-import { createIntl } from '@bubblesjs/antv-next-pro'
+import { createIntl } from '@bubblesjs/antdv-next-pro'
 const intl = createIntl('en-US', { tableForm: { search: 'Find', reset: 'Clear' } })
 ```
 

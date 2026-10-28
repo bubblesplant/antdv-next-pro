@@ -69,9 +69,9 @@ Only an awaited onFinish result of **true** closes the dialog. False, undefined,
 
 The dialog-only submitTimeout option is measured in milliseconds. A positive value temporarily disables cancellation and ignores interactive closing from the start of business submission until the timeout or completion. It does not abort the business Promise, and an unfinished submission keeps its loading indicator. Protection is off by default; instance close() and externally controlled open remain under caller control.
 
-`QueryFilter` provides responsive columns, collapsed/defaultCollapsed, span, defaultColsNumber, labelWidth, split, optionRender(props,form,doms), collapseRender(collapsed), and searchText/resetText. Resizing preserves values and validation.
+[QueryFilter](./query-filter) is independently importable and provides responsive columns, collapsed/defaultCollapsed, span, defaultColsNumber, labelWidth, split, optionRender(props,form,doms), collapseRender(collapsed), and searchText/resetText. Resizing preserves values and validation.
 
-`LightFilter` displays ordinary fields as labels that open popovers, while secondary fields live under More by default. Setting collapse=true collects every field in a single More popover. It supports collapseLabel/placement/footerRender. Confirmation validates and submits, cancellation restores the opening snapshot, and clearing removes the value and submits. More renders field rows directly and applies these actions to the group. `LightWrapper` exposes the same popover behavior and v-model:open.
+[LightFilter](./light-filter) is independently importable and displays ordinary fields as labels that open popovers, while secondary fields live under More by default. Setting collapse=true collects every field in a single More popover. It supports collapseLabel/placement/footerRender. Confirmation validates and submits, cancellation restores the opening snapshot, and clearing removes the value and submits. More renders field rows directly and applies these actions to the group. `LightWrapper` exposes the same popover behavior and v-model:open.
 
 ## Steps
 

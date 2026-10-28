@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antv-next-pro'
-import { ProTable, ErrorBoundary } from '@bubblesjs/antv-next-pro'
+import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antdv-next-pro'
+import { ProTable, ErrorBoundary } from '@bubblesjs/antdv-next-pro'
 import { computed, defineComponent, h, markRaw, nextTick, ref } from 'vue'
 import { createDemoRequest, type DemoQuery, type DemoRow } from './demoData'
 const emit = defineEmits<{

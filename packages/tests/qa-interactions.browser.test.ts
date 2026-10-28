@@ -136,11 +136,7 @@ describe('ProTable browser QA matrix', () => {
     )
     expect(wrapper.text()).toContain('Ada-1')
 
-    const pageTwo = wrapper
-      .findAll('.ant-pagination-item')
-      .find((item) => item.text().trim() === '2')
-    expect(pageTwo).toBeDefined()
-    await pageTwo?.trigger('click')
+    await wrapper.get('.ant-pagination-item-2 a').trigger('click')
     await flushPromises()
 
     expect(request).toHaveBeenLastCalledWith(

@@ -8,25 +8,25 @@ const panelId = `package-command-${useId()}`
 const managers = [
   {
     name: 'npm',
-    command: 'npm install @bubblesjs/antv-next-pro antdv-next vue',
+    command: 'npm install @bubblesjs/antdv-next-pro antdv-next vue',
     color: '#cb3837',
     mark: 'n',
   },
   {
     name: 'yarn',
-    command: 'yarn add @bubblesjs/antv-next-pro antdv-next vue',
+    command: 'yarn add @bubblesjs/antdv-next-pro antdv-next vue',
     color: '#2c8ebb',
     mark: 'y',
   },
   {
     name: 'pnpm',
-    command: 'pnpm add @bubblesjs/antv-next-pro antdv-next vue',
+    command: 'pnpm add @bubblesjs/antdv-next-pro antdv-next vue',
     color: '#e7a528',
     mark: 'p',
   },
   {
     name: 'bun',
-    command: 'bun add @bubblesjs/antv-next-pro antdv-next vue',
+    command: 'bun add @bubblesjs/antdv-next-pro antdv-next vue',
     color: '#ac8767',
     mark: 'b',
   },

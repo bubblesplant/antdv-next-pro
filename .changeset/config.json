@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "bubblesplant/antv-next-pro"
+      "repo": "bubblesplant/antdv-next-pro"
     }
   ],
   "commit": false,

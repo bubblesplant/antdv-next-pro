@@ -8,7 +8,7 @@ import SharedComponentsDemo from '../../examples/SharedComponentsDemo.vue'
 
 # Toolbar and helper components
 
-Composable toolbar, action menu, search form, filter popup, field label and error components. All are exported from `@bubblesjs/antv-next-pro`.
+Composable toolbar, action menu, search form, filter popup, field label and error components. All are exported from `@bubblesjs/antdv-next-pro`.
 
 <ClientOnly><SharedComponentsDemo /></ClientOnly>
 
@@ -20,7 +20,7 @@ Composable toolbar, action menu, search form, filter popup, field label and erro
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button, Input } from 'antdv-next'
-import { LightWrapper, ListToolBar, TableDropdown } from '@bubblesjs/antv-next-pro'
+import { LightWrapper, ListToolBar, TableDropdown } from '@bubblesjs/antdv-next-pro'
 
 const open = ref(false)
 const keyword = ref('')

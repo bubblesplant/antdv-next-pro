@@ -169,6 +169,34 @@ describe('ProForm composed real controls', () => {
     expect(finish).toHaveBeenCalledWith({ name: 'Ada', role: 'admin' })
   })
 
+  it('reuses the QueryFilter collapse icon with the upstream rotation and custom renderer priority', async () => {
+    wrapper = mount(QueryFilter, {
+      attachTo: document.body,
+      props: { defaultCollapsed: true, span: 8 },
+      slots: {
+        default: () =>
+          ['name', 'code', 'city', 'role'].map((name) => h(ProFormText, { name, label: name })),
+      },
+    })
+    await tick()
+    const selector = 'button[aria-expanded]'
+    const icon = wrapper.get(`${selector} [data-icon="down"]`).element.parentElement as HTMLElement
+    expect(icon.style.transform).toBe('rotate(0turn)')
+    expect(icon.style.marginInlineStart).toBe('0.5em')
+    expect(icon.style.transitionDuration).toBe('0.3s')
+    expect(icon.style.transitionProperty).toBe('all')
+    await wrapper.get(selector).trigger('click')
+    await tick()
+    expect(wrapper.get(selector).attributes('aria-expanded')).toBe('true')
+    expect(wrapper.get(`${selector} [data-icon="down"]`).element.parentElement).toBe(icon)
+    expect(icon.style.transform).toBe('rotate(0.5turn)')
+    await wrapper.setProps({ collapseRender: () => 'Custom collapse' })
+    expect(wrapper.get(selector).text()).toBe('Custom collapse')
+    expect(wrapper.find(`${selector} [data-icon]`).exists()).toBe(false)
+    await wrapper.setProps({ collapseRender: false })
+    expect(wrapper.find(selector).exists()).toBe(false)
+  })
+
   it.each([
     ['composition', 'ModalForm', false],
     ['composition', 'ModalForm', true],

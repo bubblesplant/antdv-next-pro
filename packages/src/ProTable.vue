@@ -59,6 +59,7 @@ import {
   provide,
 } from 'vue'
 import { useProPrefix, useIntl, useProConfig } from './provider'
+import { defaultCollapseRender } from './pro-form/query-filter/Actions'
 import { ProField } from './pro-field'
 import Search from './components/Search.vue'
 import ListToolBar from './components/ListToolBar.vue'
@@ -372,6 +373,11 @@ const localeText = computed<ProTableLocaleText>(() => ({
   ),
   ...props.localeText,
 }))
+
+function renderSearchCollapse(collapsed: boolean) {
+  return defaultCollapseRender(collapsed, localeText.value.expand, localeText.value.collapse)
+}
+
 const rootStyle = useThemeVars()
 
 const toolbarSearch = computed(() => {
@@ -1836,9 +1842,7 @@ defineExpose<
             collapsed: searchCollapsed,
             searchText: searchConfig.searchText ?? localeText.search,
             resetText: searchConfig.resetText ?? localeText.reset,
-            collapseRender:
-              searchConfig.collapseRender ??
-              ((collapsed) => (collapsed ? localeText.expand : localeText.collapse)),
+            collapseRender: searchConfig.collapseRender ?? renderSearchCollapse,
           }"
           :form="props.form"
           :form-ref="props.formRef"

@@ -4,7 +4,7 @@ import {
   SchemaForm,
   type SchemaFormColumn,
   type SchemaFormInstance,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 type Brief = Record<string, unknown> & {
   project?: string

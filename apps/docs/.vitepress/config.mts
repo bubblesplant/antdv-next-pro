@@ -19,6 +19,7 @@ const zhComponents = [
     items: [
       { text: 'ProCard', link: '/components/pro-card' },
       { text: 'ProTable', link: '/components/pro-table' },
+      { text: 'AdaptiveProTable 自适应表格', link: '/components/adaptive-pro-table' },
       { text: 'EditableProTable', link: '/components/editable-pro-table' },
       { text: 'ProList / BaseProList', link: '/components/pro-list' },
       { text: 'ProDescriptions', link: '/components/pro-descriptions' },
@@ -31,6 +32,8 @@ const zhComponents = [
       { text: 'ProFormFields', link: '/components/pro-form-fields' },
       { text: 'SchemaForm', link: '/components/schema-form' },
       { text: 'ProForm 与组合布局', link: '/components/pro-form' },
+      { text: 'QueryFilter 查询筛选', link: '/components/query-filter' },
+      { text: 'LightFilter 轻量筛选', link: '/components/light-filter' },
     ],
   },
   {
@@ -60,6 +63,7 @@ const enComponents = [
     items: [
       { text: 'ProCard', link: '/en/components/pro-card' },
       { text: 'ProTable', link: '/en/components/pro-table' },
+      { text: 'AdaptiveProTable', link: '/en/components/adaptive-pro-table' },
       { text: 'EditableProTable', link: '/en/components/editable-pro-table' },
       { text: 'ProList / BaseProList', link: '/en/components/pro-list' },
       { text: 'ProDescriptions', link: '/en/components/pro-descriptions' },
@@ -72,6 +76,8 @@ const enComponents = [
       { text: 'ProFormFields', link: '/en/components/pro-form-fields' },
       { text: 'SchemaForm', link: '/en/components/schema-form' },
       { text: 'ProForm and layouts', link: '/en/components/pro-form' },
+      { text: 'QueryFilter', link: '/en/components/query-filter' },
+      { text: 'LightFilter', link: '/en/components/light-filter' },
     ],
   },
   {
@@ -87,11 +93,11 @@ const enComponents = [
 export default defineConfig({
   title: 'Antdv Next Pro',
   description: 'Vue 3 ProCard, ProTable, EditableProTable and SchemaForm powered by Antdv Next',
-  base: '/antv-next-pro/',
+  base: '/antdv-next-pro/',
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', href: '/antv-next-pro/mark.svg', type: 'image/svg+xml' }],
+    ['link', { rel: 'icon', href: '/antdv-next-pro/mark.svg', type: 'image/svg+xml' }],
     ['meta', { name: 'theme-color', content: '#f6f7ff' }],
   ],
   markdown: {
@@ -180,10 +186,8 @@ export default defineConfig({
           replacement: fileURLToPath(new URL('./theme/components/ProOutline.vue', import.meta.url)),
         },
         {
-          find: /^@bubblesjs\/antv-next-pro$/,
-          replacement: fileURLToPath(
-            new URL('../../../packages/antdv-next-pro/src/index.ts', import.meta.url),
-          ),
+          find: /^@bubblesjs\/antdv-next-pro$/,
+          replacement: fileURLToPath(new URL('../../../packages/src/index.ts', import.meta.url)),
         },
       ],
     },
@@ -220,6 +224,6 @@ export default defineConfig({
         },
       },
     },
-    socialLinks: [{ icon: 'github', link: 'https://github.com/bubblesplant/antv-next-pro' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/bubblesplant/antdv-next-pro' }],
   },
 })

@@ -23,7 +23,7 @@ export default defineConfig({
       '**/.vitepress/cache/**',
       '**/.vitepress/dist/**',
       '**/*.vue',
-      'packages/antdv-next-pro/tests/consumer/**',
+      'packages/tests/consumer/**',
     ],
     jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
     rules: {
@@ -39,7 +39,7 @@ export default defineConfig({
     tasks: {
       quality: {
         command:
-          'pnpm format:check && pnpm lint:ox && pnpm lint:vue && pnpm typecheck && pnpm test:coverage && pnpm test:browser && pnpm build && pnpm --filter @bubblesjs/antv-next-pro verify:package',
+          'pnpm format:check && pnpm lint:ox && pnpm lint:vue && pnpm typecheck && pnpm test:coverage && pnpm test:browser && pnpm build && pnpm --filter @bubblesjs/antdv-next-pro verify:package',
         cache: {
           env: ['CI', 'NODE_ENV'],
         },

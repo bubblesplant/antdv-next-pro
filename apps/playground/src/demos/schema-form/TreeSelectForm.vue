@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SchemaForm, type SchemaFormColumn } from '@bubblesjs/antv-next-pro'
+import { SchemaForm, type SchemaFormColumn } from '@bubblesjs/antdv-next-pro'
 
 type Values = Record<string, unknown> & { name?: string; department?: string }
 const model = ref<Partial<Values>>({ name: '官网升级' })

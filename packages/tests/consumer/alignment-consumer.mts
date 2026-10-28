@@ -1,8 +1,10 @@
 import { h } from 'vue'
 import {
+  AdaptiveProTable,
   BetaSchemaForm,
   CellEditorTable,
   DragSortTable,
+  LightFilter,
   ProCard,
   ProConfigProvider,
   ProDescriptions,
@@ -14,6 +16,7 @@ import {
   ProFormRadio,
   ProFormText,
   ProList,
+  QueryFilter,
   RowEditorTable,
   StepsForm,
   type ProCardProps,
@@ -21,7 +24,7 @@ import {
   type ProConfigProviderProps,
   type ProDescriptionsColumn,
   type ProFormProps,
-} from '@bubblesjs/antv-next-pro'
+} from '@bubblesjs/antdv-next-pro'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -90,6 +93,23 @@ h(ProConfigProvider, providerProps, {
       default: () => [h(ProFormText, { name: 'name' }), h(ProFormList, { name: 'children' })],
     }),
     h(BetaSchemaForm<Row>, { columns }),
+    h(
+      QueryFilter<Row>,
+      { initialValues: { name: 'Ada' }, defaultCollapsed: false },
+      {
+        default: () => h(ProFormText, { name: 'name', label: 'Name' }),
+      },
+    ),
+    h(
+      LightFilter<Row>,
+      { initialValues: { name: 'Ada' }, collapse: true },
+      {
+        default: () => h(ProFormText, { name: 'name', label: 'Name' }),
+      },
+    ),
+    h(QueryFilter<Row>, { columns }),
+    h(LightFilter<Row>, { columns }),
+    h(AdaptiveProTable<Row>, { columns, dataSource: [], scroll: { x: 1000 } }),
     h(ProField, { text: 123, valueType: 'money', mode: 'read' }),
     h(ProField, { text: 123, valueType: { type: 'money', locale: 'en-US' } }),
     h(ProFormRadio, { name: 'choice' }),
