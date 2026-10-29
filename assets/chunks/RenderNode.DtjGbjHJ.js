@@ -1,0 +1,1 @@
+import{Mt as e,ct as t,gt as n,un as r}from"./framework.DMrgfsfe.js";import{t as i}from"./VNodeContent.mTBa_PmV.js";var a=n({name:`AntdvNextProRenderNode`,__name:`RenderNode`,props:{content:{type:[Object,String,Number,Boolean,null,Array]}},setup(n){return(a,o)=>(e(),t(r(i),{content:n.content},null,8,[`content`]))}});export{a as t};
