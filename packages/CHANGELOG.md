@@ -1,5 +1,13 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.2
+
+### Patch Changes
+
+- [#16](https://github.com/bubblesplant/antdv-next-pro/pull/16) [`07c6aac`](https://github.com/bubblesplant/antdv-next-pro/commit/07c6aacd6233edb9abb7b668ab573c24b85d7cfa) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 新增适用于 TinyEngine 与 CDN 直接加载的浏览器 ESM 整包及独立样式，除 Vue 外的依赖均包含在整包中。普通 npm 模块继续提供 ESM、CJS 与类型声明。
+
+- [#19](https://github.com/bubblesplant/antdv-next-pro/pull/19) [`cabf62d`](https://github.com/bubblesplant/antdv-next-pro/commit/cabf62d90b82559173e6038e358763929dccdaca) Thanks [@bubblesplant](https://github.com/bubblesplant)! - antdv-next-pro 改名 增加 queryFilter
+
 ## 0.3.0
 
 ### Minor Changes
