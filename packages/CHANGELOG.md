@@ -1,5 +1,17 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.3
+
+### Patch Changes
+
+- [`9827f29`](https://github.com/bubblesplant/antdv-next-pro/commit/9827f2904b97c21712e553bc88204849aacd94d5) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 将 ProTable 分页器的默认尺寸设为 small，同时保留显式传入的 pagination.size。
+
+- [`9827f29`](https://github.com/bubblesplant/antdv-next-pro/commit/9827f2904b97c21712e553bc88204849aacd94d5) Thanks [@bubblesplant](https://github.com/bubblesplant)! - ProTable 分页器默认显示当前范围和总条数，复用国际化文案，保留自定义 showTotal 及游标分页行为。
+
+- [`9827f29`](https://github.com/bubblesplant/antdv-next-pro/commit/9827f2904b97c21712e553bc88204849aacd94d5) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 为 ProTable 的 toolbar-actions 插槽提供带类型的 action 和 selectedRows 参数，并补充工具栏插槽及 toolBarRender 的文档与示例。
+
+  修复工具栏布局选择器，操作区默认垂直居中、右对齐，使用 8px 间距并支持自动换行。
+
 ## 0.3.2
 
 ### Patch Changes
