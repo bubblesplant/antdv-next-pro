@@ -244,6 +244,7 @@ describe('table request contract', () => {
     })
     await flushPromises()
     expect(request.mock.calls[0]?.[0]).toEqual({ pageSize: 1 })
+    expect(wrapper.findComponent(Pagination).props('showTotal')).toBeUndefined()
     action().setPageInfo({ current: 2 })
     await flushPromises()
     expect(request.mock.calls.at(-1)?.[0]).toEqual({ pageSize: 1, nextToken: 'second' })

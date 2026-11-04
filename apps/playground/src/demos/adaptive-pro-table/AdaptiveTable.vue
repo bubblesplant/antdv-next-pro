@@ -67,6 +67,7 @@ async function reload() {
         <label><Switch v-model:checked="showPagination" size="small" /> 分页</label>
         <label><Switch v-model:checked="empty" size="small" /> 空数据</label>
         <label><Switch v-model:checked="loading" size="small" /> 加载中</label>
+        <Button @click="reload">通过 ref 刷新</Button>
       </Space>
     </div>
     <p class="adaptive-demo-hint">
@@ -92,7 +93,12 @@ async function reload() {
         @change="emit('event', '分页、排序或筛选发生变化')"
         @selection-change="(keys) => emit('event', `已选 ${keys.length} 条`)"
       >
-        <template #toolbar-actions><Button @click="reload">通过 ref 刷新</Button></template>
+        <template #toolbar-actions="{ action, selectedRows }">
+          <Button @click="action.reload()">插槽刷新</Button>
+          <Button :disabled="!selectedRows.length" @click="action.clearSelected()">
+            取消选择（{{ selectedRows.length }}）
+          </Button>
+        </template>
         <template #cell-name="{ record }"
           ><strong>{{ record.name }}</strong></template
         >

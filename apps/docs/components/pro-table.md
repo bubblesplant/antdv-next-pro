@@ -61,6 +61,8 @@ const request: ProRequest<User, Query> = async (params, sort, filter) => {
 
 `manualRequest` 可阻止首次自动请求，之后通过组件 ref 的 `reload()` 发起。`postData` 在展示前同步转换成功数据。
 
+分页器默认使用 `small` 尺寸，并显示当前范围和总条数，例如“第 1-3 条/总共 6 条”，文案跟随国际化配置。传入 `pagination.showTotal` 函数可自定义文案，显式传入 `{ showTotal: undefined }` 可隐藏统计文案。游标分页不展示总条数。
+
 ### 搜索区与折叠
 
 默认折叠按钮沿用 ProComponents 的实现：复用同一个向下箭头，展开时旋转半圈，并以 0.3 秒过渡切换方向。文案遵循国际化及 `localeText`。`search.collapseRender` 可自定义按钮内容，设为 `false` 可隐藏按钮。
@@ -115,6 +117,10 @@ const columns = [
 远程模式把关键词写入 `request` 的第一个参数，默认参数名为 `keyword`，提交后回到第一页；清空搜索或重置会移除参数。本地模式按列的原始字段值匹配关键词。远程模式下，后端或示例请求函数需要实现实际筛选和分页。
 
 `toolbar.search` 支持同样配置，并优先于 `options.search`；可传入 Antdv Next `InputSearch` 的属性，或用 `true` 开启默认搜索。`onSearch(value)` 可以返回 `false` 或 `Promise<false>` 阻止本次搜索。标题存在时搜索框位于右侧操作区，否则位于工具栏左侧。
+
+自定义操作按钮推荐使用 `#toolbar-actions="{ action, selectedRows }"` 作用域插槽：`action` 提供 `reload()`、`reset()`、`clearSelected()` 等表格方法，`selectedRows` 为当前选中行。也支持 `toolBarRender(action, rows)` 回调，优先级为插槽、`toolBarRender`、`toolbar.actions`。自定义按钮不会覆盖内置工具按钮；`toolbar=false` 或 `toolBarRender=false` 会隐藏整个工具栏。
+
+操作区默认使用 Flex 布局，垂直居中、右对齐，按钮间距为 `8px`，空间不足时自动换行。插槽内可直接放多个按钮；自行添加包裹容器时，其内部布局由调用方控制。
 
 组件 ref 的 `getSortFilter()` 返回当前 `{ sort, filter }` 的副本；修改返回值不会影响内部状态。`EditableProTable` 也提供同名方法。
 
@@ -187,28 +193,29 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 
 ### 属性
 
-| Prop                           | 类型                                      | 说明                                     |
-| ------------------------------ | ----------------------------------------- | ---------------------------------------- |
-| `columns`                      | `ProColumns<T>[]`                         | 表格、搜索和编辑的统一列描述             |
-| `dataSource`                   | `T[]`                                     | 受控本地数据，支持 `v-model:data-source` |
-| `defaultDataSource`            | `T[]`                                     | 非受控初始数据                           |
-| `request`                      | `ProRequest<T, P>`                        | 远程 Promise 请求                        |
-| `params`                       | `P`                                       | 额外请求参数，变化时回到第一页并重载     |
-| `postData`                     | `(data: T[]) => T[]`                      | 展示前同步转换                           |
-| `rowKey`                       | `keyof T \| string \| (record) => ProKey` | 行唯一标识，默认 `id`                    |
-| `loading`                      | `boolean`                                 | 叠加外部 loading                         |
-| `search`                       | `false \| ProTableSearchConfig`           | 搜索区和折叠配置                         |
-| `pagination`                   | `false \| ProTablePagination`             | 分页、页大小和选项                       |
-| `options`                      | `false \| ProTableOptions`                | 关键词搜索、密度、全屏、刷新和列设置     |
-| `toolbar`                      | `false \| ProTableToolbarConfig`          | 标题、操作与搜索，也可使用插槽           |
-| `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next 行选择配置                    |
-| `columnsState`                 | `ProColumnsStateConfig`                   | 列显隐、顺序、固定和持久化配置           |
-| `editable`                     | `false \| EditableConfig<T>`              | 单行/多行编辑与生命周期                  |
-| `editableKeys`                 | `ProKey[]`                                | 编辑行 key，支持 `v-model:editable-keys` |
-| `polling`                      | `number`                                  | 轮询间隔（毫秒），页面隐藏时暂停         |
-| `revalidateOnFocus`            | `boolean`                                 | 窗口重新聚焦时请求                       |
-| `manualRequest`                | `boolean`                                 | 不执行首次自动请求                       |
-| `scroll` / `size` / `bordered` | Antdv Next 对应值                         | 滚动、密度和边框                         |
+| Prop                           | 类型                                      | 说明                                                                |
+| ------------------------------ | ----------------------------------------- | ------------------------------------------------------------------- |
+| `columns`                      | `ProColumns<T>[]`                         | 表格、搜索和编辑的统一列描述                                        |
+| `dataSource`                   | `T[]`                                     | 受控本地数据，支持 `v-model:data-source`                            |
+| `defaultDataSource`            | `T[]`                                     | 非受控初始数据                                                      |
+| `request`                      | `ProRequest<T, P>`                        | 远程 Promise 请求                                                   |
+| `params`                       | `P`                                       | 额外请求参数，变化时回到第一页并重载                                |
+| `postData`                     | `(data: T[]) => T[]`                      | 展示前同步转换                                                      |
+| `rowKey`                       | `keyof T \| string \| (record) => ProKey` | 行唯一标识，默认 `id`                                               |
+| `loading`                      | `boolean`                                 | 叠加外部 loading                                                    |
+| `search`                       | `false \| ProTableSearchConfig`           | 搜索区和折叠配置                                                    |
+| `pagination`                   | `false \| ProTablePagination`             | 默认 `small`，显示范围和总条数                                      |
+| `options`                      | `false \| ProTableOptions`                | 关键词搜索、密度、全屏、刷新和列设置                                |
+| `toolbar`                      | `false \| ProTableToolbarConfig`          | 标题、操作与搜索，也可使用插槽                                      |
+| `toolBarRender`                | `false \| ((action, rows) => VNodeChild)` | 自定义操作按钮，推荐使用 `toolbar-actions` 插槽；`false` 隐藏工具栏 |
+| `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next 行选择配置                                               |
+| `columnsState`                 | `ProColumnsStateConfig`                   | 列显隐、顺序、固定和持久化配置                                      |
+| `editable`                     | `false \| EditableConfig<T>`              | 单行/多行编辑与生命周期                                             |
+| `editableKeys`                 | `ProKey[]`                                | 编辑行 key，支持 `v-model:editable-keys`                            |
+| `polling`                      | `number`                                  | 轮询间隔（毫秒），页面隐藏时暂停                                    |
+| `revalidateOnFocus`            | `boolean`                                 | 窗口重新聚焦时请求                                                  |
+| `manualRequest`                | `boolean`                                 | 不执行首次自动请求                                                  |
+| `scroll` / `size` / `bordered` | Antdv Next 对应值                         | 滚动、密度和边框                                                    |
 
 ### 事件
 
@@ -229,11 +236,22 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
 
 列 key 取 `column.key`，否则取点连接后的 `dataIndex`。
 
+| 插槽                                  | 参数                                                 | 说明                        |
+| ------------------------------------- | ---------------------------------------------------- | --------------------------- |
+| `toolbar-title`                       | —                                                    | 自定义工具栏标题            |
+| `toolbar-actions`                     | `{ action: ProTableInstance<T>, selectedRows: T[] }` | 自定义工具栏操作按钮        |
+| `header-${columnKey}`                 | `{ column }`                                         | 自定义对应列的表头          |
+| `cell-${columnKey}` 或 `${columnKey}` | `{ value, record, index, column, editable }`         | 自定义对应列的单元格        |
+| 其他插槽                              | Antdv Next Table 对应参数                            | 透传给底层 Antdv Next Table |
+
 ```vue
-<ProTable :columns="columns">
+<ProTable :columns="columns" :row-selection="{}">
   <template #toolbar-title>项目列表</template>
-  <template #toolbar-actions>
-    <button @click="tableRef?.reload()">同步</button>
+  <template #toolbar-actions="{ action, selectedRows }">
+    <button @click="action.reload()">同步</button>
+    <button :disabled="!selectedRows.length" @click="action.clearSelected()">
+      取消选择（{{ selectedRows.length }}）
+    </button>
   </template>
   <template #header-name="{ column }">
     {{ column.title }} · 自定义表头
@@ -244,10 +262,6 @@ const tableColumnsState = computed<ProColumnsStateConfig>(() => ({
   </template>
 </ProTable>
 ```
-
-- `header-${columnKey}`：参数为 `{ column }`。
-- `cell-${columnKey}` 或直接 `${columnKey}`：参数为 `{ value, record, index, column, editable }`。
-- 其他插槽继续透传给底层 Antdv Next Table。
 
 单元格插槽优先于默认只读展示和编辑器；需要行内编辑的列通常只自定义表头，或在插槽中自行处理编辑态。
 

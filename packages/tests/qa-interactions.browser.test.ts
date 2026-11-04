@@ -135,6 +135,7 @@ describe('ProTable browser QA matrix', () => {
       {},
     )
     expect(wrapper.text()).toContain('Ada-1')
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 1-1 条/总共 3 条')
 
     await wrapper.get('.ant-pagination-item-2 a').trigger('click')
     await flushPromises()
@@ -145,6 +146,7 @@ describe('ProTable browser QA matrix', () => {
       {},
     )
     expect(wrapper.text()).toContain('Ada-2')
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 2-2 条/总共 3 条')
 
     await buttonByText('刷新').trigger('click')
     await flushPromises()

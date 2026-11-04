@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antdv-next-pro'
+import type { ProColumns, ProTableProps } from '@bubblesjs/antdv-next-pro'
 import { ProTable } from '@bubblesjs/antdv-next-pro'
-import { computed, h, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { createDemoRequest, type DemoQuery, type DemoRow } from './demoData'
 const emit = defineEmits<{
   event: [message: string]
@@ -11,7 +11,6 @@ const statusEnum = {
   paused: { text: '已暂停', status: 'warning' },
   done: { text: '已完成', status: 'success' },
 }
-const tableRef = ref<ProTableInstance<DemoRow> | null>(null)
 const requestCount = ref(0)
 const lastRequest = ref('')
 const loadedTotal = ref(0)
@@ -84,22 +83,6 @@ const searchConfig: ProTableProps<DemoRow, DemoQuery>['search'] = {
   span: 8,
   defaultCollapsed: false,
 }
-function toolbarButton(label: string, onClick: () => void, active = false) {
-  return h('button', { type: 'button', class: ['toolbar-demo-button', { active }], onClick }, label)
-}
-const toolbarConfig = computed<ProTableProps<DemoRow, DemoQuery>['toolbar']>(() => {
-  return {
-    title: h('span', { class: 'rich-toolbar-title' }, [
-      h('strong', '增长项目清单'),
-      h('small', `共 ${loadedTotal.value} 项 · request 驱动`),
-    ]),
-    actions: h('span', { class: 'toolbar-action-row' }, [
-      toolbarButton('重置', () => void tableRef.value?.reset()),
-      toolbarButton('刷新', () => void tableRef.value?.reload()),
-      toolbarButton('新建项目', () => announce('点击自定义新建操作'), true),
-    ]),
-  }
-})
 const optionsConfig: ProTableProps<DemoRow, DemoQuery>['options'] = {
   density: true,
   fullScreen: true,
@@ -113,7 +96,7 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
   search: searchConfig,
   pagination: { defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: [5, 10, 20] },
   options: optionsConfig,
-  toolbar: toolbarConfig.value,
+  rowSelection: {},
 }))
 </script>
 
@@ -134,12 +117,37 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
     <div v-if="requestFailure" class="inline-error" role="alert">{{ requestFailure }}</div>
 
     <ProTable
-      ref="tableRef"
       v-bind="tableBindings"
       @load="handleLoad"
       @request-error="handleRequestError"
       @change="announce('分页、排序或筛选发生变化')"
-    />
+    >
+      <template #toolbar-title>
+        <span class="rich-toolbar-title">
+          <strong>增长项目清单</strong>
+          <small>共 {{ loadedTotal }} 项 · request 驱动</small>
+        </span>
+      </template>
+      <template #toolbar-actions="{ action, selectedRows }">
+        <button type="button" class="toolbar-demo-button" @click="action.reset()">重置</button>
+        <button type="button" class="toolbar-demo-button" @click="action.reload()">刷新</button>
+        <button
+          type="button"
+          class="toolbar-demo-button"
+          :disabled="!selectedRows.length"
+          @click="action.clearSelected()"
+        >
+          取消选择（{{ selectedRows.length }}）
+        </button>
+        <button
+          type="button"
+          class="toolbar-demo-button active"
+          @click="announce('点击自定义新建操作')"
+        >
+          新建项目
+        </button>
+      </template>
+    </ProTable>
   </div>
 </template>
 
@@ -227,13 +235,6 @@ select {
   border-radius: 6px;
   background: white;
   color: var(--demo-ink);
-}
-
-:deep(.toolbar-action-row) {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
 }
 
 :deep(.toolbar-demo-button) {

@@ -93,9 +93,9 @@ const editFirst = () => {
   }
 }
 
-const reload = async () => {
-  await tableRef.value?.reload()
-  lastAction.value = '已通过组件 ref 重新请求'
+const reload = async (action: ProTableInstance<Project>) => {
+  await action.reload()
+  lastAction.value = '已通过工具栏插槽重新请求'
 }
 </script>
 
@@ -122,8 +122,16 @@ const reload = async () => {
       @request-error="lastAction = '请求失败，现有数据已保留'"
     >
       <template #toolbar-title> 项目清单 · {{ visibleRows.length }} 条 </template>
-      <template #toolbar-actions>
-        <button class="slot-button" type="button" @click="reload">ref 刷新</button>
+      <template #toolbar-actions="{ action, selectedRows }">
+        <button class="slot-button" type="button" @click="reload(action)">刷新</button>
+        <button
+          v-if="selectedRows.length"
+          class="slot-button"
+          type="button"
+          @click="action.clearSelected()"
+        >
+          取消选择（{{ selectedRows.length }}）
+        </button>
       </template>
       <template #cell-status="{ value }">
         <span :class="['status-chip', `is-${value}`]">

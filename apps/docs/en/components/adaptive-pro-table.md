@@ -59,6 +59,8 @@ ProTable provides the collapse arrows and labels. Options such as `search` and `
 
 Props, events, slots and generic parameters match [ProTable](./pro-table). Refs use `ProTableInstance<T>` and retain methods such as `reload()`, `reset()`, `setPageInfo()`, `scrollTo()` and editing actions.
 
+The `#toolbar-actions="{ action, selectedRows }"` scoped slot is forwarded directly, providing table actions and the current selection inside templates. The `toolBarRender(action, rows)` callback remains supported; the slot takes precedence when both are provided.
+
 | Setting                                         | Behavior                                                             |
 | ----------------------------------------------- | -------------------------------------------------------------------- |
 | Root class                                      | Adds `adaptive-table` and preserves the caller's `class` and `style` |

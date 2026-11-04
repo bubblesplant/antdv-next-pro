@@ -80,6 +80,8 @@ const rows: User[] = [{ id: 1, name: '林默' }]
 
 属性、事件、插槽及泛型与 [ProTable](./pro-table) 一致，组件 ref 使用 `ProTableInstance<T>`，支持 `reload()`、`reset()`、`setPageInfo()`、`scrollTo()` 和编辑等方法。
 
+`#toolbar-actions="{ action, selectedRows }"` 作用域插槽同样直接透传，可在模板内刷新、重置或操作选中行。兼容 `toolBarRender(action, rows)` 回调；同时提供时优先使用插槽。
+
 | 项目                                  | 行为                                                       |
 | ------------------------------------- | ---------------------------------------------------------- |
 | 根元素类名                            | 自动追加 `adaptive-table`，合并调用方的 `class` 与 `style` |
