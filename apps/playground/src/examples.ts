@@ -355,12 +355,13 @@ const definitions: ExampleDefinition[] = [
   {
     path: '/pro-table/toolbar-custom',
     title: 'Toolbar 自定义',
-    description: '使用 toolbar.title 和 toolbar.actions 的 Vue VNode 配置映射自定义工具栏。',
+    description: '使用 toolbar-title 和 toolbar-actions 作用域插槽，自定义标题、刷新和选中行操作。',
     componentId: 'pro-table',
     section: 'Toolbar 自定义',
     checks: [
       '自定义标题与操作区同时展示',
-      '工具栏按钮可以调用表格 ref',
+      '通过插槽 action 刷新和重置表格',
+      '选中行数量更新并支持取消选择',
       '内建选项与自定义操作同时展示',
     ],
     file: 'pro-table/ToolbarCustom.vue',

@@ -61,6 +61,8 @@ Search, pagination, sorting, filters, and external `params` all feed this reques
 
 `manualRequest` skips the initial request; call `reload()` through the component ref later. `postData` synchronously transforms successful data before display.
 
+Pagination defaults to `small` and shows the current range and total, such as “1-3 of 6 items”, using the active locale. Pass a `pagination.showTotal` function to customize the text, or explicitly pass `{ showTotal: undefined }` to hide it. Cursor pagination does not show totals.
+
 ### Search and collapse
 
 The default collapse button follows ProComponents: it reuses a single down arrow, rotating it half a turn when expanded with a 0.3-second transition. Labels come from the locale or `localeText`. Use `search.collapseRender` to customize its content, or set it to `false` to hide the button.
@@ -115,6 +117,10 @@ Enable keyword search with `options.search`, including when the query form is di
 Remote requests receive the submitted keyword under `keyword` (or the configured `name`) and reset to page one. Clearing or resetting removes that parameter. Local data is matched against raw column values. Remote request handlers must implement filtering and pagination.
 
 `toolbar.search` accepts the same configuration and takes precedence over `options.search`. Use `true` for defaults or pass Antdv Next `InputSearch` props. An `onSearch(value)` callback returning `false` or `Promise<false>` cancels submission. Search appears in the right action area when a title exists, or on the left otherwise.
+
+Prefer the `#toolbar-actions="{ action, selectedRows }"` scoped slot for custom action buttons. `action` exposes table methods such as `reload()`, `reset()` and `clearSelected()`; `selectedRows` contains the current selection. The `toolBarRender(action, rows)` callback is also supported, with precedence: slot, `toolBarRender`, then `toolbar.actions`. Custom actions retain the built-in tool buttons. Set `toolbar=false` or `toolBarRender=false` to hide the entire toolbar.
+
+The action area uses flex layout with vertical centering, right alignment, an `8px` gap, and wrapping when space is limited. Place multiple buttons directly in the slot; if you add a wrapper, manage its internal layout yourself.
 
 The component ref exposes `getSortFilter()` to read a defensive copy of the current `{ sort, filter }`. The same method is available on `EditableProTable`.
 
@@ -187,28 +193,29 @@ Continue using `renderFormItem(column, context)` for a fully custom search field
 
 ### Props
 
-| Prop                           | Type                                      | Description                                            |
-| ------------------------------ | ----------------------------------------- | ------------------------------------------------------ |
-| `columns`                      | `ProColumns<T>[]`                         | Shared table, search, and editor description           |
-| `dataSource`                   | `T[]`                                     | Controlled local rows; supports `v-model:data-source`  |
-| `defaultDataSource`            | `T[]`                                     | Uncontrolled initial rows                              |
-| `request`                      | `ProRequest<T, P>`                        | Remote Promise request                                 |
-| `params`                       | `P`                                       | Extra params; changes reset the page and reload        |
-| `postData`                     | `(data: T[]) => T[]`                      | Synchronous display transform                          |
-| `rowKey`                       | `keyof T \| string \| (record) => ProKey` | Unique row identity, defaults to `id`                  |
-| `loading`                      | `boolean`                                 | External loading state                                 |
-| `search`                       | `false \| ProTableSearchConfig`           | Search and collapse options                            |
-| `pagination`                   | `false \| ProTablePagination`             | Page state and options                                 |
-| `options`                      | `false \| ProTableOptions`                | Keyword search, density, fullscreen, reload, settings  |
-| `toolbar`                      | `false \| ProTableToolbarConfig`          | Title, actions and search; slots are also available    |
-| `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next row-selection config                        |
-| `columnsState`                 | `ProColumnsStateConfig`                   | Visibility, order, fixed-state, and persistence config |
-| `editable`                     | `false \| EditableConfig<T>`              | Single/multiple row editing lifecycle                  |
-| `editableKeys`                 | `ProKey[]`                                | Editing keys; supports `v-model:editable-keys`         |
-| `polling`                      | `number`                                  | Poll interval in milliseconds; pauses when hidden      |
-| `revalidateOnFocus`            | `boolean`                                 | Reload on window focus                                 |
-| `manualRequest`                | `boolean`                                 | Skip the initial automatic request                     |
-| `scroll` / `size` / `bordered` | Matching Antdv Next values                | Scrolling, density, and borders                        |
+| Prop                           | Type                                      | Description                                                                  |
+| ------------------------------ | ----------------------------------------- | ---------------------------------------------------------------------------- |
+| `columns`                      | `ProColumns<T>[]`                         | Shared table, search, and editor description                                 |
+| `dataSource`                   | `T[]`                                     | Controlled local rows; supports `v-model:data-source`                        |
+| `defaultDataSource`            | `T[]`                                     | Uncontrolled initial rows                                                    |
+| `request`                      | `ProRequest<T, P>`                        | Remote Promise request                                                       |
+| `params`                       | `P`                                       | Extra params; changes reset the page and reload                              |
+| `postData`                     | `(data: T[]) => T[]`                      | Synchronous display transform                                                |
+| `rowKey`                       | `keyof T \| string \| (record) => ProKey` | Unique row identity, defaults to `id`                                        |
+| `loading`                      | `boolean`                                 | External loading state                                                       |
+| `search`                       | `false \| ProTableSearchConfig`           | Search and collapse options                                                  |
+| `pagination`                   | `false \| ProTablePagination`             | Defaults to `small`; shows range and total                                   |
+| `options`                      | `false \| ProTableOptions`                | Keyword search, density, fullscreen, reload, settings                        |
+| `toolbar`                      | `false \| ProTableToolbarConfig`          | Title, actions and search; slots are also available                          |
+| `toolBarRender`                | `false \| ((action, rows) => VNodeChild)` | Custom actions; prefer the `toolbar-actions` slot; `false` hides the toolbar |
+| `rowSelection`                 | `false \| Record<string, unknown>`        | Antdv Next row-selection config                                              |
+| `columnsState`                 | `ProColumnsStateConfig`                   | Visibility, order, fixed-state, and persistence config                       |
+| `editable`                     | `false \| EditableConfig<T>`              | Single/multiple row editing lifecycle                                        |
+| `editableKeys`                 | `ProKey[]`                                | Editing keys; supports `v-model:editable-keys`                               |
+| `polling`                      | `number`                                  | Poll interval in milliseconds; pauses when hidden                            |
+| `revalidateOnFocus`            | `boolean`                                 | Reload on window focus                                                       |
+| `manualRequest`                | `boolean`                                 | Skip the initial automatic request                                           |
+| `scroll` / `size` / `bordered` | Matching Antdv Next values                | Scrolling, density, and borders                                              |
 
 ### Events
 
@@ -229,11 +236,22 @@ Continue using `renderFormItem(column, context)` for a fully custom search field
 
 The column key is `column.key` or the dot-joined `dataIndex`.
 
+| Slot                                  | Parameters                                           | Description                                  |
+| ------------------------------------- | ---------------------------------------------------- | -------------------------------------------- |
+| `toolbar-title`                       | —                                                    | Custom toolbar title                         |
+| `toolbar-actions`                     | `{ action: ProTableInstance<T>, selectedRows: T[] }` | Custom toolbar action buttons                |
+| `header-${columnKey}`                 | `{ column }`                                         | Custom header for the column                 |
+| `cell-${columnKey}` or `${columnKey}` | `{ value, record, index, column, editable }`         | Custom cell for the column                   |
+| Other slots                           | Corresponding Antdv Next Table parameters            | Forwarded to the underlying Antdv Next Table |
+
 ```vue
-<ProTable :columns="columns">
+<ProTable :columns="columns" :row-selection="{}">
   <template #toolbar-title>Projects</template>
-  <template #toolbar-actions>
-    <button @click="tableRef?.reload()">Sync</button>
+  <template #toolbar-actions="{ action, selectedRows }">
+    <button @click="action.reload()">Sync</button>
+    <button :disabled="!selectedRows.length" @click="action.clearSelected()">
+      Clear selection ({{ selectedRows.length }})
+    </button>
   </template>
   <template #header-name="{ column }">
     {{ column.title }} · custom header
@@ -244,10 +262,6 @@ The column key is `column.key` or the dot-joined `dataIndex`.
   </template>
 </ProTable>
 ```
-
-- `header-${columnKey}` receives `{ column }`.
-- `cell-${columnKey}` or `${columnKey}` receives `{ value, record, index, column, editable }`.
-- Other slots are forwarded to the underlying Antdv Next Table.
 
 A cell slot takes precedence over the default display and editor. Prefer a header-only slot for editable columns unless the slot handles editing itself.
 

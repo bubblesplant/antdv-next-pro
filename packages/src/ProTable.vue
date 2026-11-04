@@ -120,7 +120,10 @@ const emit = defineEmits<{
   load: [rows: T[], total: number]
 }>()
 
-defineSlots<{ [name: string]: ((props: any) => VNodeChild) | undefined }>()
+defineSlots<{
+  'toolbar-actions'?: (props: { action: ProTableInstance<T>; selectedRows: T[] }) => VNodeChild
+  [name: string]: ((props: any) => VNodeChild) | undefined
+}>()
 const NativeTable = Table<T>
 const attrs = useAttrs()
 const instance = getCurrentInstance()
@@ -569,10 +572,13 @@ const paginationInfo = computed<ProTablePagination>(() => ({
   total: total.value,
 }))
 
+const renderPaginationTotal: NonNullable<ProTablePagination['showTotal']> = (total, range) =>
+  `${intl.value.getMessage('pagination.total.range', '第')} ${range[0]}-${range[1]} ${intl.value.getMessage('pagination.total.total', '条/总共')} ${total} ${intl.value.getMessage('pagination.total.item', '条')}`
+
 const nativePaginationProps = computed(() => {
   if (!props.pagination) return {}
   const { type: _type, nextToken: _nextToken, onChange: _onChange, ...rest } = props.pagination
-  if (!cursorPagination.value) return rest
+  if (!cursorPagination.value) return { showTotal: renderPaginationTotal, ...rest }
   const itemRender: NonNullable<ProTablePagination['itemRender']> = (page, itemType, element) =>
     itemType === 'prev' || itemType === 'next'
       ? (rest.itemRender?.(page, itemType, element) ?? element)
@@ -588,6 +594,7 @@ const nativePaginationProps = computed(() => {
 const paginationOptions = computed(() => {
   if (props.pagination === false) return undefined
   return {
+    size: props.pagination?.size ?? 'small',
     showSizeChanger: cursorPagination.value ? false : (props.pagination?.showSizeChanger ?? true),
     pageSizeOptions: props.pagination?.pageSizeOptions ?? [10, 20, 50, 100],
   }
@@ -1903,7 +1910,7 @@ defineExpose<
                   :aria-label="toolbarSearchBindings.placeholder"
                   @search="submitToolbarSearch"
                 />
-                <slot name="toolbar-actions">
+                <slot name="toolbar-actions" :action="action" :selected-rows="selectedRows">
                   <RenderNode v-if="toolbarActions !== undefined" :content="toolbarActions" />
                 </slot>
                 <RenderView :render="renderOptions">
@@ -2307,6 +2314,7 @@ defineExpose<
           >
             <Pagination
               v-bind="nativePaginationProps"
+              :size="paginationOptions?.size"
               :current="current"
               :page-size="pageSize"
               :total="total"
@@ -2330,7 +2338,7 @@ defineExpose<
   margin-block-end: 16px;
 }
 
-[data-pro-table-toolbar] {
+[data-pro-table-list-toolbar] {
   min-height: 64px;
   margin-block-end: 0;
   padding-block: 16px;
@@ -2349,7 +2357,10 @@ defineExpose<
   font-weight: 600;
 }
 
-[data-pro-table-toolbar-actions] {
+[data-pro-table-list-toolbar-actions] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-inline-start: auto;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -2518,7 +2529,7 @@ defineExpose<
     grid-column: 1 / -1;
   }
 
-  [data-pro-table-toolbar-actions] {
+  [data-pro-table-list-toolbar-actions] {
     width: 100%;
   }
 }

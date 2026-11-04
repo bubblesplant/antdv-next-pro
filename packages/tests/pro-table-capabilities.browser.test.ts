@@ -3,9 +3,11 @@ import type { VueWrapper } from '@vue/test-utils'
 import type { ProFilter, ProSort, ProTableInstance } from '../src/types'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ConfigProvider, Table, theme } from 'antdv-next'
+import enUS from 'antdv-next/locale/en_US'
+import zhCN from 'antdv-next/locale/zh_CN'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
-import { defineComponent, h, nextTick } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 
 import EditableProTable from '../src/EditableProTable.vue'
 import ProCard from '../src/ProCard.vue'
@@ -62,6 +64,70 @@ function buttonByText(text: string) {
 }
 
 describe('ProTable browser capabilities', () => {
+  it('shows pagination ranges and totals by default and preserves custom or hidden totals', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: Array.from({ length: 6 }, (_, index) => ({ id: index, name: `Row ${index}` })),
+        search: false,
+        toolbar: false,
+      },
+    })
+    await flushPromises()
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 1-6 条/总共 6 条')
+
+    await wrapper.setProps({ pagination: { pageSize: 3 } })
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 1-3 条/总共 6 条')
+    await wrapper.get('.ant-pagination-item-2 a').trigger('click')
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 4-6 条/总共 6 条')
+
+    await wrapper.setProps({ dataSource: [] })
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 0-0 条/总共 0 条')
+
+    const showTotal = vi.fn((total: number, range: [number, number]) =>
+      h('strong', `Showing ${range.join('-')} of ${total}`),
+    )
+    await wrapper.setProps({ pagination: { showTotal } })
+    expect(wrapper.get('.ant-pagination-total-text strong').text()).toBe('Showing 0-0 of 0')
+    expect(showTotal).toHaveBeenLastCalledWith(0, [0, 0])
+
+    await wrapper.setProps({ pagination: { showTotal: undefined } })
+    expect(wrapper.find('.ant-pagination-total-text').exists()).toBe(false)
+    await wrapper.setProps({ pagination: {} })
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 0-0 条/总共 0 条')
+    await wrapper.setProps({ pagination: false })
+    expect(wrapper.find('[data-pro-table-pagination]').exists()).toBe(false)
+  })
+
+  it('updates default pagination totals when the native locale changes', async () => {
+    const locale = ref(enUS)
+    wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(
+            ConfigProvider,
+            { locale: locale.value },
+            {
+              default: () =>
+                h(ProTable, {
+                  columns: [{ title: 'Name', dataIndex: 'name' }],
+                  dataSource: [{ id: 1, name: 'Ada' }],
+                  search: false,
+                  toolbar: false,
+                }),
+            },
+          ),
+      }),
+      { attachTo: document.body },
+    )
+    await flushPromises()
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('1-1 of 1 items')
+    locale.value = zhCN
+    await nextTick()
+    expect(wrapper.get('.ant-pagination-total-text').text()).toBe('第 1-1 条/总共 1 条')
+  })
+
   it('preserves editable toolbar slots by default and hides them only when explicitly disabled', async () => {
     wrapper = mount(EditableProTable, {
       attachTo: document.body,

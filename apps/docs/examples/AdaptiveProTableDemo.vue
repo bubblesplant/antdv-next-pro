@@ -49,6 +49,7 @@ async function reload() {
     <Space wrap class="adaptive-doc-actions">
       <Button @click="height = height === 600 ? 760 : 600">切换高度：{{ height }}px</Button>
       <Button @click="empty = !empty">{{ empty ? '恢复数据' : '清空数据' }}</Button>
+      <Button @click="reload">通过 ref 刷新</Button>
     </Space>
     <p class="adaptive-doc-hint">{{ message }}</p>
     <div :style="{ height: `${height}px`, minHeight: 0 }">
@@ -60,10 +61,16 @@ async function reload() {
         header-title="项目清单"
         :search="{ defaultCollapsed: true, span: 12 }"
         :pagination="{ defaultPageSize: 20 }"
+        :row-selection="{}"
         :scroll="{ x: 780, y: '100%' }"
         @search-collapse="message = $event ? '已收起查询条件。' : '已展开查询条件，表体自动缩小。'"
       >
-        <template #toolbar-actions><Button @click="reload">刷新数据</Button></template>
+        <template #toolbar-actions="{ action, selectedRows }">
+          <Button @click="action.reload()">插槽刷新</Button>
+          <Button :disabled="!selectedRows.length" @click="action.clearSelected()">
+            取消选择（{{ selectedRows.length }}）
+          </Button>
+        </template>
         <template #cell-name="{ record }"
           ><strong>{{ record.name }}</strong></template
         >
