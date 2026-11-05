@@ -11,6 +11,8 @@ import {
   provide,
   reactive,
   ref,
+  Teleport,
+  useId,
   watch,
 } from 'vue'
 import type { ProDataIndex } from '../types'
@@ -24,7 +26,9 @@ import {
   setValue,
 } from '../schema-form/utils'
 import type { FormRecord } from '../schema-form/utils'
-import { useThemeVars } from '../shared/useThemeVars'
+import { useFormThemeVars } from './useFormThemeVars'
+import { useOverlayFormFooter } from './useOverlayFormFooter'
+import { useProConfig } from '../provider'
 import { proFormContextKey } from './context'
 import { formProviderKey } from './hooks'
 import type { RegisteredFormField } from './context'
@@ -85,7 +89,10 @@ export default defineComponent({
     const fields = new Set<RegisteredFormField>()
     const provider = inject(formProviderKey, undefined)
     const { prefix, direction, config, t } = useFormPrefix('form', () => props.prefixCls)
-    const themeVars = useThemeVars()
+    const themeVars = useFormThemeVars()
+    const { token } = useProConfig()
+    const overlayFooter = useOverlayFormFooter()
+    const formId = `pro-form-${useId()}`
     let requestSequence = 0
     let submission: Promise<FormRecord> | undefined
     let alive = true
@@ -403,6 +410,7 @@ export default defineComponent({
                     type: 'primary',
                     ...submitter.submitButtonProps,
                     htmlType: 'submit',
+                    form: overlayFooter?.enabled.value ? (attrs.id ?? formId) : undefined,
                     loading: loading.value || submitter.submitButtonProps?.loading,
                   },
                   () =>
@@ -430,10 +438,12 @@ export default defineComponent({
         Form,
         {
           ...attrs,
+          id: attrs.id ?? (overlayFooter?.enabled.value ? formId : undefined),
           ref: formRef,
           model,
           name: props.name,
           'data-pro-form': '',
+          'data-pro-form-layout': props.layout,
           layout: props.layout,
           disabled: props.disabled,
           class: [
@@ -464,13 +474,20 @@ export default defineComponent({
             ),
             actions &&
               h(
-                'div',
+                Teleport,
                 {
-                  'data-pro-form-submitter': '',
-                  class: [`${prefix.value}-submitter`, semantic.classes.submitter],
-                  style: semantic.styles.submitter,
+                  to: overlayFooter?.target.value ?? 'body',
+                  disabled: !overlayFooter?.enabled.value || !overlayFooter.target.value,
                 },
-                [h(Space, null, () => actions)],
+                h(
+                  'div',
+                  {
+                    'data-pro-form-submitter': '',
+                    class: [`${prefix.value}-submitter`, semantic.classes.submitter],
+                    style: [themeVars.value, semantic.styles.submitter],
+                  },
+                  [h(Space, { size: token.value.marginXS }, () => actions)],
+                ),
               ),
           ],
         },

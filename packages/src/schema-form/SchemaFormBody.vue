@@ -133,6 +133,22 @@ const formSubmitter = computed<false | SubmitterProps>(() => {
           },
   }
 })
+const formClasses = computed(() => {
+  const source = props.formProps?.classes
+  return {
+    ...(typeof source === 'function' ? source({ props: props.formProps ?? {} }) : source),
+    ...(props.classes.form !== undefined && { form: props.classes.form }),
+    ...(props.classes.submitter !== undefined && { submitter: props.classes.submitter }),
+  }
+})
+const formStyles = computed(() => {
+  const source = props.formProps?.styles
+  return {
+    ...(typeof source === 'function' ? source({ props: props.formProps ?? {} }) : source),
+    ...(props.styles.form !== undefined && { form: props.styles.form }),
+    ...(props.styles.submitter !== undefined && { submitter: props.styles.submitter }),
+  }
+})
 const filterProps = computed(() => ({
   ...props.formProps,
   prefixCls: props.prefixCls,
@@ -301,14 +317,9 @@ defineExpose({
 <template>
   <div
     class="antdv-next-pro-schema-body"
-    :class="[
-      `${prefix}-content`,
-      isStepLayout && `${prefix}-container`,
-      isStepLayout && classes.container,
-      `is-${layoutType.toLowerCase()}`,
-      classes.content,
-    ]"
-    :style="[rootStyle, styles.content, isStepLayout && styles.container]"
+    :class="[`${prefix}-content`, `is-${layoutType.toLowerCase()}`, classes.content]"
+    :style="[rootStyle, styles.content]"
+    :data-pro-steps-form="isStepLayout ? '' : undefined"
   >
     <Spin :spinning="loading">
       <component
@@ -345,6 +356,7 @@ defineExpose({
         <div
           v-if="layoutType === 'StepsForm' && steps.length > 1"
           :class="`${prefix}-steps-container`"
+          data-pro-steps-form-header
         >
           <Steps
             v-bind="stepsProps"
@@ -356,63 +368,70 @@ defineExpose({
           />
         </div>
         <div
-          v-for="(step, index) in steps"
-          :key="index"
-          :class="[
-            `${prefix}-step`,
-            index === normalizedCurrent && `${prefix}-step-active`,
-            classes.step,
-          ]"
-          :style="[{ display: index === normalizedCurrent ? undefined : 'none' }, styles.step]"
-          :aria-hidden="index !== normalizedCurrent"
+          data-pro-steps-form-content
+          :class="[`${prefix}-container`, classes.container]"
+          :style="styles.container"
         >
-          <ProForm
-            ref="stepForms"
-            v-bind="formProps"
-            :model-value="model"
-            :readonly="readonly"
-            :label-col="labelCol"
-            :wrapper-col="wrapperCol"
-            :submitter="false"
-            :on-finish="
-              async () => {
-                if (hasNext) emit('next')
-                else await finishForm()
-              }
-            "
-            @update:model-value="emit('modelChange', $event)"
+          <div
+            v-for="(step, index) in steps"
+            :key="index"
+            :class="[
+              `${prefix}-step`,
+              index === normalizedCurrent && `${prefix}-step-active`,
+              classes.step,
+            ]"
+            :style="[{ display: index === normalizedCurrent ? undefined : 'none' }, styles.step]"
+            :aria-hidden="index !== normalizedCurrent"
+            data-pro-steps-form-step
+          >
+            <ProForm
+              ref="stepForms"
+              v-bind="formProps"
+              :model-value="model"
+              :readonly="readonly"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
+              :submitter="false"
+              :on-finish="
+                async () => {
+                  if (hasNext) emit('next')
+                  else await finishForm()
+                }
+              "
+              @update:model-value="emit('modelChange', $event)"
+            >
+              <VNodeContent
+                v-if="schemaSlots['step-content']"
+                :content="schemaSlots['step-content'](stepSlotProps(index))"
+              />
+              <SchemaFormFields
+                v-else
+                :columns="step.columns"
+                :model="model"
+                :readonly="readonly"
+                :grid="grid"
+                :layout-type="layoutType"
+                :schema-slots="schemaSlots"
+                @field-change="handleFieldChange"
+              />
+            </ProForm>
+          </div>
+          <div
+            v-if="showSubmitter"
+            class="antdv-next-pro-schema-submitter"
+            :class="[`${prefix}-submitter`, classes.submitter]"
+            :style="styles.submitter"
           >
             <VNodeContent
-              v-if="schemaSlots['step-content']"
-              :content="schemaSlots['step-content'](stepSlotProps(index))"
+              v-if="schemaSlots['step-actions']"
+              :content="schemaSlots['step-actions'](stepActionSlotProps)"
             />
-            <SchemaFormFields
-              v-else
-              :columns="step.columns"
-              :model="model"
-              :readonly="readonly"
-              :grid="grid"
-              :layout-type="layoutType"
-              :schema-slots="schemaSlots"
-              @field-change="handleFieldChange"
+            <VNodeContent
+              v-else-if="schemaSlots.submitter"
+              :content="schemaSlots.submitter({ values: model, current: normalizedCurrent })"
             />
-          </ProForm>
-        </div>
-        <div
-          v-if="showSubmitter"
-          class="antdv-next-pro-schema-submitter"
-          :class="[`${prefix}-submitter`, classes.submitter]"
-          :style="styles.submitter"
-        >
-          <VNodeContent
-            v-if="schemaSlots['step-actions']"
-            :content="schemaSlots['step-actions'](stepActionSlotProps)"
-          />
-          <VNodeContent
-            v-else-if="schemaSlots.submitter"
-            :content="schemaSlots.submitter({ values: model, current: normalizedCurrent })"
-          />
-          <Space v-else><VNodeContent :content="renderStepActions()" /></Space>
+            <Space v-else><VNodeContent :content="renderStepActions()" /></Space>
+          </div>
         </div>
       </template>
       <ProForm
@@ -425,6 +444,9 @@ defineExpose({
         :wrapper-col="wrapperCol"
         :submitter="formSubmitter"
         :on-finish="finishForm"
+        :prefix-cls="prefix"
+        :classes="formClasses"
+        :styles="formStyles"
         @update:model-value="emit('modelChange', $event)"
         @reset="emit('reset')"
       >

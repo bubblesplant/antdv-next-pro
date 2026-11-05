@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<ProListProps<T, P>>(), {
   itemHeaderRender: undefined,
   toolBarRender: undefined,
   headerTitle: undefined,
+  split: undefined,
 })
 const slots = defineSlots<{
   [name: string]:

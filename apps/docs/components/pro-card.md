@@ -48,6 +48,12 @@ const collapsed = ref(false)
 
 标题默认没有分割线；`headerBordered` 显示分割线。`variant="borderless"` 移除边框。`ghost` 提供透明背景、无边框、无阴影与零内容内边距。普通卡片边框遵从底层 Card 配置。
 
+卡片默认无阴影，ProTable 的搜索区和表格区也沿用此行为。`boxShadow` 显式开启主题阴影，`hoverable` 在悬浮时显示阴影，`styles.root.boxShadow` 可自定义阴影。
+
+`boxShadow` 使用 `boxShadowTertiary`，`ghost` 优先于内置阴影。Card 的 `headerPadding/headerPaddingSM` 控制标题左右间距；无分割线标题的上下留白分别使用普通 `padding` 和小尺寸 `paddingXS`。
+
+普通卡片的默认边框、圆角、正文间距和标题字重跟随原生 Card，与 ProComponents 3.x 的普通 Card 路径一致；官网稳定 2.x 的这些默认值有所不同。
+
 ## 响应式分栏与组合
 
 父卡片将直接子 ProCard 包装为列。`colSpan` 的数字按 24 栅格计算，字符串作为列宽，`0` 隐藏列；响应式对象使用 `xs/sm/md/lg/xl/xxl`，随窗口宽度变化。`colStyle` 配在父卡片上，应用到各子列包装节点。
@@ -60,6 +66,8 @@ const collapsed = ref(false)
 ```
 
 `direction="row"` 横向排列，`direction="column"` 纵向排列；`wrap` 允许换行。`gutter` 支持单值、响应式值与 `[横向, 纵向]` 数组。`split="vertical"` 为左右分割，`split="horizontal"` 为上下分割。`layout="center"` 居中内容。
+
+包含子 ProCard（包括 `v-for` 产生的 Fragment）或设置 `split` 时，父卡片默认清除内容内边距；`bodyStyle/styles.body` 可显式覆盖。单独设置 `direction/gutter` 不会改变普通内容的布局。分割线遵循主题的 `lineWidth/lineType/colorSplit`。
 
 `ProCard.Group` / 具名 `ProCardGroup` 使用透明父卡片，默认横向排列。`ProCard.Divider` / `ProCardDivider` 提供独立分割线，`type` 默认为 `vertical`，也可设为 `horizontal`。
 
@@ -85,6 +93,8 @@ const collapsed = ref(false)
 
 `tabs.cardProps.ghost` 控制标签内容的透明紧凑状态；此对象不作为完整卡片配置传给每个面板，这与固定上游实际使用范围一致。`ProCard.TabPane` / `ProCardTabPane` 是官网历史用法的兼容入口，支持 `key`、`tab`、`disabled` 和配置自身卡片的 `cardProps`；新用法优先使用 `tabs.items`。TabPane 不属于本次固定提交的现有导出。
 
+标签页由导航和内容区分别管理留白，外层 Card 默认无内容内边距；`tabs.styles` 可覆盖对应部位，`tabs.cardProps.ghost` 默认清除标签内容区留白。
+
 ## 折叠、加载与选择
 
 `collapsible` 或 `collapsible="header"` 允许点击标题区折叠；`collapsible="icon"` 只响应折叠按钮。操作区、标题内交互控件与嵌套卡片不会触发父卡折叠。按钮支持 Enter 和空格，标签跟随国际化配置。
@@ -92,6 +102,8 @@ const collapsed = ref(false)
 非受控使用 `defaultCollapsed`，受控使用 `v-model:collapsed`。折叠隐藏内容并保留输入状态。`loading` 显示原生 Card 加载态，也可由 `#loading` 替换；加载期间普通正文卸载。
 
 传入 `checked` 启用受控选择状态；点击或 Enter/空格触发 `checked` 事件，父组件更新值。`disabled` 阻止选择与折叠，未显式设置时继承原生全局禁用状态。`boxShadow` 使用当前主题阴影。
+
+选中态使用主题的 `controlItemBgActive/controlOutline` 设置背景和边框，并显示主题色角标。
 
 ## API
 

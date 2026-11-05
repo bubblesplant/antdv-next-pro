@@ -48,11 +48,15 @@ const intl = useIntl()
 const prefix = useProPrefix('descriptions', () => props.prefixCls)
 const { direction } = useProConfig()
 const themeVars = useThemeVars()
-const { classes, styles } = useSemanticStyles(props, {
-  classes: () => props.classes,
-  classNames: () => props.classNames,
-  styles: () => props.styles,
-})
+const { classes, styles } = useSemanticStyles(
+  props,
+  {
+    classes: () => props.classes,
+    classNames: () => props.classNames,
+    styles: () => props.styles,
+  },
+  { styles: { content: { minWidth: 0 } } },
+)
 const instance = getCurrentInstance()
 const bindings = computed(() => {
   Object.values(props)
@@ -291,7 +295,7 @@ defineExpose<ProDescriptionsInstance<T>>(action)
         :style="themeVars"
         data-pro-descriptions
       >
-        <template v-if="props.title !== undefined || $slots.title" #title
+        <template v-if="props.title !== undefined || props.tooltip || $slots.title" #title
           ><slot name="title"><RenderNode :content="props.title" /></slot
           ><Tooltip
             v-if="props.tooltip"

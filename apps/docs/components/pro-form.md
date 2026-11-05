@@ -10,6 +10,8 @@ import CompositionForm from '../../playground/src/demos/schema-form/CompositionF
 
 `ProForm` 通过字段子组件组合表单，无需 `columns`。需要使用 Schema 描述字段时，请使用 [BetaSchemaForm](./schema-form)。普通表单默认 `layout="vertical"`；原有横向布局可显式设置 `layout="horizontal"`。
 
+普通表单的提交区默认在起点对齐，不额外增加顶部间距；多个按钮的间距使用主题 `marginXS`。
+
 <ClientOnly>
   <CompositionForm />
 </ClientOnly>
@@ -74,6 +76,8 @@ async function save(values: Record<string, unknown>) {
 
 List 默认插槽提供 `{ field, index, action, fields, record, list }`。`actionRef` 或组件 ref 提供 `add(record?, index?)`、`remove(index \| indices)`、`copy(index)`、`move(from,to)`、`get(index)`、`getList()`。新增/删除 guard 支持 Promise：`actionGuard.beforeAddRow(record,index,count)`、`beforeRemoveRow(index,count)` 返回 false 可阻止操作。`actionRender` 和 `itemRender` 可定制操作及整行内容；只读、禁用和 min/max 仍约束公开操作。
 
+`ProFormGroup` 默认横向间距为 `32px`、换行间距为 `0`，标题下方间距使用主题 `marginXL`。`labelLayout="twoLine"` 让标题独占一行，字段区域左侧缩进 `16px`。
+
 ## 弹层与筛选
 
 `ModalForm` / `DrawerForm` 不传 columns 时渲染组合字段，传 columns 时兼容 Schema 入口。支持 `trigger` 插槽、`open/v-model:open`、`title/width` 和原生 `modalProps/drawerProps`。open、业务 title/width、footer 和关闭回调由表单协调，其余原生配置透传。非受控时由触发器和实例 `open()/close()` 管理；受控时父组件须接收 open 更新。
@@ -85,6 +89,8 @@ List 默认插槽提供 `{ field, index, action, fields, record, list }`。`acti
 [QueryFilter](./query-filter) 可独立导入，提供响应式栅格、折叠及操作区：`collapsed/defaultCollapsed`、`span`、`defaultColsNumber`、`labelWidth`、`split`、`optionRender(props, form, doms)`、`collapseRender(collapsed)`、`searchText/resetText`。宽度变化会调整列宽，字段值和校验继续保留。
 
 [LightFilter](./light-filter) 可独立导入，将普通字段显示为标签和弹层，`secondary` 字段默认进入更多筛选；`collapse=true` 将全部字段收进同一个更多弹层。支持 `collapseLabel/placement/footerRender`。确认先校验再提交；取消恢复打开时的值，清除移除值后提交。更多弹层内直接展示字段行，并对该组字段统一确认、取消和清除。`LightWrapper` 提供同一弹层行为和 `v-model:open`。
+
+弹层默认宽度为 `800px`；可通过 `width` 或原生 `modalProps.width/drawerProps.width` 覆盖，原生宽度配置优先。提交区位于原生弹层的 footer 并右对齐，保留内部表单的校验和提交行为。Modal 默认提交文案为“确认”，Drawer 为“提交”，均可通过 submitter 配置覆盖；Modal 也遵循原生 `okText` 与 locale。
 
 ## 多步骤
 
@@ -100,6 +106,8 @@ List 默认插槽提供 `{ field, index, action, fields, record, list }`。`acti
 ```
 
 每步是独立原生 Form，支持自身 initialValues/request/rules/onFinish。没有 step onFinish 时校验成功即前进；配置回调后只有返回 true 才前进。false、undefined、reject 不前进，回退保留草稿。最后一步重新校验各步并合并提交值。`current/v-model:current`、`stepsProps`、`formProps`、`formMapRef` 可配置；实例提供 `next()/prev()/submit()/validate()/reset()/formMap()`，按 name 获取每步实例。`StepsForm.StepForm` 为组合成员，独立 `StepForm` 亦可导入。
+
+步骤导航最大宽度为 `1160px`，表单和提交区位于同一个居中容器。容器按内容撑开，最小宽度为 `min(420px, 100%)`，最大宽度不超过父容器；每步顶部间距为 `32px`。
 
 ## 提交区与 URL
 

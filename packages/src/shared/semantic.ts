@@ -1,6 +1,18 @@
 import { computed, toValue, type CSSProperties, type MaybeRefOrGetter } from 'vue'
 import type { ProSemanticClasses, ProSemanticSource, ProSemanticStyles } from '../provider/types'
 
+// Reinsert overwritten keys so later shorthand declarations follow earlier longhands.
+export function mergeStyle(...sources: (CSSProperties | undefined)[]): CSSProperties {
+  const result: CSSProperties = {}
+  for (const source of sources) {
+    for (const [key, value] of Object.entries(source ?? {})) {
+      delete result[key as keyof CSSProperties]
+      Object.assign(result, { [key]: value })
+    }
+  }
+  return result
+}
+
 export function resolveSemantic<Value, Props>(
   source: ProSemanticSource<Value, Props> | undefined,
   props: Props,

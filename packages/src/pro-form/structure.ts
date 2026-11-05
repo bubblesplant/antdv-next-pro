@@ -34,7 +34,7 @@ import type {
 import { assignRef, flattenChildren, resolveSemantic, useFormPrefix } from './utils'
 import ProField from '../pro-field/ProField'
 import type { ProFieldValueTypeInput } from '../pro-field/valueType'
-import { useThemeVars } from '../shared/useThemeVars'
+import { useFormThemeVars } from './useFormThemeVars'
 
 const semanticProps = {
   prefixCls: String,
@@ -56,13 +56,13 @@ export const ProFormGroup = defineComponent({
     collapsed: { type: Boolean, default: undefined },
     defaultCollapsed: Boolean,
     direction: { type: String, default: 'horizontal' },
-    size: [Number, String],
+    size: { type: [Number, String], default: 32 },
     labelLayout: String,
   },
   emits: ['update:collapsed', 'collapse'],
   setup(props, { attrs, slots, emit }) {
     const { prefix } = useFormPrefix('form-group', () => props.prefixCls)
-    const themeVars = useThemeVars()
+    const themeVars = useFormThemeVars()
     const internal = ref(props.defaultCollapsed)
     const collapsed = computed(() => props.collapsed ?? internal.value)
     function toggle() {
@@ -77,9 +77,9 @@ export const ProFormGroup = defineComponent({
         typeof props.size === 'number'
           ? `${props.size}px`
           : props.size === 'small'
-            ? '8px'
+            ? 'var(--pro-form-space-small, 8px)'
             : props.size === 'middle'
-              ? '16px'
+              ? 'var(--antdv-next-pro-padding, 16px)'
               : props.size === 'large'
                 ? 'var(--antdv-next-pro-padding-lg, 24px)'
                 : undefined
@@ -88,6 +88,7 @@ export const ProFormGroup = defineComponent({
         {
           ...attrs,
           'data-pro-form-group': '',
+          'data-pro-form-label-layout': props.labelLayout,
           class: [
             prefix.value,
             attrs.class,
@@ -100,7 +101,7 @@ export const ProFormGroup = defineComponent({
           style: [themeVars.value, attrs.style, semantic.styles.root],
         },
         [
-          (title || slots.extra || props.extra || props.collapsible) &&
+          (title || props.tooltip || slots.extra || props.extra || props.collapsible) &&
             h(
               'div',
               {
@@ -145,6 +146,8 @@ export const ProFormGroup = defineComponent({
                   flexDirection: props.direction === 'vertical' ? 'column' : 'row',
                   gap,
                   flexWrap: 'wrap',
+                  rowGap: 0,
+                  alignItems: 'flex-start',
                 },
                 semantic.styles.container,
               ],
@@ -213,7 +216,8 @@ export const ProFormList = defineComponent({
     const form = useProFormContext()
     if (!form) throw new Error('ProFormList must be used inside ProForm')
     const path = useProFormNamePath(() => props.name)
-    const { prefix, t } = useFormPrefix('form-list', () => props.prefixCls)
+    const { prefix, t, config } = useFormPrefix('form-list', () => props.prefixCls)
+    const themeVars = useFormThemeVars()
     const busy = ref(false)
     let sequence = 0
     const keys = ref<number[]>([])
@@ -359,8 +363,11 @@ export const ProFormList = defineComponent({
                 block: true,
                 type: 'dashed',
                 ...creatorButtonProps,
-                'data-pro-form-list-creator': '',
-                class: `${prefix.value}-creator`,
+                'data-pro-form-list-creator': creatorPosition === 'top' ? 'top' : 'bottom',
+                class: [
+                  `${prefix.value}-creator`,
+                  creatorPosition === 'top' && `${prefix.value}-creator-button-top`,
+                ],
                 disabled: busy.value || form.disabled.value,
                 onClick: () => void add(),
               },
@@ -437,6 +444,13 @@ export const ProFormList = defineComponent({
           {
             key: field.key,
             'data-pro-form-list-item': '',
+            'data-pro-form-list-first': index === 0 ? '' : undefined,
+            'data-pro-form-list-labels':
+              props.alwaysShowItemLabel === undefined
+                ? 'default'
+                : props.alwaysShowItemLabel
+                  ? 'show'
+                  : 'hide',
             class: [
               `${prefix.value}-item`,
               {
@@ -453,12 +467,21 @@ export const ProFormList = defineComponent({
               : [
                   h(
                     'div',
-                    { 'data-pro-form-list-content': '', class: `${prefix.value}-container` },
+                    {
+                      'data-pro-form-list-content': '',
+                      class: [`${prefix.value}-container`, semantic.classes.container],
+                      style: semantic.styles.container,
+                    },
                     [content],
                   ),
                   h(
                     Space,
-                    { 'data-pro-form-list-actions': '', class: `${prefix.value}-action` },
+                    {
+                      'data-pro-form-list-actions':
+                        config.value.componentSize === 'small' ? 'small' : '',
+                      class: [`${prefix.value}-action`, semantic.classes.actions],
+                      style: semantic.styles.actions,
+                    },
                     () => actions,
                   ),
                 ],
@@ -471,7 +494,7 @@ export const ProFormList = defineComponent({
           ...attrs,
           'data-pro-form-list': '',
           class: [prefix.value, attrs.class, semantic.classes.root],
-          style: [attrs.style, semantic.styles.root],
+          style: [themeVars.value, attrs.style, semantic.styles.root],
         },
         [
           h(

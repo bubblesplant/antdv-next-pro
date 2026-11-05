@@ -25,7 +25,7 @@ import type {
   UploadFile,
   UploadProps,
 } from 'antdv-next'
-import type { VNodeChild } from 'vue'
+import type { HTMLAttributes, VNodeChild } from 'vue'
 
 import type { ProDataIndex, ProValueEnumItem } from '../types'
 import type { ProFieldValueTypeInput } from '../pro-field/valueType'
@@ -73,7 +73,7 @@ export interface ProFormBaseFieldProps<
   label?: VNodeChild
   rules?: FormItemProps['rules']
   fieldMode?: ProFormFieldMode
-  fieldProps?: Partial<FieldProps>
+  fieldProps?: Partial<FieldProps> & Pick<HTMLAttributes, 'class' | 'style'>
   formItemProps?: Partial<FormItemProps>
   disabled?: boolean
   readonly?: boolean

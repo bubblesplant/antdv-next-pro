@@ -1,6 +1,6 @@
 import type { VueWrapper } from '@vue/test-utils'
 
-import type { ProFilter, ProSort, ProTableInstance } from '../src/types'
+import type { ProCardProps, ProFilter, ProSort, ProTableInstance } from '../src/types'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ConfigProvider, Table, theme } from 'antdv-next'
 import enUS from 'antdv-next/locale/en_US'
@@ -180,6 +180,8 @@ describe('ProTable browser capabilities', () => {
       resolveCssVariableColor(root, '--antdv-next-pro-color-bg-container'),
     )
     expect(getComputedStyle(card).backgroundColor).toBe(getComputedStyle(search).backgroundColor)
+    expect(getComputedStyle(search).boxShadow).toBe('none')
+    expect(getComputedStyle(card).boxShadow).toBe('none')
     expect(
       getComputedStyle(wrapper.get('[data-pro-table-search] .ant-pro-card-body').element).padding,
     ).toBe('24px')
@@ -188,6 +190,133 @@ describe('ProTable browser capabilities', () => {
         .paddingTop,
     ).toBe('0px')
     expect(card.getBoundingClientRect().top).toBeGreaterThan(search.getBoundingClientRect().bottom)
+    await wrapper.setProps({ cardProps: { boxShadow: true } })
+    expect(getComputedStyle(card).boxShadow).not.toBe('none')
+    expect(getComputedStyle(search).boxShadow).toBe('none')
+  })
+
+  it('merges card semantic styles and legacy body styles with toolbar spacing', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [{ id: 1, name: 'Ada' }],
+        search: false,
+        cardProps: {
+          title: 'Users',
+          extra: 'Details',
+          bodyStyle: { padding: '14px' },
+          styles: {
+            root: { boxShadow: '0 0 5px rgb(255, 0, 0)', borderRadius: '18px' },
+            header: { paddingBottom: '10px' },
+            title: { fontSize: '19px' },
+            extra: { fontSize: '13px' },
+            body: { padding: '20px' },
+          },
+        },
+      },
+    })
+    await flushPromises()
+    const card = wrapper.get('[data-pro-table-container]')
+    const body = card.get('.ant-pro-card-body')
+    expect(getComputedStyle(card.element).boxShadow).toBe('rgb(255, 0, 0) 0px 0px 5px 0px')
+    expect(getComputedStyle(card.element).borderRadius).toBe('18px')
+    expect(getComputedStyle(card.get('.ant-pro-card-header').element).paddingBottom).toBe('10px')
+    expect(getComputedStyle(card.get('.ant-pro-card-title').element).fontSize).toBe('19px')
+    expect(getComputedStyle(card.get('.ant-pro-card-extra').element).fontSize).toBe('13px')
+    expect(getComputedStyle(body.element).padding).toBe('20px')
+
+    await wrapper.setProps({ cardProps: { bodyStyle: { padding: '14px' } } })
+    expect(getComputedStyle(body.element).padding).toBe('14px')
+    await wrapper.setProps({ cardProps: {} })
+    expect(getComputedStyle(body.element).paddingTop).toBe('0px')
+    expect(getComputedStyle(body.element).paddingRight).toBe('24px')
+    await wrapper.setProps({ toolbar: false })
+    expect(getComputedStyle(body.element).padding).toBe('0px')
+    await wrapper.setProps({
+      cardProps: {
+        bodyStyle: { paddingTop: '14px' },
+        styles: { body: { padding: '20px' } },
+      },
+    })
+    expect(getComputedStyle(body.element).padding).toBe('20px')
+  })
+
+  it('resolves functional card styles with reactive ProCard props', async () => {
+    const styles = vi.fn(({ props: card }: { props: ProCardProps }) => ({
+      root: { borderRadius: card.size === 'small' ? '6px' : '18px' },
+      body: { paddingInline: card.size === 'small' ? '6px' : '18px' },
+    }))
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [],
+        search: false,
+        cardProps: { size: 'small', styles },
+      },
+    })
+    await flushPromises()
+    const card = wrapper.get('[data-pro-table-container]')
+    const body = card.get('.ant-pro-card-body')
+    expect(styles).toHaveBeenCalledWith({ props: expect.objectContaining({ size: 'small' }) })
+    expect(getComputedStyle(card.element).borderRadius).toBe('6px')
+    expect(getComputedStyle(body.element).paddingLeft).toBe('6px')
+    expect(getComputedStyle(body.element).paddingTop).toBe('0px')
+    await wrapper.setProps({ cardProps: { size: 'default', styles } })
+    expect(getComputedStyle(card.element).borderRadius).toBe('18px')
+    expect(getComputedStyle(body.element).paddingLeft).toBe('18px')
+  })
+
+  it('honors legacy card borders, explicit variants and table/search border settings', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [],
+      },
+    })
+    await flushPromises()
+    const card = wrapper.get('[data-pro-table-container]')
+    const search = wrapper.get('[data-pro-table-search]')
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('0px')
+    await wrapper.setProps({ cardProps: { bordered: true } })
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('1px')
+    await wrapper.setProps({ cardProps: { bordered: true, variant: 'borderless' } })
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('0px')
+    await wrapper.setProps({ cardBordered: { table: true, search: false } })
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('1px')
+    expect(getComputedStyle(search.element).borderTopWidth).toBe('0px')
+    await wrapper.setProps({ cardBordered: { table: false, search: true } })
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('0px')
+    expect(getComputedStyle(search.element).borderTopWidth).toBe('1px')
+    await wrapper.setProps({ cardProps: false, cardBordered: true })
+    expect(getComputedStyle(card.element).borderTopWidth).toBe('0px')
+    expect(getComputedStyle(card.element).boxShadow).toBe('none')
+  })
+
+  it('removes toolbar spacing when all controls or the toolbar renderer are disabled', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name' }],
+        dataSource: [],
+        search: false,
+        options: false,
+      },
+    })
+    await flushPromises()
+    const body = wrapper.get('[data-pro-table-container] .ant-pro-card-body')
+    expect(wrapper.find('[data-pro-table-list-toolbar]').exists()).toBe(false)
+    expect(getComputedStyle(body.element).padding).toBe('0px')
+    await wrapper.setProps({ headerTitle: 'Users' })
+    expect(wrapper.get('[data-pro-table-list-toolbar]').text()).toContain('Users')
+    expect(getComputedStyle(body.element).paddingRight).toBe('24px')
+    await wrapper.setProps({ toolBarRender: false })
+    expect(wrapper.find('[data-pro-table-list-toolbar]').exists()).toBe(false)
+    expect(getComputedStyle(body.element).padding).toBe('0px')
+    await wrapper.setProps({ cardProps: { bodyStyle: { padding: '8px' } } })
+    expect(getComputedStyle(body.element).padding).toBe('8px')
   })
 
   it('submits and clears toolbar keywords even when the query form is disabled', async () => {

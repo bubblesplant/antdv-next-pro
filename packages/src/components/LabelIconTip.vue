@@ -15,18 +15,32 @@ const { prefix, direction, classes, styles, themeVars } = useAuxiliaryStyle(prop
     :class="[prefix, classes.root]"
     :style="[
       themeVars,
-      ellipsis ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : undefined,
+      { boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', maxWidth: '100%' },
       styles.root,
     ]"
     data-pro-label-tip
     :dir="direction"
-    ><span :class="classes.label" :style="styles.label"
+    ><span
+      :class="classes.label"
+      :style="[
+        { display: 'inline-flex', flex: 1, minWidth: 0 },
+        ellipsis
+          ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+          : undefined,
+        styles.label,
+      ]"
       ><slot><RenderNode :content="label" /></slot></span
     ><span
       v-if="subTitle"
       :class="[`${prefix}-sub-title`, classes.subTitle]"
       :style="[
-        { marginInlineStart: '8px', color: 'var(--antdv-next-pro-color-text-secondary)' },
+        {
+          marginInlineStart: '8px',
+          color: 'var(--antdv-next-pro-color-text-secondary)',
+          fontSize: 'var(--antdv-next-pro-font-size)',
+          fontWeight: 'normal',
+          whiteSpace: 'nowrap',
+        },
         styles.subTitle,
       ]"
       ><RenderNode :content="subTitle" /></span

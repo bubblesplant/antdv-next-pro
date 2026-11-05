@@ -10,6 +10,8 @@ import CompositionForm from '../../../playground/src/demos/schema-form/Compositi
 
 `ProForm` composes field components without `columns`. Use [BetaSchemaForm](./schema-form) for a schema-driven form. The default layout is `vertical`; set `layout="horizontal"` to keep the previous horizontal appearance.
 
+Standard form actions align to the start with no additional top margin. Multiple buttons use the theme's `marginXS` gap.
+
 <ClientOnly>
   <CompositionForm />
 </ClientOnly>
@@ -61,6 +63,8 @@ Names support strings, numbers, and path arrays such as `['profile','name']`. `o
 
 List's default slot receives `{field,index,action,fields,record,list}`. `actionRef` and the component ref expose `add(record?,index?)`, `remove(index | indices)`, `copy(index)`, `move(from,to)`, `get(index)`, and `getList()`. Asynchronous `actionGuard.beforeAddRow(record,index,count)` and `beforeRemoveRow(index,count)` can return false. `actionRender/itemRender` customize actions and rows. Readonly, disabled, and min/max still constrain the public actions.
 
+Groups default to a `32px` horizontal gap and no row gap. Title spacing follows the theme's `marginXL`. With `labelLayout="twoLine"`, the title occupies a full row and the field area has `16px` of inline-start padding.
+
 ## Dialog and filter forms
 
 `ModalForm/DrawerForm` compose children without columns and retain a schema entry when columns are provided. Use trigger slots, open/v-model:open, title/width, and native modalProps/drawerProps. The form coordinates open, business title/width, footer, and close callbacks; other native settings pass through. Uncontrolled dialogs support instance open()/close(); controlled parents must accept open updates.
@@ -72,6 +76,8 @@ The dialog-only submitTimeout option is measured in milliseconds. A positive val
 [QueryFilter](./query-filter) is independently importable and provides responsive columns, collapsed/defaultCollapsed, span, defaultColsNumber, labelWidth, split, optionRender(props,form,doms), collapseRender(collapsed), and searchText/resetText. Resizing preserves values and validation.
 
 [LightFilter](./light-filter) is independently importable and displays ordinary fields as labels that open popovers, while secondary fields live under More by default. Setting collapse=true collects every field in a single More popover. It supports collapseLabel/placement/footerRender. Confirmation validates and submits, cancellation restores the opening snapshot, and clearing removes the value and submits. More renders field rows directly and applies these actions to the group. `LightWrapper` exposes the same popover behavior and v-model:open.
+
+Both overlays default to `800px` wide. Set `width` or native `modalProps.width/drawerProps.width` to override it; native width settings take precedence. Actions render in the native footer, align to the end, and retain form validation and submission. Modal defaults to Confirm and Drawer to Submit, following locale. Submitter text overrides these defaults; Modal also respects native `okText`.
 
 ## Steps
 
@@ -87,6 +93,8 @@ The dialog-only submitTimeout option is measured in milliseconds. A positive val
 ```
 
 Each step owns an independent native Form with its own initialValues/request/rules/onFinish. Without step onFinish, successful validation advances; with a callback, only true advances. False, undefined, or rejection stays on the step. Going back preserves drafts. The final submission revalidates all steps and merges formatted output. Use current/v-model:current, stepsProps, formProps, and formMapRef. The root instance exposes next()/prev()/submit()/validate()/reset()/formMap(); formMap provides each instance by name. `StepsForm.StepForm` and standalone `StepForm` are available.
+
+Step navigation has a maximum width of `1160px`. Fields and actions share a centered container sized to its contents, with a minimum width of `min(420px, 100%)` and a maximum of `100%`. Each step has `32px` of top spacing.
 
 ## Actions and URL synchronization
 

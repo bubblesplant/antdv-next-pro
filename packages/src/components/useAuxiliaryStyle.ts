@@ -4,9 +4,11 @@ import { useThemeVars } from '../shared/useThemeVars'
 import type { AuxiliarySemanticProps } from './types'
 
 export function useAuxiliaryStyle<P extends AuxiliarySemanticProps<P>>(props: P, suffix: string) {
-  const { direction } = useProConfig()
+  const { direction, token, nativeConfig } = useProConfig()
   return {
     direction,
+    token,
+    nativeConfig,
     prefix: useProPrefix(suffix, () => props.prefixCls),
     intl: useIntl(),
     themeVars: useThemeVars(),

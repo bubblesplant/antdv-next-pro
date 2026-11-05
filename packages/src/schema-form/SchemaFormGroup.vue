@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import type { CompositeState, FieldProps } from './fieldTypes'
 import { Row } from 'antdv-next'
-import { mergeProps } from 'vue'
+import { computed, mergeProps } from 'vue'
+import { ProFormGroup } from '../pro-form/structure'
 import VNodeContent from '../shared/VNodeContent'
 import SchemaFormChildren from './SchemaFormChildren.vue'
 import { schemaChildren } from './utils'
 import { useFormPrefix } from '../pro-form/utils'
 
 defineOptions({ inheritAttrs: false })
-defineProps<{
+const props = defineProps<{
   context: FieldProps
   state: CompositeState
   rootAttrs: Record<string, unknown>
 }>()
 const { prefix } = useFormPrefix('form-group', () => undefined)
+const groupProps = computed(() => {
+  const fieldProps = props.context.column.fieldProps
+  return (typeof fieldProps === 'function' ? fieldProps(props.context.model) : fieldProps) ?? {}
+})
 </script>
 
 <template>
@@ -23,7 +28,7 @@ const { prefix } = useFormPrefix('form-group', () => undefined)
   >
     <VNodeContent :content="state.content" />
   </div>
-  <fieldset
+  <ProFormGroup
     v-else
     v-bind="
       mergeProps(
@@ -34,17 +39,14 @@ const { prefix } = useFormPrefix('form-group', () => undefined)
             `antdv-next-pro-schema-${context.column.valueType ?? 'group'}`,
           ],
         },
+        groupProps,
         rootAttrs,
       )
     "
+    :title="state.title"
+    :tooltip="context.column.tooltip"
+    :extra="context.column.extra"
   >
-    <legend
-      v-if="context.column.title"
-      class="antdv-next-pro-schema-group-title"
-      :class="`${prefix}-title`"
-    >
-      <VNodeContent :content="state.title" />
-    </legend>
     <Row
       v-if="context.grid"
       v-bind="{ gutter: 16, ...context.column.rowProps }"
@@ -52,8 +54,8 @@ const { prefix } = useFormPrefix('form-group', () => undefined)
     >
       <SchemaFormChildren :columns="schemaChildren(context.column)" :context="context" />
     </Row>
-    <div v-else :class="`${prefix}-container`">
+    <template v-else>
       <SchemaFormChildren :columns="schemaChildren(context.column)" :context="context" />
-    </div>
-  </fieldset>
+    </template>
+  </ProFormGroup>
 </template>

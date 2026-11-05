@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { CSSProperties, VNode, VNodeChild } from 'vue'
+import type { TabsProps } from 'antdv-next'
 import type { ProCardProps, ProCardSemanticName, ProCardSlots } from './types'
 
 import { QuestionCircleOutlined, RightOutlined } from '@antdv-next/icons'
 import { Card, Tabs, Tooltip, useConfig } from 'antdv-next'
 import { useProPrefix, useIntl, useProConfig } from './provider'
-import { useSemanticStyles } from './shared/semantic'
+import { mergeStyle, useSemanticStyles } from './shared/semantic'
 import {
   computed,
   ref,
@@ -99,8 +100,40 @@ const tabItems = computed(() => {
     }))
 })
 const tabsBindings = computed(() => {
-  const { cardProps, ...rest } = props.tabs ?? {}
-  return { ...rest, items: tabItems.value }
+  const { cardProps, styles, classes, ...rest } = props.tabs ?? {}
+  const vertical = ['left', 'right', 'start', 'end'].includes(
+    rest.tabPlacement ?? rest.tabPosition ?? 'top',
+  )
+  return {
+    ...rest,
+    items: tabItems.value,
+    styles: (info: { props: TabsProps }) => {
+      const own = typeof styles === 'function' ? styles(info) : styles
+      return {
+        ...own,
+        header: {
+          marginBlockEnd: 0,
+          marginInlineEnd: 0,
+          '--antdv-next-pro-card-tabs-nav-padding-inline': vertical
+            ? 0
+            : `${token.value.paddingLG}px`,
+          '--antdv-next-pro-card-tabs-nav-padding-block': vertical ? `${token.value.padding}px` : 0,
+          ...own?.header,
+        },
+        content: {
+          padding: cardProps?.ghost ? 0 : `${token.value.paddingLG}px`,
+          ...own?.content,
+        },
+      }
+    },
+    classes: (info: { props: TabsProps }) => {
+      const own = typeof classes === 'function' ? classes(info) : classes
+      return {
+        ...own,
+        header: ['antdv-next-pro-card-tabs-header', own?.header].filter(Boolean).join(' '),
+      }
+    },
+  }
 })
 const gutter = computed(() => {
   const g = props.gutter
@@ -115,24 +148,23 @@ const tooltipProps = computed(() =>
   typeof props.tooltip === 'string' ? { title: props.tooltip } : (props.tooltip ?? {}),
 )
 const isCardGroup = computed(() => {
-  const children = slots.default?.()
   return Boolean(
     props.split ||
-    props.gutter ||
-    props.direction ||
-    (Array.isArray(children) &&
-      children.some(
-        (node) =>
-          node &&
-          typeof node === 'object' &&
-          'type' in node &&
-          typeof node.type === 'object' &&
-          (node.type as { name?: string }).name === 'ProCard',
-      )),
+    flattenChildren(slots.default?.()).some(
+      (node) =>
+        typeof node.type === 'object' && (node.type as { name?: string }).name === 'ProCard',
+    ),
   )
 })
 const rootLayoutStyle = computed<CSSProperties>(() => ({
-  ...(props.boxShadow ? { boxShadow: token.value.boxShadow } : {}),
+  '--antdv-next-pro-card-split-border': `${token.value.lineWidth}px ${token.value.lineType} ${token.value.colorSplit}`,
+  ...(props.checked
+    ? {
+        backgroundColor: token.value.controlItemBgActive,
+        borderColor: token.value.controlOutline,
+      }
+    : {}),
+  ...(props.boxShadow ? { boxShadow: token.value.boxShadowTertiary } : {}),
 }))
 const { componentSize } = useConfig()
 const isSmall = computed(() => (props.size ?? componentSize.value) === 'small')
@@ -226,7 +258,7 @@ function renderBodyChildren(): VNodeChild {
 }
 const cardStyles = computed(() => {
   const cardToken = nativeCardToken.value
-  const headerPadding = `${(isSmall.value ? cardToken.headerPaddingSM : cardToken.headerPadding) ?? (isSmall.value ? token.value.paddingXS : token.value.padding)}px`
+  const headerPadding = `${isSmall.value ? token.value.paddingXS : token.value.padding}px`
   const headerHeight = isSmall.value ? cardToken.headerHeightSM : cardToken.headerHeight
   const header: CSSProperties =
     props.headerBordered || props.type === 'inner'
@@ -239,25 +271,26 @@ const cardStyles = computed(() => {
         }
   return {
     ...resolvedStyles.value,
-    root: {
-      ...(props.ghost ? { background: 'transparent', border: 'none', boxShadow: 'none' } : {}),
-      ...rootLayoutStyle.value,
-      ...resolvedStyles.value.root,
-    },
-    header: {
-      ...header,
-      ...(props.ghost ? { paddingInline: 0, paddingBlockEnd: headerPadding } : {}),
-      ...(headerCollapsible.value ? { cursor: 'pointer' } : {}),
-      ...props.headStyle,
-      ...resolvedStyles.value.header,
-    },
-    body: {
-      ...(props.ghost ? { padding: 0 } : {}),
-      ...props.bodyStyle,
-      ...(isCardGroup.value ? { padding: props.split ? 0 : undefined } : {}),
-      ...resolvedStyles.value.body,
-      ...(isCollapsed.value ? { display: 'none' } : {}),
-    },
+    root: mergeStyle(
+      rootLayoutStyle.value,
+      props.ghost ? { background: 'transparent', border: 'none', boxShadow: 'none' } : undefined,
+      resolvedStyles.value.root,
+    ),
+    header: mergeStyle(
+      header,
+      props.ghost ? { paddingInline: 0, paddingBlockEnd: headerPadding } : undefined,
+      headerCollapsible.value ? { cursor: 'pointer' } : undefined,
+      props.headStyle,
+      resolvedStyles.value.header,
+    ),
+    body: mergeStyle(
+      props.ghost || props.tabs || (isCardGroup.value && !props.loading)
+        ? { padding: 0 }
+        : undefined,
+      props.bodyStyle,
+      resolvedStyles.value.body,
+      isCollapsed.value ? { display: 'none' } : undefined,
+    ),
   }
 })
 
@@ -293,6 +326,7 @@ function handleRootClick(event: MouseEvent): void {
   <Card
     v-bind="attrs"
     data-pro-card
+    :data-pro-card-hoverable="props.hoverable || undefined"
     :data-pro-card-checked="props.checked || undefined"
     :data-pro-card-disabled="disabled || undefined"
     :tabindex="props.checked !== undefined ? (disabled ? -1 : 0) : attrs.tabindex"
@@ -427,15 +461,32 @@ function handleRootClick(event: MouseEvent): void {
 [data-pro-card] {
   min-width: 0;
 }
-[data-pro-card-tabs-ghost] [role='tabpanel'] {
-  padding: 0;
+/* ProCard is flat by default; retain the native Card hover shadow when requested. */
+[data-pro-card]:not([data-pro-card-hoverable]:hover) {
+  box-shadow: none;
+}
+.antdv-next-pro-card-tabs-header > [class*='-nav-wrap'] > [class*='-nav-list'] {
+  padding-inline-start: var(--antdv-next-pro-card-tabs-nav-padding-inline);
+  padding-block-start: var(--antdv-next-pro-card-tabs-nav-padding-block);
 }
 [data-pro-card-disabled] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 [data-pro-card-checked] {
-  outline: 1px solid var(--antdv-next-pro-color-primary);
+  position: relative;
+}
+[data-pro-card-checked]::after {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-end: 2px;
+  width: 0;
+  height: 0;
+  border: 6px solid var(--antdv-next-pro-color-primary);
+  border-block-end-color: transparent;
+  border-inline-start-color: transparent;
+  border-start-end-radius: 2px;
+  content: '';
 }
 [data-pro-card-col] > [data-pro-card] {
   height: 100%;
@@ -445,14 +496,14 @@ function handleRootClick(event: MouseEvent): void {
   > [data-pro-card-content]
   > [data-pro-card-col]
   + [data-pro-card-col] {
-  border-inline-start: 1px solid var(--antdv-next-pro-color-border-secondary, #f0f0f0);
+  border-inline-start: var(--antdv-next-pro-card-split-border);
 }
 [data-pro-card-split='horizontal']
   > div
   > [data-pro-card-content]
   > [data-pro-card-col]
   + [data-pro-card-col] {
-  border-block-start: 1px solid var(--antdv-next-pro-color-border-secondary, #f0f0f0);
+  border-block-start: var(--antdv-next-pro-card-split-border);
 }
 [data-pro-card-title-heading] {
   display: flex;

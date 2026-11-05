@@ -10,6 +10,7 @@ import type { TableColumnsType, FormInstance } from 'antdv-next'
 import type { CSSProperties, VNodeChild, VNode } from 'vue'
 import type {
   EditableAction,
+  ProCardProps,
   ProColumns,
   ProColumnsState,
   ProFilter,
@@ -68,6 +69,7 @@ import ErrorBoundary from './components/ErrorBoundary.vue'
 
 import ProCard from './ProCard.vue'
 import { useThemeVars } from './shared/useThemeVars'
+import { mergeStyle } from './shared/semantic'
 import RenderNode from './table/RenderNode.vue'
 import { resolveColumnValueType } from './table/valueType'
 import { proTableViewKey } from './table/viewContext'
@@ -100,6 +102,7 @@ const props = withDefaults(defineProps<ProTableProps<T, P>>(), {
   tableAlertRender: undefined,
   tableAlertOptionRender: undefined,
   cardProps: undefined,
+  cardBordered: undefined,
   ErrorBoundary: undefined,
   search: () => ({}),
   pagination: () => ({}),
@@ -226,7 +229,7 @@ const tableCardProps = computed(() => {
   return props.cardProps === false
     ? { ghost: true, variant: 'borderless' as const }
     : {
-        variant: 'borderless' as const,
+        variant: props.cardProps?.bordered ? ('outlined' as const) : ('borderless' as const),
         ...props.cardProps,
         ...(bordered === undefined
           ? {}
@@ -750,12 +753,32 @@ const rowSelectionConfig = computed<import('./types').ProTableRowSelection<T> | 
 const showToolbar = computed(
   () =>
     props.toolbar !== false &&
+    props.toolBarRender !== false &&
     (props.toolbar !== undefined ||
       props.headerTitle !== undefined ||
-      props.toolBarRender !== false ||
+      typeof props.toolBarRender === 'function' ||
       props.options !== false ||
       Boolean(slots['toolbar-title'] || slots['toolbar-actions'])),
 )
+
+function tableCardStyles(context: { props: ProCardProps }) {
+  const cardProps = props.cardProps === false ? undefined : props.cardProps
+  const styles =
+    typeof cardProps?.styles === 'function' ? cardProps.styles(context) : cardProps?.styles
+  const body = mergeStyle(cardProps?.bodyStyle, styles?.body)
+  const hasTopPadding =
+    body.padding !== undefined ||
+    body.paddingBlock !== undefined ||
+    body.paddingBlockStart !== undefined ||
+    body.paddingTop !== undefined
+  return {
+    ...styles,
+    body: mergeStyle(
+      showToolbar.value ? (hasTopPadding ? undefined : { paddingBlockStart: 0 }) : { padding: 0 },
+      body,
+    ),
+  }
+}
 
 const toolbarTitle = computed(() =>
   props.toolbar && typeof props.toolbar === 'object'
@@ -1867,11 +1890,11 @@ defineExpose<
         v-bind="tableCardProps"
         :class="`${prefix}-container`"
         data-pro-table-container
-        :styles="{ body: showToolbar ? { paddingBlockStart: 0 } : { padding: 0 } }"
+        :styles="tableCardStyles"
       >
         <RenderView :render="renderTableRoot">
           <ListToolBar
-            v-if="showToolbar && props.toolBarRender !== false"
+            v-if="showToolbar"
             data-pro-part="toolbar"
             :class="`${prefix}-list-toolbar`"
             data-pro-table-list-toolbar
@@ -2189,6 +2212,7 @@ defineExpose<
                 :row-selection="rowSelectionConfig"
                 :scroll="props.scroll"
                 :size="density"
+                :bordered="props.bordered"
                 @change="handleTableChange"
               >
                 <template #bodyCell="{ column, record, index }">

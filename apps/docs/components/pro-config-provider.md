@@ -60,23 +60,37 @@ const intl = createIntl('en-US', {
 
 以下为当前已有渲染消费者的 Pro token；原生组件另行消费自身 `theme.components` token。类型继承 GlobalToken 不表示每个原生 token 都有对应的 Pro 自绘部位。
 
-| token                   | 实际生效部位                                                                      |
-| ----------------------- | --------------------------------------------------------------------------------- |
-| `colorText`             | Field 根、Table、表单、List、FieldLabel、DropdownFooter                           |
-| `colorTextSecondary`    | Card 副标题/提示、Table 次要文本、LabelIconTip                                    |
-| `colorPrimary`          | Card 选中轮廓、Table 列设置选中项                                                 |
-| `colorPrimaryBg`        | Table 选择/提示区                                                                 |
-| `colorBgContainer`      | Table 全屏、List 背景                                                             |
-| `colorBgElevated`       | Table 列设置弹层、DropdownFooter                                                  |
-| `colorFillAlter`        | Table 列设置拖拽项悬停、SchemaForm 列表                                           |
-| `colorBorderSecondary`  | Card/List 分隔、DropdownFooter、Table 提示区                                      |
-| `colorError`            | Table 编辑错误提示                                                                |
-| `boxShadowSecondary`    | FilterDropdown 弹层                                                               |
-| `paddingLG`             | Form Group 间距、QueryFilter 列、Steps 内容、List 行、ListToolBar、FilterDropdown |
-| `borderRadiusLG`        | Table 弹层/提示区                                                                 |
-| `margin`                | Field option 操作间距                                                             |
-| `boxShadow`             | 启用 boxShadow 的 Card                                                            |
-| `padding` / `paddingXS` | Card 普通/小号标题的回退内边距，显式原生 Card headerPadding 配置优先              |
+| token                                                         | 实际生效部位                                                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `colorText`                                                   | Field 根、Table、表单、List、FieldLabel、DropdownFooter                                |
+| `colorTextSecondary`                                          | Card 副标题/提示、Table 次要文本、工具栏副标题、LabelIconTip、代码字段与数字范围分隔符 |
+| `colorTextHeading`                                            | ListToolBar 标题                                                                       |
+| `colorTextPlaceholder` / `colorBgTextHover`                   | FieldLabel 禁用文字与悬停背景                                                          |
+| `colorPrimary`                                                | Table 列设置选中项                                                                     |
+| `controlItemBgActive` / `controlOutline`                      | Card 选中背景与边框                                                                    |
+| `colorPrimaryBg`                                              | Table 选择/提示区                                                                      |
+| `colorBgContainer`                                            | Table 全屏、数字范围分隔符；普通 List 根背景透明                                       |
+| `colorBgElevated`                                             | Table 列设置弹层、DropdownFooter                                                       |
+| `colorFillAlter`                                              | Table 列设置拖拽项悬停                                                                 |
+| `colorBorderSecondary`                                        | Table 提示区                                                                           |
+| `colorSplit` / `lineWidth` / `lineType`                       | Card/List 分隔线；DropdownFooter 使用 colorSplit                                       |
+| `colorBorder`                                                 | 数字范围分隔符边框                                                                     |
+| `colorError`                                                  | Table 编辑错误提示                                                                     |
+| `boxShadowSecondary`                                          | FilterDropdown 弹层                                                                    |
+| `paddingLG`                                                   | QueryFilter 列间距、Card 标签页内容                                                    |
+| `paddingXS`                                                   | List 行内边距、小号 Card 标题上下间距、Group 小号间距                                  |
+| `marginXS` / `marginXXS`                                      | 提交操作与工具栏间距 / FieldLabel 图标间距                                             |
+| `marginLG` / `marginXL`                                       | FormList 操作下间距、工具栏 inline 菜单间距 / Group 标题下间距                         |
+| `marginSM`                                                    | List 内容/操作间距、拖拽手柄间距                                                       |
+| `borderRadiusLG`                                              | Table 弹层/提示区                                                                      |
+| `margin`                                                      | Field option 操作间距、ListToolBar 额外行下间距                                        |
+| `boxShadowTertiary`                                           | 显式启用 boxShadow 的 Card                                                             |
+| `padding`                                                     | ListToolBar 操作行上下间距、普通 Card 无分割线标题上下间距、纵向标签页导航留白         |
+| `fontSize` / `fontSizeSM` / `fontSizeLG` / `fontWeightStrong` | 工具栏与字段标签字号、工具栏标题字重                                                   |
+| `fontFamilyCode`                                              | 只读 code/jsonCode 字段                                                                |
+| `controlHeight` / `controlHeightSM`                           | FormList 操作高度 / 小号操作与拖拽手柄高度                                             |
+
+Card 标题左右间距优先使用显式原生 `headerPadding/headerPaddingSM`；未配置时使用 Pro 的 `padding/paddingXS`。这两个原生 Card 配置不控制标题上下间距。FilterDropdown 内容 padding 默认固定为 16px，可用组件属性覆盖。
 
 具体组件样式可再通过 `classes` / `styles` 覆盖。
 
