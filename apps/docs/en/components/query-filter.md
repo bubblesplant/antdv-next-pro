@@ -11,6 +11,8 @@ import SchemaQueryFilter from '../../../playground/src/demos/query-filter/Schema
 
 `QueryFilter` is a standalone search form with responsive columns, search and reset actions, and expandable fields. `ProTable` uses the same component for its default search area. Compose `ProForm` fields or pass `columns` to generate fields from a schema.
 
+The default form layout is horizontal. Root padding and row gaps are both `24px`, without additional Form.Item bottom margins. Set `layout="vertical"` explicitly or customize the corresponding areas through `styles.root/row/item/actions`.
+
 ## Import
 
 ```ts
@@ -67,7 +69,7 @@ The component also supports the [shared ProForm options](./pro-form), including 
 | `defaultCollapsed`                | `boolean`                                                 | `true`                                                        |
 | `defaultColsNumber`               | `number`                                                  | `3`; default column count in wider containers                 |
 | `span`                            | `number \| Record<string, number>`                        | Grid span with `xs/sm/md/lg/xl` breakpoints                   |
-| `labelWidth`                      | `number \| 'auto'`                                        | Label width; numbers use px                                   |
+| `labelWidth`                      | `number \| 'auto'`                                        | Label width; defaults to 80, numbers use px                   |
 | `split`                           | `boolean`                                                 | `false`; separator styling                                    |
 | `searchText` / `resetText`        | `VNodeChild`                                              | Localized search / reset labels                               |
 | `optionRender`                    | `false \| (props, form, doms) => VNodeChild`              | Customize search and reset actions; `false` hides them        |

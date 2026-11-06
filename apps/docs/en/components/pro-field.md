@@ -39,6 +39,12 @@ There are 42 types: text, password, money, index, indexBorder, option, textarea;
 
 index/indexBorder, option and avatar remain display fields in all three modes. progress/second use numeric input; fromNow uses a date-time picker; image uses a URL input; code/jsonCode use text areas. Schema containers group/formList/formSet/divider/dependency are handled by BetaSchemaForm and never fall back to an Input.
 
+Readonly `code` / `jsonCode` render in a shaded code block with 16px padding, a 3px radius, and the theme's code font and secondary text color. `jsonCode` formats valid JSON. Customize the block with `fieldProps.class/style`; matching `classes.control` / `styles.control` settings take precedence.
+
+Readonly `textarea` preserves line breaks and wraps long text when `copyable` / `ellipsis` are disabled. Readonly `text` also wraps long text. Switching to readonly preserves `control` semantic styling and the instance prefix.
+
+Editable `digitRange` uses a compact numeric-input group with themed separator borders, background, and secondary text color. Set `fieldProps.separator` / `separatorWidth` to customize the separator and its width in pixels; defaults are `~` / `30`. A `placeholder` array targets each endpoint, and `fieldProps.style` styles the group container.
+
 ## Field atoms and money
 
 Named atoms such as `FieldText`, `FieldSelect`, `FieldMoney` and `FieldDatePicker` share this protocol. `FieldMoney` also accepts `locale`, `customSymbol`, `moneySymbol`, `numberFormatOptions` and `numberPopoverRender`. Formatting defaults to two decimal places and follows locale separators and currency placement. Set `numberPopoverRender=false` to disable the editing amount hint.

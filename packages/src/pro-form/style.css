@@ -4,15 +4,21 @@
 [data-pro-form-submitter],
 [data-pro-steps-form-submitter] {
   display: flex;
+  align-items: center;
+}
+[data-pro-overlay-footer] {
+  display: flex;
   justify-content: flex-end;
-  margin-block-start: var(--pro-margin, 16px);
 }
 [data-pro-form-group-title] {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-block-end: 16px;
-  font-weight: 600;
+  margin-block-end: var(--pro-form-margin-xl, 32px);
+  font-weight: bold;
+}
+[data-pro-form-group] {
+  box-sizing: border-box;
 }
 [data-pro-form-group-extra] {
   margin-inline-start: auto;
@@ -26,16 +32,33 @@
   cursor: pointer;
 }
 [data-pro-form-group-content] {
-  column-gap: var(--antdv-next-pro-padding-lg, 24px);
+  max-width: 100%;
 }
-[data-pro-form-label-layout='twoLine'] [class*='-form-item-row'] {
-  flex-direction: column;
+[data-pro-form-group-content] > * {
+  max-width: 100%;
 }
-[data-pro-form-label-layout='twoLine'] [class*='-form-item-label'] {
-  text-align: start;
+[data-pro-form-group][data-pro-form-label-layout='twoLine'] {
+  display: block;
+  width: 100%;
 }
-[data-pro-form-label-layout='inline'] [class*='-form-item-row'] {
-  flex-direction: row;
+[data-pro-form-group][data-pro-form-label-layout='twoLine'] > [data-pro-form-group-title] {
+  width: 100%;
+  margin: 8px 0;
+}
+[data-pro-form-group-content][data-pro-form-label-layout='twoLine'] {
+  padding-inline-start: 16px;
+}
+[data-pro-form-group-content][data-pro-form-label-layout='twoLine'] > *,
+[data-pro-form-group-content][data-pro-form-label-layout='twoLine'] [class*='-form-item'] {
+  width: 100%;
+}
+[data-pro-form-group-content][data-pro-form-label-layout='twoLine'] [class*='-form-item-control'] {
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+[data-pro-form-list] {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 [data-pro-form-list-item] {
   display: flex;
@@ -47,16 +70,42 @@
   min-width: 0;
 }
 [data-pro-form-list-actions] {
-  margin-block-start: 4px;
+  height: var(--pro-form-control-height, 32px);
+  margin-block-end: var(--pro-form-margin-lg, 24px);
+  line-height: var(--pro-form-control-height, 32px);
 }
-[data-pro-form-list-creator] {
-  margin-block-end: 16px;
+[data-pro-form-list-actions='small'] {
+  height: var(--pro-form-control-height-sm, 24px);
+  line-height: var(--pro-form-control-height-sm, 24px);
+}
+[data-pro-form-list-creator='top'] {
+  margin-block-end: 24px;
+}
+[data-pro-form]:not([data-pro-form-layout='horizontal'])
+  [data-pro-form-list-item][data-pro-form-list-labels='hide']
+  [class*='-form-item-label'],
+[data-pro-form-list-item][data-pro-form-list-labels='default']:not([data-pro-form-list-first])
+  [class*='-form-item-label'] {
+  display: none;
+}
+[data-pro-form-list-item][data-pro-form-list-labels='show'] [class*='-form-item-label'],
+[data-pro-form-list-item][data-pro-form-list-labels='default'][data-pro-form-list-first]
+  [class*='-form-item-label'] {
+  display: inline-block;
+}
+[data-pro-query-filter] {
+  box-sizing: border-box;
+  padding: 24px;
+}
+[data-pro-query-filter] :is([class$='-form-item'], [class*='-form-item ']),
+[data-pro-query-filter] [data-pro-form-group-title] {
+  margin-block: 0;
 }
 [data-pro-query-row] {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  row-gap: 16px;
+  row-gap: 24px;
 }
 [data-pro-query-col] {
   padding-inline-end: var(--antdv-next-pro-padding-lg, 24px);
@@ -67,12 +116,24 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding-block-start: 4px;
+}
+[data-pro-light-filter] {
+  box-sizing: border-box;
+  line-height: 30px;
+}
+[data-pro-light-filter='small'] {
+  line-height: var(--pro-form-line-height, 1.5714285714);
+}
+[data-pro-light-filter]::before {
+  display: block;
+  height: 0;
+  visibility: hidden;
+  content: "'.'";
 }
 [data-pro-light-container] {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--antdv-next-pro-margin-xs, 8px);
   align-items: center;
 }
 [data-pro-light-footer] {
@@ -84,6 +145,28 @@
   min-width: 220px;
   max-width: min(480px, 90vw);
 }
+[data-pro-light-popover] :is([class$='-form-item'], [class*='-form-item ']) {
+  margin-block-end: 0;
+}
+[data-pro-light-container] > * {
+  white-space: nowrap;
+}
+[data-pro-steps-form] {
+  box-sizing: border-box;
+}
+[data-pro-steps-form-header] {
+  max-width: 1160px;
+  margin-inline: auto;
+}
 [data-pro-steps-form-content] {
-  padding-block: var(--antdv-next-pro-padding-lg, 24px);
+  width: max-content;
+  min-width: min(420px, 100%);
+  max-width: 100%;
+  margin-inline: auto;
+}
+[data-pro-steps-form-step] {
+  margin-block-start: 32px;
+}
+[data-pro-steps-form-step] > form {
+  max-width: 100%;
 }

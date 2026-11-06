@@ -48,6 +48,12 @@ Pro classes default to `ant-pro-card`. Native `prefixCls="demo"` produces `demo-
 
 Headers have no separator by default; enable `headerBordered` to show it. `variant="borderless"` removes the border. `ghost` provides a transparent background without borders, shadows, or body padding. Regular borders follow the native Card configuration.
 
+Cards have no shadow by default. ProTable uses this behavior for both its search and table cards. Enable `boxShadow` for a theme shadow, use `hoverable` for a shadow on hover, or customize it through `styles.root.boxShadow`.
+
+`boxShadow` uses `boxShadowTertiary`; `ghost` takes precedence over the built-in shadow. Card's `headerPadding/headerPaddingSM` control horizontal header spacing. Headers without a separator use `padding` vertically, or `paddingXS` for small cards.
+
+Regular cards inherit native Card borders, radius, body spacing, and title weight, following the ProComponents 3.x regular Card path. These defaults differ from the stable 2.x website.
+
 ## Responsive columns and members
 
 The parent wraps direct child ProCards in columns. Numeric `colSpan` values use a 24-column grid; strings set the width and `0` hides a column. Responsive maps use `xs/sm/md/lg/xl/xxl` and update with the window width. Set `colStyle` on the parent to style each child column wrapper.
@@ -60,6 +66,8 @@ The parent wraps direct child ProCards in columns. Numeric `colSpan` values use 
 ```
 
 `direction="row"` arranges cards horizontally; `direction="column"` arranges them vertically. `wrap` allows wrapping. `gutter` accepts a number, a responsive map, or a `[horizontal, vertical]` array. `split="vertical"` separates side-by-side cards, while `split="horizontal"` separates stacked cards. `layout="center"` centers content.
+
+Cards containing child ProCards, including fragments produced by `v-for`, and cards with `split` default to zero body padding. Explicit `bodyStyle/styles.body` can override it. Setting only `direction/gutter` leaves ordinary content layout unchanged. Separators follow the theme's `lineWidth/lineType/colorSplit`.
 
 `ProCard.Group` / named `ProCardGroup` uses a transparent parent card and defaults to a row. `ProCard.Divider` / `ProCardDivider` renders a separator with `type="vertical"` by default, or `horizontal`.
 
@@ -85,6 +93,8 @@ The parent wraps direct child ProCards in columns. Numeric `colSpan` values use 
 
 `tabs.cardProps.ghost` controls the compact transparent tab-content state. The entire object is not forwarded as a card configuration to every panel; this matches the pinned upstream usage. `ProCard.TabPane` / `ProCardTabPane` preserves historical website usage with `key`, `tab`, `disabled`, and a `cardProps` object configuring that pane's own card. Prefer `tabs.items` for new usage. TabPane is a compatibility member rather than an export present in the pinned upstream commit.
 
+Tabs manage navigation and content spacing separately, with zero outer Card body padding by default. Override semantic parts through `tabs.styles`; `tabs.cardProps.ghost` defaults tab content padding to zero.
+
 ## Collapse, loading, and checked state
 
 `collapsible` and `collapsible="header"` toggle from the title area. `collapsible="icon"` toggles only from the collapse button. Extra actions, interactive title controls, and nested cards do not collapse the parent. The button supports Enter and Space, with localized labels.
@@ -92,6 +102,8 @@ The parent wraps direct child ProCards in columns. Numeric `colSpan` values use 
 Use `defaultCollapsed` for an uncontrolled initial value or `v-model:collapsed` for controlled state. Collapsing hides content and preserves input state. `loading` uses the native Card loading state, replaceable through `#loading`. Ordinary content unmounts while loading.
 
 Providing `checked` enables controlled selection. Click, Enter, and Space emit `checked`; the parent updates the value. `disabled` prevents selection and collapse and inherits native global disabled state when omitted. `boxShadow` uses the active theme shadow.
+
+Checked cards use the theme's `controlItemBgActive/controlOutline` for their background and border, with a primary-colored corner marker.
 
 ## API
 

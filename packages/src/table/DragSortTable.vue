@@ -8,9 +8,9 @@
 >
 import type { DragSortTableProps } from './enhancements'
 import type { ProTableInstance, ProKey, ProColumns } from '../types'
-import { ref, shallowRef, computed, h, watch, getCurrentInstance } from 'vue'
+import { ref, shallowRef, computed, h, watch, getCurrentInstance, type CSSProperties } from 'vue'
 import { HolderOutlined } from '@antdv-next/icons'
-import { useProPrefix, useIntl } from '../provider'
+import { useProPrefix, useIntl, useProConfig } from '../provider'
 import { resolveRowKey } from './utils'
 import { useTableRef } from './useTableRef'
 import ProTable from '../ProTable.vue'
@@ -26,6 +26,17 @@ const rows = shallowRef<T[]>(props.dataSource ?? props.defaultDataSource ?? [])
 const dragging = ref<ProKey>()
 const prefix = useProPrefix('table', () => props.prefixCls)
 const intl = useIntl()
+const { token } = useProConfig()
+const handleStyles = computed<CSSProperties>(() => ({
+  '--pro-table-drag-control-height': `${token.value.controlHeightSM}px`,
+  '--pro-table-drag-margin': `${token.value.marginSM}px`,
+  '--pro-table-drag-color': token.value.colorTextSecondary,
+  '--pro-table-drag-icon-color': token.value.colorText,
+  '--pro-table-drag-background-hover': token.value.colorInfoBg,
+  '--pro-table-drag-font-size': `${token.value.fontSize}px`,
+  '--pro-table-drag-border-radius': `${token.value.borderRadius}px`,
+  '--pro-table-drag-motion-duration': token.value.motionDurationMid,
+}))
 const instance = getCurrentInstance()
 const bindings = computed(() => {
   Object.values(props)
@@ -86,6 +97,7 @@ function handle(record: T, index: number) {
       draggable: true,
       'data-pro-table-drag-handle': '',
       class: `${prefix.value}-drag-icon`,
+      style: handleStyles.value,
       'aria-label': intl.value.getMessage('tableToolBar.columnDrag', '拖动排序'),
       onDragstart: (event: DragEvent) => {
         dragging.value = key(record)
@@ -146,12 +158,32 @@ defineExpose<ProTableInstance<T>>(useTableRef(table))
 </template>
 <style>
 [data-pro-table-drag-handle] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pro-table-drag-control-height);
+  min-height: var(--pro-table-drag-control-height);
+  margin-inline-end: var(--pro-table-drag-margin);
   border: 0;
+  border-radius: var(--pro-table-drag-border-radius);
   background: transparent;
-  color: inherit;
+  color: var(--pro-table-drag-color);
   cursor: grab;
-  padding: 6px;
+  padding: 0;
+  font-size: var(--pro-table-drag-font-size);
   touch-action: none;
+  transition:
+    color var(--pro-table-drag-motion-duration),
+    background-color var(--pro-table-drag-motion-duration);
+}
+[data-pro-table-drag-handle] [role='img'] {
+  color: var(--pro-table-drag-icon-color);
+  font-size: inherit;
+}
+[data-pro-table-drag-handle]:hover,
+[data-pro-table-drag-handle]:active {
+  color: var(--pro-table-drag-icon-color);
+  background: var(--pro-table-drag-background-hover);
 }
 [data-pro-table-drag-handle]:active {
   cursor: grabbing;

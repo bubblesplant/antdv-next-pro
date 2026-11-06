@@ -31,6 +31,8 @@ import { useProFormContext, useProFormNamePath } from './context'
 import { flattenChildren, resolveSemantic, useFormPrefix } from './utils'
 import { useOverlaySubmitLock } from './useOverlaySubmitLock'
 import { defaultCollapseRender } from './query-filter/Actions'
+import { provideOverlayFormFooter } from './useOverlayFormFooter'
+import { useFormThemeVars } from './useFormThemeVars'
 
 export function pickFormProps(props: Record<string, unknown>) {
   return Object.fromEntries(Object.keys(proFormProps).map((key) => [key, props[key]]))
@@ -88,9 +90,12 @@ export function createDialogForm(kind: 'ModalForm' | 'DrawerForm') {
       const inner = ref<ProFormInstance>()
       const api = proxyForm(inner)
       const local = ref(false)
-      const { prefix, t } = useFormPrefix('form', () => props.prefixCls)
+      const { prefix, t, config } = useFormPrefix('form', () => props.prefixCls)
       const closeLock = useOverlaySubmitLock(() => props.submitTimeout)
       const open = computed(() => props.open ?? local.value)
+      const footer = provideOverlayFormFooter(
+        computed(() => props.submitter !== false && !slots.footer),
+      )
       let revision = 0
       let alive = true
       onBeforeUnmount(() => {
@@ -122,12 +127,19 @@ export function createDialogForm(kind: 'ModalForm' | 'DrawerForm') {
         const options = kind === 'ModalForm' ? props.modalProps : props.drawerProps
         const sourceSubmitter = props.submitter === false ? undefined : props.submitter
         const sourceReset = sourceSubmitter?.resetButtonProps
+        const okText = props.modalProps?.okText ?? config.value.locale?.Modal?.okText
         const submitter: false | SubmitterProps =
-          props.submitter === false
+          props.submitter === false || slots.footer
             ? false
             : {
                 ...sourceSubmitter,
                 searchConfig: {
+                  submitText:
+                    sourceSubmitter?.submitText ??
+                    (kind === 'ModalForm'
+                      ? ((typeof okText === 'function' ? okText() : okText) ??
+                        t('form.lightFilter.confirm', '确认'))
+                      : t('tableForm.submit', '提交')),
                   resetText: sourceSubmitter?.resetText ?? t('editableTable.action.cancel', '取消'),
                   ...sourceSubmitter?.searchConfig,
                 },
@@ -160,8 +172,8 @@ export function createDialogForm(kind: 'ModalForm' | 'DrawerForm') {
               ...options,
               open: open.value,
               title: props.title ?? options?.title,
-              width: props.width ?? options?.width,
-              footer: null,
+              width: options?.width ?? props.width ?? 800,
+              footer: footer.enabled.value || slots.footer ? undefined : null,
               ...(kind === 'ModalForm'
                 ? {
                     afterClose: () => {
@@ -197,6 +209,16 @@ export function createDialogForm(kind: 'ModalForm' | 'DrawerForm') {
             },
             {
               ...slots,
+              footer:
+                slots.footer ??
+                (footer.enabled.value
+                  ? () =>
+                      h('div', {
+                        ref: footer.target,
+                        'data-pro-overlay-footer': '',
+                        style: { display: 'flex', justifyContent: 'flex-end' },
+                      })
+                  : undefined),
               default: () =>
                 h(
                   ProForm,
@@ -248,11 +270,12 @@ export const QueryFilter = defineComponent({
   inheritAttrs: false,
   props: {
     ...proFormProps,
+    layout: { ...proFormProps.layout, default: 'horizontal' },
     collapsed: { type: Boolean, default: undefined },
     defaultCollapsed: { type: Boolean, default: true },
     defaultColsNumber: { type: Number, default: 3 },
     span: [Number, Object] as PropType<QueryFilterProps['span']>,
-    labelWidth: [Number, String] as PropType<QueryFilterProps['labelWidth']>,
+    labelWidth: { type: [Number, String] as PropType<QueryFilterProps['labelWidth']>, default: 80 },
     split: Boolean,
     searchText: null,
     resetText: null,
@@ -283,6 +306,7 @@ export const QueryFilter = defineComponent({
     const local = ref(props.defaultCollapsed)
     const collapsed = computed(() => props.collapsed ?? local.value)
     const { prefix, t } = useFormPrefix('query-filter', () => props.prefixCls)
+    const themeVars = useFormThemeVars()
     const breakpoint = computed(() =>
       width.value < 576
         ? 'xs'
@@ -393,13 +417,14 @@ export const QueryFilter = defineComponent({
         'div',
         {
           ref: root,
+          'data-pro-query-filter': '',
           class: [
             `${prefix.value}-container`,
             attrs.class,
             semantic.classes.root,
             { [`${prefix.value}-split`]: props.split },
           ],
-          style: [attrs.style, semantic.styles.root],
+          style: [themeVars.value, attrs.style, semantic.styles.root],
         },
         [
           h(
@@ -407,9 +432,14 @@ export const QueryFilter = defineComponent({
             {
               ...attrs,
               ...pickFormProps(props),
+              class: undefined,
+              style: undefined,
+              classes: { ...semantic.classes, root: undefined },
+              classNames: undefined,
+              styles: { ...semantic.styles, root: undefined },
               ref: inner,
               prefixCls: prefix.value,
-              layout: 'horizontal',
+              layout: props.layout,
               submitter: false,
               labelCol:
                 props.labelWidth === undefined
@@ -692,6 +722,7 @@ export const LightFilter = defineComponent({
           prefixCls: prefix.value,
           layout: 'inline',
           submitter: false,
+          'data-pro-light-filter': size,
           class: [attrs.class, semantic.classes.root],
           style: [attrs.style, semantic.styles.root],
           'onUpdate:modelValue': (values: unknown) => emit('update:modelValue', values),

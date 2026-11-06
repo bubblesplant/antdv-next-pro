@@ -40,6 +40,12 @@ ProTable、ProDescriptions、表单字段共用的字段渲染器。`mode="read"
 
 index / indexBorder、option、avatar 在三种模式下始终展示。progress / second 编辑时为数字输入，fromNow 编辑时为日期时间，image 为 URL 输入，code / jsonCode 为多行文本。Schema 的 group / formList / formSet / divider / dependency 由 BetaSchemaForm 处理，直接作为 ProField 时不会生成输入框。
 
+只读 `code` / `jsonCode` 使用带背景的代码块，默认内边距 16px、圆角 3px，并采用主题中的代码字体和次要文本颜色。`jsonCode` 格式化有效 JSON；`fieldProps.class/style` 可定制代码块，`classes.control` / `styles.control` 的同名样式优先。
+
+只读 `textarea` 在未启用 `copyable` / `ellipsis` 时保留换行并对长文本自动折行；`text` 也支持长文本折行。切换只读模式时仍保留 `control` 语义样式和实例前缀。
+
+编辑态 `digitRange` 使用紧凑数字输入组合，分隔符采用主题边框、背景及次要文本颜色。通过 `fieldProps.separator` / `separatorWidth` 设置分隔符和像素宽度，默认分别为 `~` / `30`；`placeholder` 数组分别作用于两端，`fieldProps.style` 设置组合容器样式。
+
 ## 原子字段与金额
 
 `FieldText`、`FieldSelect`、`FieldMoney`、`FieldDatePicker` 等具名原子复用相同协议。`FieldMoney` 另外公开 `locale`、`customSymbol`、`moneySymbol`、`numberFormatOptions`、`numberPopoverRender`；默认两位小数，遵循 locale 的分组、小数符号和货币位置。`numberPopoverRender=false` 关闭编辑态金额提示。

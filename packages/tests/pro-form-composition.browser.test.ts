@@ -381,7 +381,9 @@ describe('ProForm composed real controls', () => {
       expect(open.value).toBe(true)
       expect(nativeClose).not.toHaveBeenCalled()
       await vi.waitFor(() => expect(button('取消').disabled).toBe(false))
-      expect(button('提交').classList.contains('ant-btn-loading')).toBe(true)
+      expect(
+        button(layoutType === 'ModalForm' ? '确认' : '提交').classList.contains('ant-btn-loading'),
+      ).toBe(true)
       form.value.setFieldValue('name', 'Grace')
       button('取消').click()
       await tick()
@@ -1126,12 +1128,16 @@ describe('ProForm composed real controls', () => {
     ).toBe(true)
     const content = wrapper.get('[data-pro-form-group-content]').element
     const row = wrapper.get('.demo-form-item-row').element
-    expect(getComputedStyle(content).gap).toBe('32px')
-    expect(getComputedStyle(row).flexDirection).toBe('column')
+    expect(getComputedStyle(content).columnGap).toBe('32px')
+    expect(getComputedStyle(content).rowGap).toBe('0px')
+    expect(getComputedStyle(content).paddingInlineStart).toBe('16px')
+    expect(getComputedStyle(row).flexDirection).toBe('row')
     padding.value = 40
     labelLayout.value = 'inline'
     await tick()
-    expect(getComputedStyle(content).gap).toBe('40px')
+    expect(getComputedStyle(content).columnGap).toBe('40px')
+    expect(getComputedStyle(content).rowGap).toBe('0px')
+    expect(getComputedStyle(content).paddingInlineStart).toBe('0px')
     expect(getComputedStyle(row).flexDirection).toBe('row')
     expect(wrapper.find('.demo-pro-form-group-twoLine').exists()).toBe(false)
   })

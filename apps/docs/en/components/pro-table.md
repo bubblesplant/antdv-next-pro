@@ -103,6 +103,8 @@ Without `span`, the query form uses one, two or three columns according to its c
 
 The query form appears above a card containing the toolbar, table and pagination. Both areas reuse [ProCard](./pro-card), inheriting native Card backgrounds, padding, border radius, dark themes, and component token overrides. Set `toolbar: false` to hide the toolbar.
 
+`cardProps` configures the table card. Its `styles` accepts a semantic object or `({ props }) => semantic styles`, receiving the actual ProCard props. Body styles merge default spacing, `bodyStyle`, then `styles.body`. `variant` takes precedence over the legacy `bordered` prop; an explicit `cardBordered.table` or boolean `cardBordered` overrides both. With `options: false` and no title or actions, no empty toolbar is rendered. Hidden toolbars default to zero card body padding.
+
 Enable keyword search with `options.search`, including when the query form is disabled:
 
 ```vue

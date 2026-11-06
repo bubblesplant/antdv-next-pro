@@ -209,6 +209,8 @@ The default Cancel button closes the dialog, invokes its native close callback, 
 
 Per-field mode removes empty URL values; named-key mode stores the complete model. The component listens to `popstate` / `hashchange` and hydrates again, which is useful for shareable filters. URL values override the request result during initialization but are still overridden by explicit `modelValue`.
 
+ModalForm and DrawerForm default to `800px` wide, with actions aligned to the end in the native footer. Modal defaults to Confirm and Drawer to Submit. Width, native overlay options, and submitter text can override these defaults; see [ProForm layouts](./pro-form). Standard schema form actions align to the start, and group fields reuse ProFormGroup title spacing and semantic styling.
+
 ## API
 
 ### Props
@@ -321,4 +323,4 @@ await formRef.value?.next()
 
 Forms inherit native ConfigProvider locale, direction, componentSize/Disabled, prefixCls, theme algorithms, global tokens, and native Form/Input component tokens. Pro extensions use ProConfigProvider.token and valueTypeMap. Standard forms use ant-pro-form; query, light, and step layouts use ant-pro-query-filter, ant-pro-form-light-filter, and ant-pro-steps-form. Step navigation, content, and the active step expose -steps-container, -container, and -step-active. Native prefix demo produces demo-pro classes; explicit prefixCls overrides the layout prefix.
 
-classes/styles accept an object or `({ props }) => object`; classes wins over legacy classNames for the same part. Schema supports root/content, step submitter, and the applicable filter parts such as row/item/actions/container/collapseButton. Configure the internal standard form through formProps classes/styles. class/style/id/data-_/aria-_ target the visible form or layout container; modalProps/drawerProps configure the overlay shell.
+classes/styles accept an object or `({ props }) => object`; classes wins over legacy classNames for the same part. Schema supports root/content, the internal form, submitter actions, and applicable filter parts such as row/item/actions/container/collapseButton. The internal standard form also accepts formProps classes/styles. class/style/id/data-_/aria-_ target the visible form or layout container; modalProps/drawerProps configure the overlay shell.

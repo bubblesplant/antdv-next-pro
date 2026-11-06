@@ -62,7 +62,7 @@ The v3 renderer is `(dom, record, index, action, schema)`: the first argument is
 | `columns` / `metas`                                       | `ProListColumn<T>[]` / `ProListMetas<T>`                                                       |
 | `grid`                                                    | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`; numbers specify items per row           |
 | `itemLayout`                                              | horizontal or vertical                                                                         |
-| `split`                                                   | Dividers, enabled by default                                                                   |
+| `split`                                                   | Dividers and row radius; see the three states below                                            |
 | `showActions` / `showExtra`                               | always or hover; hover content also appears on keyboard focus within the row                   |
 | `itemRender`                                              | `(record, index, defaultDom) => VNodeChild`, replaces the entire item                          |
 | `itemTitleRender` / `itemHeaderRender`                    | The same signature for the title or header; false hides that region                            |
@@ -74,7 +74,11 @@ The v3 renderer is `(dom, record, index, action, schema)`: the first argument is
 
 ProList disables search, options and pagination by default; pass explicit configurations to enable them. Other request, toolbar and editing props follow ProTable. BaseProList additionally defaults cardProps, search and toolBarRender to false; each default can be overridden.
 
+Omitting `split` gives no dividers and zero row radius. Setting it to `false` gives no dividers and themed row radius; setting it to `true` gives dividers and zero row radius.
+
 With grid enabled, each item uses the existing ProCard. Pass card props through itemCardProps. Set cardActionProps="actions" on the actions schema, such as metas.actions, to place actions in the card footer; extra or an omitted value places them in the header extra region. Grid breakpoint numbers specify cards per row.
+
+The list root has a transparent background by default. Grid items retain their ProCard backgrounds and padding; the surrounding list rows add no extra padding or dividers.
 
 ## Events, slots and ref
 

@@ -11,6 +11,8 @@ import SchemaQueryFilter from '../../playground/src/demos/query-filter/SchemaQue
 
 `QueryFilter` 是可独立使用的查询表单，支持响应式栅格、查询、重置及展开收起。`ProTable` 的默认搜索区域也使用这个组件。可以组合 `ProForm` 字段，也可以传入 `columns` 生成字段。
 
+默认使用横向表单布局，根容器内边距和字段行间距均为 `24px`，字段不额外叠加 Form.Item 的底部间距。可显式设置 `layout="vertical"`；`styles.root/row/item/actions` 可定制对应区域。
+
 ## 引入
 
 ```ts
@@ -67,7 +69,7 @@ import '@bubblesjs/antdv-next-pro/style.css'
 | `defaultCollapsed`                | `boolean`                                                 | `true`                                       |
 | `defaultColsNumber`               | `number`                                                  | `3`，较宽容器的默认列数                      |
 | `span`                            | `number \| Record<string, number>`                        | 24 栅格列宽，断点为 `xs/sm/md/lg/xl`         |
-| `labelWidth`                      | `number \| 'auto'`                                        | 标签宽度，数字单位为 px                      |
+| `labelWidth`                      | `number \| 'auto'`                                        | 标签宽度，默认 80，数字单位为 px             |
 | `split`                           | `boolean`                                                 | `false`，分隔样式                            |
 | `searchText` / `resetText`        | `VNodeChild`                                              | 默认使用国际化查询 / 重置文案                |
 | `optionRender`                    | `false \| (props, form, doms) => VNodeChild`              | 定制查询、重置操作；`false` 隐藏操作按钮     |

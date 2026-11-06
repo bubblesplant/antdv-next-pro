@@ -677,7 +677,7 @@ describe('auxiliary components', () => {
       defineComponent(
         () => () =>
           h(ConfigProvider, { prefixCls: prefix.value, direction: 'rtl', locale: enUS }, () =>
-            h(ProConfigProvider, { token: { paddingLG: padding.value } }, () => [
+            h(ProConfigProvider, { token: { padding: padding.value, paddingLG: 90 } }, () => [
               h(DropdownFooter, {
                 onClear: clear,
                 classNames: { root: 'legacy' },
@@ -701,12 +701,16 @@ describe('auxiliary components', () => {
     expect(footer.text()).toContain('Clear')
     await footer.findAll('button')[0]!.trigger('click')
     expect(clear).toHaveBeenCalledTimes(1)
-    expect(getComputedStyle(wrapper.get('[data-pro-toolbar]').element).paddingTop).toBe('20px')
+    expect(getComputedStyle(wrapper.get('[data-pro-toolbar-container]').element).paddingTop).toBe(
+      '30px',
+    )
     padding.value = 45
     prefix.value = 'changed'
     await flushPromises()
     expect(footer.classes()).toContain('changed-pro-core-field-dropdown-footer')
-    expect(getComputedStyle(wrapper.get('[data-pro-toolbar]').element).paddingTop).toBe('30px')
+    expect(getComputedStyle(wrapper.get('[data-pro-toolbar-container]').element).paddingTop).toBe(
+      '45px',
+    )
   })
 
   it('calls toolbar search/tab/menu callbacks once and renders multiple-line structure', async () => {

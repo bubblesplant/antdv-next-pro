@@ -17,11 +17,22 @@ import RenderView from '../components/RenderView.vue'
 const props = withDefaults(defineProps<ProListViewProps<T>>(), {
   itemTitleRender: undefined,
   itemHeaderRender: undefined,
+  split: undefined,
 })
 const slots = useSlots()
 const prefix = useProPrefix('list', () => props.prefixCls)
-const { direction } = useProConfig()
+const { direction, token } = useProConfig()
 const themeVars = useThemeVars()
+const tokenStyles = computed<CSSProperties>(() => ({
+  '--pro-list-padding-xs': `${token.value.paddingXS}px`,
+  '--pro-list-margin-sm': `${token.value.marginSM}px`,
+  '--pro-list-color-text-description': token.value.colorTextDescription,
+  '--pro-list-color-selected': token.value.colorPrimaryBgHover,
+  '--pro-list-color-hover': `color-mix(in srgb, ${token.value.colorTextBase} 2%, transparent)`,
+  '--pro-list-line-width': `${token.value.lineWidth}px`,
+  '--pro-list-line-type': token.value.lineType,
+  '--pro-list-line-height': token.value.lineHeight,
+}))
 const tableView = inject<ProTableViewContext<T>>(proTableViewKey)
 const selected = ref<import('../types').ProKey[]>(
   props.rowSelection ? (props.rowSelection.defaultSelectedRowKeys ?? []) : [],
@@ -187,6 +198,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
     {
       class: [`${prefix.value}-row-header-container`, props.classes?.header],
       style: props.styles?.header,
+      'data-pro-list-row-header': '',
     },
     [
       selection,
@@ -200,6 +212,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
             props.classes?.title,
           ],
           style: props.styles?.title,
+          'data-pro-list-row-title': '',
         },
         [titleDom],
       ),
@@ -209,6 +222,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
             {
               class: [`${prefix.value}-row-sub-title`, props.classes?.subTitle],
               style: props.styles?.subTitle,
+              'data-pro-list-row-sub-title': '',
             },
             [slots.subTitle?.({ record, index }) ?? renderSlot(record, index, 'subTitle')],
           )
@@ -242,6 +256,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
               props.classes?.description,
             ],
             style: props.styles?.description,
+            'data-pro-list-row-description': '',
           },
           [slots.description?.({ record, index }) ?? renderSlot(record, index, 'description')],
         )
@@ -283,7 +298,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
       :class="[prefix, classes?.root]"
       :dir="direction"
       data-pro-list
-      :style="[themeVars, gridStyles, styles?.root]"
+      :style="[themeVars, tokenStyles, gridStyles, styles?.root]"
     >
       <Empty v-if="!dataSource?.length" />
       <ul
@@ -314,9 +329,11 @@ function renderGridCard(record: T, index: number): VNodeChild {
           :data-row-key="keyOf(record, index)"
           data-pro-list-row
           :data-split="split !== false || undefined"
+          :data-split-border="split === true || undefined"
           :data-layout="itemLayout"
           :data-actions="showActions"
           :data-extra="showExtra"
+          :data-selected="selectedKeys.includes(keyOf(record, index)) || undefined"
         >
           <RenderView :render="itemRender ? (dom) => itemRender!(record, index, dom) : undefined">
             <RenderNode v-if="grid" :content="renderGridCard(record, index)" />
@@ -360,7 +377,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
                     <div v-if="meta('avatar')" :class="`${prefix}-item-meta-avatar`">
                       <RenderNode :content="renderSlot(record, index, 'avatar')" />
                     </div>
-                    <div :class="`${prefix}-item-meta-content`">
+                    <div :class="`${prefix}-item-meta-content`" data-pro-list-meta-content>
                       <div
                         :class="[
                           `${prefix}-row-header`,
@@ -380,6 +397,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
                               classes?.title,
                             ]"
                             :style="styles?.title"
+                            data-pro-list-row-title
                           >
                             <slot name="title" :record="record" :index="index"
                               ><RenderNode :content="renderSlot(record, index, 'title')"
@@ -389,6 +407,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
                           v-if="meta('subTitle')"
                           :class="[`${prefix}-row-sub-title`, classes?.subTitle]"
                           :style="styles?.subTitle"
+                          data-pro-list-row-sub-title
                           ><RenderNode :content="renderSlot(record, index, 'subTitle')"
                         /></span>
                       </div>
@@ -400,6 +419,7 @@ function renderGridCard(record: T, index: number): VNodeChild {
                           classes?.description,
                         ]"
                         :style="styles?.description"
+                        data-pro-list-row-description
                       >
                         <slot name="description" :record="record" :index="index"
                           ><RenderNode :content="renderSlot(record, index, 'description')"
@@ -464,8 +484,14 @@ function renderGridCard(record: T, index: number): VNodeChild {
 </template>
 <style>
 [data-pro-list] {
+  box-sizing: border-box;
   color: var(--antdv-next-pro-color-text);
-  background: var(--antdv-next-pro-color-bg-container);
+  background: transparent;
+}
+[data-pro-list] *,
+[data-pro-list] *::before,
+[data-pro-list] *::after {
+  box-sizing: border-box;
 }
 [data-pro-list-container] {
   list-style: none;
@@ -478,17 +504,37 @@ function renderGridCard(record: T, index: number): VNodeChild {
   gap: var(--pro-list-gap, 16px);
 }
 [data-pro-list-row] {
-  padding: calc(var(--antdv-next-pro-padding-lg, 24px) * 2 / 3) 0;
+  padding: var(--pro-list-padding-xs);
+  border-radius: var(--antdv-next-pro-border-radius);
   min-width: 0;
 }
-[data-pro-list-row][data-split] + [data-pro-list-row] {
-  border-block-start: 1px solid var(--antdv-next-pro-color-border-secondary, #f0f0f0);
+[data-pro-list-row][data-split] {
+  border-radius: 0;
+}
+[data-pro-list-row][data-split-border]:not(:last-child) {
+  border-block-end: var(--pro-list-line-width) var(--pro-list-line-type)
+    var(--antdv-next-pro-color-split);
+}
+[data-pro-list-container][data-grid] > [data-pro-list-row] {
+  padding: 0;
+  border: 0;
+}
+[data-pro-list-row]:hover,
+[data-pro-list-row]:focus-within {
+  background: var(--pro-list-color-hover);
+}
+[data-pro-list-row][data-selected] {
+  background: var(--pro-list-color-selected);
+}
+[data-pro-list-container][data-grid] > [data-pro-list-row]:hover,
+[data-pro-list-container][data-grid] > [data-pro-list-row]:focus-within {
+  background: transparent;
 }
 [data-pro-list-row-container],
 [data-pro-list-row-header] {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--antdv-next-pro-margin-xs);
 }
 [data-pro-list-row-main] {
   flex: 1;
@@ -497,24 +543,61 @@ function renderGridCard(record: T, index: number): VNodeChild {
 [data-pro-list-meta] {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--antdv-next-pro-margin-xs);
 }
-[data-pro-list-row-header] {
-  margin-block-end: 8px;
+[data-pro-list-meta-content] {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--antdv-next-pro-margin-xxs);
+}
+[data-pro-list-row-header],
+[data-pro-list-row-title] {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+[data-pro-list-row-title] {
+  display: flex;
+  align-items: center;
+  gap: var(--antdv-next-pro-margin-xs);
+  margin: 0;
+  color: var(--antdv-next-pro-color-text);
+  font-size: var(--antdv-next-pro-font-size);
+  font-weight: var(--antdv-next-pro-font-weight-strong);
+  line-height: var(--pro-list-line-height);
+  word-break: break-word;
+}
+[data-pro-list-row-sub-title] {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--antdv-next-pro-margin-xxs);
+  color: var(--antdv-next-pro-color-text-secondary);
+}
+[data-pro-list-row-description] {
+  margin-block-start: var(--antdv-next-pro-margin-xxs);
+  color: var(--pro-list-color-text-description);
+  font-size: var(--antdv-next-pro-font-size);
+  line-height: var(--pro-list-line-height);
+  word-break: break-all;
 }
 [data-pro-list-row-actions] {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--pro-list-margin-sm);
 }
 [data-pro-list-row][data-actions='hover'] [data-pro-list-row-actions],
 [data-pro-list-row][data-extra='hover'] [data-pro-list-row-extra] {
-  visibility: hidden;
+  /* Match upstream hover-only controls: hidden actions release their row space. */
+  display: none;
 }
 [data-pro-list-row]:hover [data-pro-list-row-actions],
 [data-pro-list-row]:focus-within [data-pro-list-row-actions],
 [data-pro-list-row]:hover [data-pro-list-row-extra],
 [data-pro-list-row]:focus-within [data-pro-list-row-extra] {
-  visibility: visible;
+  display: flex;
 }
 [data-pro-list-row][data-layout='vertical'] [data-pro-list-row-container] {
   align-items: flex-start;

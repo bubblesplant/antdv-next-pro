@@ -17,8 +17,17 @@ const { prefix, direction, classes, styles, themeVars } = useAuxiliaryStyle(
   'core-field-dropdown',
 )
 const popoverBindings = computed(() => {
-  const { onOpenChange, styles, ...rest } = props.popoverProps ?? {}
+  const { onOpenChange, styles, classes, ...rest } = props.popoverProps ?? {}
   return rest
+})
+const popoverClasses = computed(() => {
+  const source = props.popoverProps?.classes
+  const resolved =
+    typeof source === 'function' ? source({ props: props.popoverProps ?? {} }) : source
+  return {
+    ...resolved,
+    root: [`${prefix.value}-overlay`, resolved?.root].filter(Boolean).join(' '),
+  }
 })
 const popoverStyles = computed(() => {
   const source = props.popoverProps?.styles
@@ -28,6 +37,7 @@ const popoverStyles = computed(() => {
     ...resolved,
     container: {
       padding: 0,
+      minWidth: '200px',
       boxShadow: 'var(--antdv-next-pro-box-shadow-secondary)',
       ...themeVars.value,
       ...resolved?.container,
@@ -50,7 +60,7 @@ function setOpen(value: boolean) {
     :open="opened && !disabled"
     trigger="click"
     :placement="placement ?? popoverProps?.placement"
-    :classes="{ root: `${prefix}-overlay` }"
+    :classes="popoverClasses"
     :styles="popoverStyles"
     @open-change="setOpen"
     ><template #content
@@ -59,10 +69,7 @@ function setOpen(value: boolean) {
         :style="[
           themeVars,
           {
-            padding:
-              padding === undefined
-                ? 'calc(var(--antdv-next-pro-padding-lg,24px) * 2 / 3)'
-                : `${padding}px`,
+            padding: `${padding ?? 16}px`,
           },
           styles.content,
         ]"
@@ -71,7 +78,11 @@ function setOpen(value: boolean) {
       >
         <slot />
       </div>
-      <DropdownFooter v-if="footer" v-bind="footer" :footer-render="footerRender" /></template
+      <DropdownFooter
+        v-if="footer"
+        :disabled="disabled"
+        v-bind="footer"
+        :footer-render="footerRender" /></template
     ><span
       v-bind="$attrs"
       :class="[`${prefix}-label`, prefix, classes.root, $attrs.class]"

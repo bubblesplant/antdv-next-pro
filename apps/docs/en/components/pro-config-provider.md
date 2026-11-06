@@ -57,23 +57,37 @@ Pro search/edit/form actions, boolean fields, captcha and upload text use this c
 
 The following Pro tokens have rendered consumers. Native components separately resolve their own component tokens. Inheriting the GlobalToken type does not imply that every native token controls a Pro custom area.
 
-| Token                   | Rendered consumers                                                                                      |
-| ----------------------- | ------------------------------------------------------------------------------------------------------- |
-| `colorText`             | Field root, Table, forms, List, FieldLabel, DropdownFooter                                              |
-| `colorTextSecondary`    | Card subtitle/tooltip, Table secondary text, LabelIconTip                                               |
-| `colorPrimary`          | Card selection outline, selected Table column settings                                                  |
-| `colorPrimaryBg`        | Table selection/alert area                                                                              |
-| `colorBgContainer`      | Fullscreen Table, List background                                                                       |
-| `colorBgElevated`       | Table column-settings popup, DropdownFooter                                                             |
-| `colorFillAlter`        | Table column-settings drag hover, SchemaForm list                                                       |
-| `colorBorderSecondary`  | Card/List dividers, DropdownFooter, Table alert                                                         |
-| `colorError`            | Table edit errors                                                                                       |
-| `boxShadowSecondary`    | FilterDropdown popup                                                                                    |
-| `paddingLG`             | Form Group gap, QueryFilter columns, Steps content, List rows, ListToolBar, FilterDropdown              |
-| `borderRadiusLG`        | Table popups/alert                                                                                      |
-| `margin`                | Field option action gap                                                                                 |
-| `boxShadow`             | Card with boxShadow enabled                                                                             |
-| `padding` / `paddingXS` | Card regular/small header padding fallback; explicit native Card headerPadding settings take precedence |
+| Token                                                         | Rendered consumers                                                                                                 |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `colorText`                                                   | Field root, Table, forms, List, FieldLabel, DropdownFooter                                                         |
+| `colorTextSecondary`                                          | Card subtitle/tooltip, Table secondary text, toolbar subtitle, LabelIconTip, code fields and digit-range separator |
+| `colorTextHeading`                                            | ListToolBar heading                                                                                                |
+| `colorTextPlaceholder` / `colorBgTextHover`                   | FieldLabel disabled text and hover background                                                                      |
+| `colorPrimary`                                                | Selected Table column settings                                                                                     |
+| `controlItemBgActive` / `controlOutline`                      | Card selection background and border                                                                               |
+| `colorPrimaryBg`                                              | Table selection/alert area                                                                                         |
+| `colorBgContainer`                                            | Fullscreen Table, digit-range separator; regular List roots are transparent                                        |
+| `colorBgElevated`                                             | Table column-settings popup, DropdownFooter                                                                        |
+| `colorFillAlter`                                              | Table column-settings drag hover                                                                                   |
+| `colorBorderSecondary`                                        | Table alert                                                                                                        |
+| `colorSplit` / `lineWidth` / `lineType`                       | Card/List dividers; DropdownFooter uses colorSplit                                                                 |
+| `colorBorder`                                                 | Digit-range separator border                                                                                       |
+| `colorError`                                                  | Table edit errors                                                                                                  |
+| `boxShadowSecondary`                                          | FilterDropdown popup                                                                                               |
+| `paddingLG`                                                   | QueryFilter column gap, Card tab content                                                                           |
+| `paddingXS`                                                   | List row padding, small Card vertical header padding, small Group gap                                              |
+| `marginXS` / `marginXXS`                                      | Submitter and toolbar gaps / FieldLabel icon gap                                                                   |
+| `marginLG` / `marginXL`                                       | FormList action bottom spacing and inline toolbar menu gap / Group heading bottom spacing                          |
+| `marginSM`                                                    | List content/action gaps, drag-handle spacing                                                                      |
+| `borderRadiusLG`                                              | Table popups/alert                                                                                                 |
+| `margin`                                                      | Field option action gap, ListToolBar extra-line bottom spacing                                                     |
+| `boxShadowTertiary`                                           | Card with boxShadow explicitly enabled                                                                             |
+| `padding`                                                     | ListToolBar vertical padding, regular Card headers without separators, vertical Card tab navigation                |
+| `fontSize` / `fontSizeSM` / `fontSizeLG` / `fontWeightStrong` | Toolbar and FieldLabel font sizes, toolbar heading weight                                                          |
+| `fontFamilyCode`                                              | Read-only code/jsonCode fields                                                                                     |
+| `controlHeight` / `controlHeightSM`                           | FormList action height / small actions and drag-handle height                                                      |
+
+Explicit native Card `headerPadding/headerPaddingSM` take precedence for horizontal header spacing; otherwise Pro `padding/paddingXS` provide the fallback. These native Card settings do not control vertical header spacing. FilterDropdown content padding defaults to a fixed 16px and can be overridden through its prop.
 
 Use `classes` / `styles` for local semantic styling.
 

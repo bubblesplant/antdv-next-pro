@@ -20,7 +20,8 @@ import type {
 } from './types'
 
 import { Button, FormItem } from 'antdv-next'
-import { computed, ref, shallowRef, toRaw, useSlots, watch, getCurrentInstance } from 'vue'
+import { PlusOutlined } from '@antdv-next/icons'
+import { computed, ref, shallowRef, toRaw, useSlots, watch, getCurrentInstance, h } from 'vue'
 
 import ProTable from './ProTable.vue'
 import RenderNode from './table/RenderNode.vue'
@@ -291,7 +292,12 @@ defineExpose<EditableProTableInstance<T>>({
           :class="`${prefix}-record-creator`"
           data-pro-table-record-creator
         >
-          <Button block type="dashed" v-bind="creatorBindings" @click="createRecord"
+          <Button
+            block
+            type="dashed"
+            :icon="h(PlusOutlined)"
+            v-bind="creatorBindings"
+            @click="createRecord"
             ><slot name="creator-button"
               ><RenderNode
                 :content="
@@ -306,7 +312,12 @@ defineExpose<EditableProTableInstance<T>>({
           :class="`${prefix}-record-creator`"
           data-pro-table-record-creator
         >
-          <Button block type="dashed" v-bind="creatorBindings" @click="createRecord"
+          <Button
+            block
+            type="dashed"
+            :icon="h(PlusOutlined)"
+            v-bind="creatorBindings"
+            @click="createRecord"
             ><slot name="creator-button"
               ><RenderNode
                 :content="
@@ -327,7 +338,9 @@ defineExpose<EditableProTableInstance<T>>({
   </component>
 </template>
 <style>
-[data-pro-table-record-creator] {
-  padding: 16px 0;
+[data-pro-table-record-creator] > button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
 }
 </style>

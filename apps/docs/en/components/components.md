@@ -64,6 +64,8 @@ const menus = [
 
 Returning false from search.onSearch suppresses the component search(value) event. Menu/tabs onChange(key) notify selection changes; accept controlled activeKey updates in the parent.
 
+Search appears on the right when a title, subtitle, tooltip or menu exists, and on the left otherwise. Its default width is 200px. Filters appear on the right in single-line mode; `multipleLine=true` puts filters and extra tabs on the next line. An empty toolbar has no action row. Row padding uses `token.padding`, and action gaps use `token.marginXS`.
+
 Slots: title, actions, settings, filter. Semantic parts: root, container, left, right, title, subTitle, extraLine. No separate instance methods.
 
 ## TableDropdown / TableDropdown.Button
@@ -107,6 +109,8 @@ The component ref forwards SchemaFormInstance. Search collects and validates val
 
 The default slot contains the panel, and label replaces the trigger. Semantic parts are root for the trigger and content for the panel. Customize the popup container with popoverProps.styles.container. Footer callbacks own clearing and closing behavior; no data changes happen automatically. No separate instance methods.
 
+The popup has a default minimum width of 200px and 16px content padding. Override the relevant parts through padding, semantic styles or native popup styles. Native popoverProps.classes are merged with the internal popup class.
+
 ## LightWrapper
 
 Combines FieldLabel and FilterDropdown. Props: label, value, open, disabled, allowClear, footerRender, placement. The default slot is panel content. Semantic parts: root, content.
@@ -119,6 +123,8 @@ Props: disabled, confirmText, clearText, onConfirm(event?), onClear(event?), foo
 
 FooterRender false renders nothing. A function receives `(confirm?, clear?)` and returns VNodeChild. Callbacks only notify; they do not wait for asynchronous operations, clear data or close a parent. Semantic parts: root, clear, confirm. Custom footerRender replaces the default buttons, so their parts no longer apply.
 
+The default clear and confirm buttons sit at opposite ends with 8px padding. Without onClear, the clear button is hidden while its space is preserved. Returning false from footerRender also hides the footer.
+
 ## FieldLabel / LabelIconTip
 
 | Component      | Props and behavior                                                                                                        | Slots                  | Semantic parts                 |
@@ -127,6 +133,8 @@ FooterRender false renders nothing. A function receives `(confirm?, clear?)` and
 | `LabelIconTip` | label, tooltip (string or TooltipProps), subTitle, ellipsis                                                               | Default replaces label | root, label, subTitle, tooltip |
 
 FieldLabel uses a focusable button. A value with onClear shows a clear control that stops propagation; otherwise an arrow is shown. Panel state belongs to the caller. Neither exposes separate instance methods.
+
+FieldLabel is 30px high by default and 24px under small component sizing; hover changes only its background. LabelIconTip applies ellipsis to the label while preserving separate subtitle and tooltip areas.
 
 ## InlineErrorFormItem
 

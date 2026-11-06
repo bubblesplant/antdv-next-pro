@@ -645,6 +645,9 @@ defineExpose({
     :field-props="fieldProps"
     :readonly-render="readonlyRender"
     v-bind="resolveReadonlyAttrs()"
+    :prefix-cls="prefixCls"
+    :classes="{ control: classes.control }"
+    :styles="{ control: styles.control }"
   />
 
   <div

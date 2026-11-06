@@ -90,6 +90,7 @@ export const StepForm = defineComponent({
       return h(
         'div',
         {
+          'data-pro-steps-form-step': '',
           class: [prefix.value, { [`${prefix.value}-active`]: active.value }],
           style: { display: active.value ? undefined : 'none' },
           'aria-hidden': !active.value,
@@ -337,11 +338,12 @@ export const StepsForm = defineComponent({
         'div',
         {
           ...attrs,
+          'data-pro-steps-form': '',
           class: [prefix.value, attrs.class, semantic.classes.root],
           style: [themeVars.value, attrs.style, semantic.styles.root],
         },
         [
-          h('div', { class: `${prefix.value}-steps-container` }, [
+          h('div', { 'data-pro-steps-form-header': '', class: `${prefix.value}-steps-container` }, [
             h(Steps, {
               ...props.stepsProps,
               current: current.value,
@@ -364,19 +366,21 @@ export const StepsForm = defineComponent({
               class: [`${prefix.value}-container`, semantic.classes.container],
               style: semantic.styles.container,
             },
-            flattenChildren(slots.default?.()),
+            [
+              ...flattenChildren(slots.default?.()),
+              props.submitter !== false &&
+                actions &&
+                h(
+                  'div',
+                  {
+                    'data-pro-steps-form-submitter': '',
+                    class: [`${prefix.value}-submitter`, semantic.classes.submitter],
+                    style: semantic.styles.submitter,
+                  },
+                  [h(Space, null, () => actions)],
+                ),
+            ],
           ),
-          props.submitter !== false &&
-            actions &&
-            h(
-              'div',
-              {
-                'data-pro-steps-form-submitter': '',
-                class: [`${prefix.value}-submitter`, semantic.classes.submitter],
-                style: semantic.styles.submitter,
-              },
-              [h(Space, null, () => actions)],
-            ),
         ],
       )
     }

@@ -64,6 +64,8 @@ const menus = [
 
 `search.onSearch` 返回 `false` 时不再发出组件 `search(value)` 事件。`menu.onChange(key)`、`tabs.onChange(key)` 提供选择变化通知；受控 activeKey 由调用方更新。
 
+标题、副标题、提示或菜单存在时，搜索框放在右侧；仅搜索时放在左侧，默认宽度为 200px。单行模式的 filter 放在右侧；`multipleLine=true` 时 filter 与额外 tabs 放在下一行。空工具栏不保留操作行。操作行上下间距使用 `token.padding`，操作间距使用 `token.marginXS`。
+
 插槽：`title`、`actions`、`settings`、`filter`。语义部位：`root`、`container`、`left`、`right`、`title`、`subTitle`、`extraLine`。无独立实例方法。
 
 ## TableDropdown / TableDropdown.Button
@@ -107,6 +109,8 @@ const menus = [
 
 默认插槽为面板内容，`label` 插槽为触发内容。语义部位是 `root`（触发节点）、`content`（浮层内容）；浮层容器可通过 `popoverProps.styles.container` 定制。footer 回调负责清空数据与关闭面板，组件不自动执行业务修改。无独立实例方法。
 
+浮层默认最小宽度为 200px，内容 padding 为 16px；`padding`、语义样式及原生浮层样式可覆盖相应部位。`popoverProps.classes` 与内部浮层类名合并。
+
 ## LightWrapper
 
 组合 FieldLabel 与 FilterDropdown。属性：`label`、`value`、`open`、`disabled`、`allowClear`、`footerRender`、`placement`。默认插槽为面板内容，语义部位为 `root`、`content`。
@@ -119,6 +123,8 @@ const menus = [
 
 `footerRender=false` 不渲染；函数签名为 `(confirm?, clear?) => VNodeChild`。回调只通知操作，不负责异步等待、清空数据或关闭外层容器。语义部位：`root`、`clear`、`confirm`；自定义 footerRender 替换默认按钮后，按钮部位不再生效。
 
+默认清空与确认按钮分居两侧，内边距为 8px；未提供 onClear 时保留清空按钮的位置并隐藏按钮。footerRender 返回 false 同样隐藏底部。
+
 ## FieldLabel / LabelIconTip
 
 | 组件           | 属性与行为                                                                                                     | 插槽               | 语义部位                       |
@@ -127,6 +133,8 @@ const menus = [
 | `LabelIconTip` | label、tooltip（字符串或原生 TooltipProps）、subTitle、ellipsis                                                | 默认插槽替换 label | root、label、subTitle、tooltip |
 
 FieldLabel 使用可聚焦按钮；有值且提供 onClear 时显示清除入口，清除阻止冒泡，否则显示箭头。两者无独立实例方法。
+
+FieldLabel 默认高度为 30px，继承小号组件配置时为 24px；悬停仅改变背景。LabelIconTip 的省略样式作用于 label，副标题与提示图标保留独立显示区域。
 
 ## InlineErrorFormItem
 

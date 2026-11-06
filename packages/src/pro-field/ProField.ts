@@ -19,7 +19,7 @@ import type {
   ProSemanticSource,
   ProSemanticStyles,
 } from '../provider/types'
-import { useSemanticStyles } from '../shared/semantic'
+import { mergeStyle, useSemanticStyles } from '../shared/semantic'
 import FieldControl from '../pro-form-fields/FieldControl.vue'
 import { findFieldOption, formatReadonlyValue } from '../pro-form-fields/readonly'
 import { useFieldOptions } from '../pro-form-fields/useFieldOptions'
@@ -156,11 +156,18 @@ export const ProField = defineComponent({
             : props.text
       const { type } = definition.value
       const fieldProps = effectiveFieldProps.value
-      const readControlProps = {
+      const readControlProps: Record<string, unknown> & { class: string; style: CSSProperties } = {
         ...fieldProps,
         class: normalizeClass([fieldProps.class, classes.value.control]),
-        style: normalizeStyle([fieldProps.style, styles.value.control]) as CSSProperties,
+        style: mergeStyle(
+          normalizeStyle([fieldProps.style]) as CSSProperties,
+          styles.value.control,
+        ),
       }
+      const renderReadonlyText = (content: VNodeChild) =>
+        classes.value.control || styles.value.control
+          ? h('span', { class: classes.value.control, style: styles.value.control }, [content])
+          : content
       const options = optionState.options.value
       const renderDefault = (): VNodeChild => {
         if ((PRO_FIELD_SCHEMA_LAYOUT_VALUE_TYPES as readonly string[]).includes(type)) return null
@@ -232,7 +239,8 @@ export const ProField = defineComponent({
             },
             slots,
           )
-        if (value === undefined || value === null || value === '') return props.emptyText ?? '-'
+        if (value === undefined || value === null || value === '')
+          return renderReadonlyText(props.emptyText ?? '-')
         if (isVNode(value) || type === 'option') return value as VNodeChild
         if (type === 'fromNow') {
           const date = value instanceof Date ? value : new Date(value as string | number)
@@ -246,9 +254,11 @@ export const ProField = defineComponent({
                   : Math.abs(seconds) >= 60
                     ? ([60, 'minute'] as const)
                     : ([1, 'second'] as const)
-            return new Intl.RelativeTimeFormat(config.intl.value.locale.replace('_', '-'), {
-              numeric: 'auto',
-            }).format(Math.round(seconds / divisor), unit)
+            return renderReadonlyText(
+              new Intl.RelativeTimeFormat(config.intl.value.locale.replace('_', '-'), {
+                numeric: 'auto',
+              }).format(Math.round(seconds / divisor), unit),
+            )
           }
         }
         const option = findFieldOption(value, options)
@@ -260,9 +270,11 @@ export const ProField = defineComponent({
             text: h('span', [option.label]),
           })
         if (!option && typeof value === 'boolean')
-          return config.intl.value.getMessage(
-            value ? 'switch.open' : 'switch.close',
-            value ? '是' : '否',
+          return renderReadonlyText(
+            config.intl.value.getMessage(
+              value ? 'switch.open' : 'switch.close',
+              value ? '是' : '否',
+            ),
           )
         if (type === 'progress') return h(Progress, { ...readControlProps, percent: Number(value) })
         if (type === 'image')
@@ -285,7 +297,27 @@ export const ProField = defineComponent({
               /* preserve invalid input for inspection */
             }
           }
-          return h('pre', { style: { margin: 0, whiteSpace: 'pre-wrap' } }, h('code', text))
+          return h(
+            'pre',
+            {
+              ...readControlProps,
+              style: mergeStyle(
+                {
+                  padding: '16px',
+                  overflow: 'auto',
+                  fontSize: '85%',
+                  lineHeight: 1.45,
+                  color: config.token.value.colorTextSecondary,
+                  fontFamily: config.token.value.fontFamilyCode,
+                  backgroundColor: 'rgba(150, 150, 150, 0.1)',
+                  borderRadius: '3px',
+                  width: 'min-content',
+                },
+                readControlProps.style,
+              ),
+            },
+            h('code', text),
+          )
         }
         const content = formatReadonlyValue(value, {
           type,
@@ -295,13 +327,41 @@ export const ProField = defineComponent({
           moneyPrefix: fieldProps.prefix as VNodeChild | false | undefined,
           fieldProps,
         })
+        if (type === 'textarea' && !props.copyable && !props.ellipsis) {
+          const {
+            autoSize: _autoSize,
+            showCount: _showCount,
+            classNames: _classNames,
+            styles: _styles,
+            ...textareaProps
+          } = readControlProps
+          return h(
+            'span',
+            {
+              ...textareaProps,
+              class: normalizeClass([`${prefix.value}-readonly-textarea`, readControlProps.class]),
+              style: mergeStyle(
+                {
+                  display: 'inline-block',
+                  lineHeight: 1.5715,
+                  maxWidth: '100%',
+                  overflowWrap: 'anywhere',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                },
+                readControlProps.style,
+              ),
+            },
+            [content],
+          )
+        }
         return props.copyable || props.ellipsis
           ? h(
               TypographyText,
               { ...readControlProps, copyable: props.copyable, ellipsis: props.ellipsis },
               { default: () => content },
             )
-          : content
+          : renderReadonlyText(content)
       }
       const context: ProFieldRenderContext = {
         mode,
@@ -333,7 +393,14 @@ export const ProField = defineComponent({
             classes.value.root,
             attrs.class,
           ],
-          style: [{ color: config.token.value.colorText }, attrs.style, styles.value.root],
+          style: [
+            { color: config.token.value.colorText },
+            mode === 'read' && type === 'text'
+              ? { overflowWrap: 'anywhere', wordBreak: 'break-word' }
+              : undefined,
+            attrs.style,
+            styles.value.root,
+          ],
           dir: config.direction.value,
         },
         [content],

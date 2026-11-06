@@ -103,6 +103,8 @@ const columns = [
 
 查询区位于表格卡片上方；工具栏、表格和分页共享同一张卡片。两个区域都复用 [ProCard](./pro-card)，背景、圆角与内边距沿用 Card 主题，支持深色主题及 Card token 覆盖。`toolbar: false` 隐藏工具栏。
 
+`cardProps` 配置表格卡片，`styles` 支持语义对象及 `({ props }) => 语义对象`，函数接收实际 ProCard 属性。内容样式按默认留白、`bodyStyle`、`styles.body` 的顺序合并。`variant` 优先于兼容属性 `bordered`；显式 `cardBordered.table`（或布尔 `cardBordered`）优先于这两项。`options: false` 且没有标题或操作时不显示空工具栏；关闭工具栏时默认清除表格卡片内容留白。
+
 设置 `options.search` 可在工具栏开启关键词搜索；即使 `search: false` 关闭查询表单，关键词搜索仍然可用：
 
 ```vue

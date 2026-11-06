@@ -208,6 +208,8 @@ const columns = [
 
 字段模式会删除 URL 中的空值；命名 key 模式存储完整模型。组件监听 `popstate` / `hashchange` 并回填表单，适合可分享的筛选条件。URL 值在初始化时覆盖 `request` 结果，但仍会被显式 `modelValue` 覆盖。
 
+ModalForm / DrawerForm 默认宽度为 `800px`，提交区位于原生 footer 并右对齐；Modal 默认“确认”、Drawer 默认“提交”。`width`、原生弹层配置和 submitter 文案仍可覆盖默认值，详见 [ProForm 默认布局](./pro-form)。普通 Schema 表单的提交区默认起点对齐；group 字段复用 `ProFormGroup` 的标题、间距及语义样式。
+
 ## API
 
 ### 属性
@@ -320,4 +322,4 @@ await formRef.value?.next()
 
 继承原生 ConfigProvider 的 locale、direction、componentSize/Disabled、prefixCls、主题算法、全局 token 及原生 Form/Input 等组件 token。Pro 自有扩展用 `ProConfigProvider.token`，自定义字段走 valueTypeMap。普通表单根类为 ant-pro-form，查询/轻量/步骤布局分别为 ant-pro-query-filter、ant-pro-form-light-filter、ant-pro-steps-form；步骤导航、内容与当前步骤具有 -steps-container、-container、-step-active。原生前缀 demo 时变为 demo-pro；显式 prefixCls 覆盖对应布局前缀。
 
-`classes/styles` 接受对象或 `({ props }) => object`；旧 classNames 补缺，同部位 classes 优先。Schema 外层支持 `root/content`，步骤操作区支持 `submitter`，筛选布局继续接受 `row/item/actions/container/collapseButton` 等对应部位。普通表单内部区域可通过 formProps 的 classes/styles 定制。`class/style/id/data-*/aria-*` 路由到可见表单或布局容器；弹层外壳使用 modalProps/drawerProps。
+`classes/styles` 接受对象或 `({ props }) => object`；旧 classNames 补缺，同部位 classes 优先。Schema 外层支持 `root/content`，内部表单支持 `form`，提交区支持 `submitter`，筛选布局继续接受 `row/item/actions/container/collapseButton` 等对应部位。普通表单内部区域也可通过 formProps 的 classes/styles 定制。`class/style/id/data-*/aria-*` 路由到可见表单或布局容器；弹层外壳使用 modalProps/drawerProps。

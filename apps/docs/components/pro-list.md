@@ -62,7 +62,7 @@ const metas: ProListMetas<Project> = {
 | `columns` / `metas`                                       | `ProListColumn<T>[]` / `ProListMetas<T>`                                        |
 | `grid`                                                    | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`；数字表示每行项数         |
 | `itemLayout`                                              | `horizontal` / `vertical`                                                       |
-| `split`                                                   | 是否显示分隔线，默认显示                                                        |
+| `split`                                                   | 分隔线与行圆角，见下方三态说明                                                  |
 | `showActions` / `showExtra`                               | `always` / `hover`；悬停模式也在键盘焦点进入行时显示                            |
 | `itemRender`                                              | `(record, index, defaultDom) => VNodeChild`，替换整项                           |
 | `itemTitleRender` / `itemHeaderRender`                    | 同上，分别替换标题、头部；`false` 隐藏该区域                                    |
@@ -74,7 +74,11 @@ const metas: ProListMetas<Project> = {
 
 `ProList` 默认关闭 `search`、`options`、`pagination`，可显式开启；其他工具栏、请求和编辑属性参见 ProTable。`BaseProList` 在此基础上默认设置 `cardProps=false`、`search=false`、`toolBarRender=false`，这些默认值均可覆盖。
 
+`split` 未传时无分隔线且行圆角为 0；显式设为 `false` 时无分隔线且使用主题圆角；设为 `true` 时显示分隔线且行圆角为 0。
+
 启用 `grid` 时，每项使用现有 ProCard 呈现，`itemCardProps` 传入卡片属性。操作 schema（如 `metas.actions`）的 `cardActionProps="actions"` 将操作放在卡片底部；`extra` 或省略时放在卡片头部附加区域。`grid` 的断点数值决定每行卡片数。
+
+列表根背景默认透明；网格模式保留各项 ProCard 的背景与内边距，外层列表行不再叠加内边距或分隔线。
 
 ## 事件、插槽与实例
 

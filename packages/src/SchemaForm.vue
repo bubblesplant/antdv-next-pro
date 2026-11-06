@@ -10,12 +10,13 @@ import type {
   SchemaFormSlots,
 } from './types'
 
-import { Drawer, Modal } from 'antdv-next'
+import { Drawer, Modal, type ModalProps } from 'antdv-next'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, useAttrs, watch } from 'vue'
 import { useSemanticStyles } from './shared/semantic'
 import { useFormPrefix, assignRef } from './pro-form/utils'
 import { useThemeVars } from './shared/useThemeVars'
 import { useOverlaySubmitLock } from './pro-form/useOverlaySubmitLock'
+import { provideOverlayFormFooter } from './pro-form/useOverlayFormFooter'
 
 import SchemaFormBody from './schema-form/SchemaFormBody.vue'
 import {
@@ -87,7 +88,7 @@ const emit = defineEmits<{
 const slots = defineSlots<SchemaFormSlots<T>>()
 const attrs = useAttrs()
 const { prefix: defaultPrefix } = useFormPrefix('', () => undefined)
-const { prefix, direction, t } = useFormPrefix(
+const { prefix, direction, t, config } = useFormPrefix(
   'form',
   () =>
     props.prefixCls ??
@@ -167,15 +168,36 @@ const steps = computed(() => buildSchemaSteps(props.columns))
 const isDialog = computed(
   () => layoutType.value === 'ModalForm' || layoutType.value === 'DrawerForm',
 )
-const dialogTitle = computed(() => props.title as unknown as string | undefined)
-const dialogFooter = computed(() => (slots.footer ? undefined : null))
+const dialogTitle = computed(
+  () =>
+    (props.title ??
+      (layoutType.value === 'ModalForm'
+        ? props.modalProps?.title
+        : props.drawerProps?.title)) as ModalProps['title'],
+)
+const overlayFooter = provideOverlayFormFooter(
+  computed(() => isDialog.value && props.submitter !== false && !slots.footer),
+)
+function setFooterTarget(element: unknown): void {
+  overlayFooter.target.value = element instanceof HTMLElement ? element : undefined
+}
+const dialogFooter = computed(() =>
+  slots.footer || overlayFooter.enabled.value ? undefined : null,
+)
 const dialogSubmitter = computed(() => {
   if (slots.footer || props.submitter === false) return false
   const source = props.submitter ?? {}
   const sourceReset = source.resetButtonProps
+  const okText = props.modalProps?.okText ?? config.value.locale?.Modal?.okText
   return {
     ...source,
     searchConfig: {
+      submitText:
+        source.submitText ??
+        (layoutType.value === 'ModalForm'
+          ? ((typeof okText === 'function' ? okText() : okText) ??
+            t('form.lightFilter.confirm', '确认'))
+          : t('tableForm.submit', '提交')),
       resetText: source.resetText ?? t('editableTable.action.cancel', '取消'),
       ...source.searchConfig,
     },
@@ -591,7 +613,7 @@ onBeforeUnmount(() => {
     v-bind="modalOptions"
     :open="internalOpen"
     :title="dialogTitle"
-    :width="width"
+    :width="modalProps?.width ?? width ?? 800"
     :footer="dialogFooter"
     @cancel="cancelModal"
   >
@@ -633,8 +655,10 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <template v-if="slots.footer" #footer>
+    <template v-if="slots.footer || overlayFooter.enabled.value" #footer>
+      <div v-if="!slots.footer" :ref="setFooterTarget" data-pro-overlay-footer />
       <slot
+        v-else
         name="footer"
         :values="slotValues"
         :submitting="submitting"
@@ -650,7 +674,8 @@ onBeforeUnmount(() => {
     v-bind="drawerOptions"
     :open="internalOpen"
     :title="dialogTitle"
-    :width="width"
+    :width="drawerProps?.width ?? width ?? 800"
+    :footer="dialogFooter"
     @close="closeDrawer"
   >
     <template v-if="slots.title" #title>
@@ -691,8 +716,10 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <template v-if="slots.footer" #footer>
+    <template v-if="slots.footer || overlayFooter.enabled.value" #footer>
+      <div v-if="!slots.footer" :ref="setFooterTarget" data-pro-overlay-footer />
       <slot
+        v-else
         name="footer"
         :values="slotValues"
         :submitting="submitting"
@@ -748,9 +775,7 @@ onBeforeUnmount(() => {
 
 .antdv-next-pro-schema-submitter {
   display: flex;
-  justify-content: flex-end;
   width: 100%;
-  margin-block-start: 16px;
 }
 
 .antdv-next-pro-schema-body.is-queryfilter .antdv-next-pro-schema-submitter,
@@ -764,7 +789,6 @@ onBeforeUnmount(() => {
 
 .antdv-next-pro-schema-group {
   min-width: 0;
-  margin: 0 0 20px;
   padding: 0;
   border: 0;
 }
@@ -782,18 +806,10 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
-.antdv-next-pro-form-list {
-  margin-block-end: 20px;
-}
-
 .antdv-next-pro-form-list-row {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  padding: 12px;
-  margin-block-end: 8px;
-  background: var(--antdv-next-pro-color-fill-alter, rgba(0, 0, 0, 0.02));
-  border-radius: 6px;
 }
 
 .antdv-next-pro-form-list-fields {
