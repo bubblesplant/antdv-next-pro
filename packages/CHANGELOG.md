@@ -1,5 +1,17 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.4
+
+### Patch Changes
+
+- [#24](https://github.com/bubblesplant/antdv-next-pro/pull/24) [`ce18b62`](https://github.com/bubblesplant/antdv-next-pro/commit/ce18b62d78bbced81910226c50913ce7f494afe8) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 继续参照 ProComponents 3.1.15-7 对齐表单、字段、列表、详情、编辑表格与辅助组件的布局及主题样式。
+
+  修复 ModalForm/DrawerForm 的页脚提交区和默认宽度，调整 QueryFilter、Group、FormList、StepsForm 的间距；补齐只读代码、多行文本与数字范围样式；对齐 ProList 分隔线三态、列表背景、详情内容收缩、编辑表格新增按钮及拖拽手柄；修正工具栏单/多行布局、筛选浮层、底部操作与字段标签样式，保留显式用户样式覆盖。
+
+- [#24](https://github.com/bubblesplant/antdv-next-pro/pull/24) [`ce18b62`](https://github.com/bubblesplant/antdv-next-pro/commit/ce18b62d78bbced81910226c50913ce7f494afe8) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 移除 ProCard 及 ProTable 搜索区、表格区继承的默认无边框阴影，保留显式开启阴影、自定义样式和悬浮阴影。
+
+  修复 ProTable 卡片样式与兼容边框配置透传、空工具栏留白，补齐 ProCard 标题纵向间距、嵌套布局、选中态、透明卡片、分割线主题及标签页留白。
+
 ## 0.3.3
 
 ### Patch Changes
