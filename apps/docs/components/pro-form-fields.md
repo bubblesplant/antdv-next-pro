@@ -72,38 +72,38 @@ Vue 模板也可直接使用具名组件。`ProFormRadio` 本身是可渲染的�
 
 ## 通用 API
 
-### 公共 Props
+### 公共 Props {#props}
 
 每个字段默认由 FormItem 和 Input、Select 等基础控件组成。公共属性分为字段能力、表单项属性和基础控件属性：`label`、`rules` 等配置表单项，`fieldProps` 配置基础控件。
 
 以下属性适用于所有字段包装组件。`ProFormRadio.Button` 是原生 RadioButton，使用 [Radio 属性][antd-radio]，不套用此表。
 
-| Prop             | 类型                                                | 默认值                     | 说明                                                                          |
-| ---------------- | --------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
-| `modelValue`     | 由组件决定                                          | `undefined`                | 标准 `v-model` 值；在 ProForm 内未显式绑定时从 `name` 对应的表单 store 取值   |
-| `name`           | `string \| number \| readonly (string \| number)[]` | —                          | FormItem 字段名，支持嵌套路径；在 ProForm 内同时连接表单 store                |
-| `label`          | `VNodeChild`                                        | —                          | FormItem 标签，支持文本、VNode；也可用 `#label` 插槽自定义，插槽优先          |
-| `rules`          | `FormItemProps['rules']`                            | —                          | 校验规则，参见 [FormItem 属性][antd-form-item]                                |
-| `fieldMode`      | `'form-item' \| 'field'`                            | `'form-item'`              | 渲染表单项或裸控件                                                            |
-| `ignoreFormItem` | `boolean`                                           | `false`                    | 为 `true` 时强制使用裸控件模式，优先于 `fieldMode`                            |
-| `fieldProps`     | `Partial<基础控件 Props> & { class?, style? }`      | —                          | 传给 Input、Select 等基础控件；各字段下方提供对应的 antdv-next 属性链接       |
-| `formItemProps`  | `Partial<FormItemProps>`                            | —                          | 只传给 FormItem，参见 [FormItem 属性][antd-form-item]                         |
-| `placeholder`    | 对应基础控件的 `placeholder` 类型                   | —                          | 当前顶层值尚未透传，请使用 `fieldProps.placeholder`；范围字段可使用字符串数组 |
-| `disabled`       | `boolean`                                           | 继承上层配置，否则 `false` | 保持控件外观并禁止交互；可继承 ProForm / ConfigProvider                       |
-| `readonly`       | `boolean`                                           | 继承 ProForm，否则 `false` | 改用统一只读展示                                                              |
-| `emptyText`      | `VNodeChild`                                        | `'-'`                      | `undefined`、`null`、空字符串的占位                                           |
-| `readonlyRender` | `(value) => VNodeChild`                             | —                          | 自定义只读输出；返回 `null` / `undefined` 时回退默认格式化                    |
-| `width`          | `number \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`    | —                          | 数字为像素；预设宽度依次为 104 / 216 / 328 / 440 / 552px，最大不超过容器      |
-| `prefixCls`      | `string`                                            | 由 ProConfigProvider 生成  | 自定义字段样式前缀                                                            |
-| `classes`        | `ProSemanticSource<ProSemanticClasses>`             | —                          | 各语义部位的类名，支持对象或 `({ props }) => 对象`，见下方样式说明            |
-| `classNames`     | `ProSemanticSource<ProSemanticClasses>`             | —                          | 兼容旧语义类名；仅补充 `classes` 未指定的部位                                 |
-| `styles`         | `ProSemanticSource<ProSemanticStyles>`              | —                          | 各语义部位的样式，支持对象或 `({ props }) => 对象`                            |
-| `convertValue`   | `(value, values) => unknown`                        | —                          | 在 ProForm 初始化、同步外部值或注册字段时转换传入值                           |
-| `transform`      | `(value, values) => unknown`                        | —                          | 在 ProForm 格式化取值或提交时转换值；返回普通对象会移除原字段并合并到提交结果 |
-| `preserve`       | `boolean`                                           | 保留                       | 在 ProForm 中设为 `false` 时，字段卸载后移除对应 store 值                     |
-| `proFieldProps`  | `Record<string, unknown>`                           | —                          | ProField 配置；`mode: 'read'` 或 `readonly: true` 可指定只读                  |
+| Prop             | 类型                                                | 默认值                     | 说明                                                                                                                |
+| ---------------- | --------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `modelValue`     | 由组件决定                                          | `undefined`                | 标准 `v-model` 值；在 ProForm 内未显式绑定时从 `name` 对应的表单 store 取值                                         |
+| `name`           | `string \| number \| readonly (string \| number)[]` | —                          | FormItem 字段名，支持嵌套路径；在 ProForm 内同时连接表单 store                                                      |
+| `label`          | `VNodeChild`                                        | —                          | FormItem 标签，支持文本、VNode；也可用 `#label` 插槽自定义，插槽优先                                                |
+| `rules`          | `FormItemProps['rules']`                            | —                          | 校验规则，参见 [FormItem 属性][antd-form-item]                                                                      |
+| `fieldMode`      | `'form-item' \| 'field'`                            | `'form-item'`              | 渲染表单项或裸控件                                                                                                  |
+| `ignoreFormItem` | `boolean`                                           | `false`                    | 为 `true` 时强制使用裸控件模式，优先于 `fieldMode`                                                                  |
+| `fieldProps`     | `Partial<基础控件 Props> & { class?, style? }`      | —                          | 传给 Input、Select 等基础控件；各字段下方提供对应的 antdv-next 属性链接                                             |
+| `formItemProps`  | `Partial<FormItemProps>`                            | —                          | 只传给 FormItem，参见 [FormItem 属性][antd-form-item]                                                               |
+| `placeholder`    | 对应基础控件的 `placeholder` 类型                   | —                          | 当前顶层值尚未透传，请使用 `fieldProps.placeholder`；范围字段可使用字符串数组                                       |
+| `disabled`       | `boolean`                                           | 继承上层配置，否则 `false` | 保持控件外观并禁止交互；可继承 ProForm / ConfigProvider                                                             |
+| `readonly`       | `boolean`                                           | 继承 ProForm，否则 `false` | 改用统一只读展示                                                                                                    |
+| `emptyText`      | `VNodeChild`                                        | `'-'`                      | `undefined`、`null`、空字符串的占位                                                                                 |
+| `readonlyRender` | `(value) => VNodeChild`                             | —                          | 自定义只读输出；返回 `null` / `undefined` 时回退默认格式化                                                          |
+| `width`          | `number \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`    | —                          | 数字为像素；预设宽度依次为 104 / 216 / 328 / 440 / 552px，最大不超过容器                                            |
+| `prefixCls`      | `string`                                            | 由 ProConfigProvider 生成  | 自定义字段样式前缀                                                                                                  |
+| `classes`        | `ProSemanticSource<ProSemanticClasses>`             | —                          | 各语义部位的类名，支持对象或 `({ props }) => 对象`，见下方样式说明                                                  |
+| `classNames`     | `ProSemanticSource<ProSemanticClasses>`             | —                          | 兼容旧语义类名；仅补充 `classes` 未指定的部位                                                                       |
+| `styles`         | `ProSemanticSource<ProSemanticStyles>`              | —                          | 各语义部位的样式，支持对象或 `({ props }) => 对象`                                                                  |
+| `convertValue`   | `(value, values) => unknown`                        | —                          | 在 ProForm 初始化、同步外部值或注册字段时转换传入值                                                                 |
+| `transform`      | `(value, values) => unknown`                        | —                          | 在 ProForm 格式化取值或提交时转换值；返回普通对象会移除原字段并合并到提交结果                                       |
+| `preserve`       | `boolean`                                           | 保留                       | 在 ProForm 中设为 `false` 时，字段卸载后移除对应 store 值                                                           |
+| `proFieldProps`  | `Record<string, unknown>`                           | —                          | [ProField 配置](./pro-field#props)；`mode: 'read'` 或 `readonly: true` 强制只读；内部选择 ProField 时也合并其余配置 |
 
-### 表单项公共属性
+### 表单项公共属性 {#form-item-props}
 
 除上表中的 `name`、`label`、`rules`，以下属性同样作用于字段内部的 FormItem，适用于全部字段包装组件。它们均可通过 `formItemProps` 配置，完整原生定义见 [antdv-next FormItem 属性][antd-form-item]。
 
@@ -123,6 +123,7 @@ Vue 模板也可直接使用具名组件。`ProFormRadio` 本身是可渲染的�
 | `validateFirst`    | `boolean \| 'parallel'`                                   | `false`                      | `true` 时首个失败规则后停止；`'parallel'` 时并行校验并采用首个失败结果       |
 | `validateTrigger`  | `'change' \| 'blur' \| 'focus' \| TriggerType[] \| false` | 继承 Form，最终为 `'change'` | 触发校验的事件，可配置数组；`false` 关闭事件触发校验                         |
 | `validateDebounce` | `number`                                                  | 无延迟                       | 事件触发校验的防抖时间，单位毫秒                                             |
+| `id`               | `string`                                                  | 自动生成                     | 原生 FormItem 的字段 ID，见 [FormItem 属性][antd-form-item]                  |
 | `class`            | `HTMLAttributes['class']`                                 | —                            | FormItem 根元素类名                                                          |
 | `style`            | `HTMLAttributes['style']`                                 | —                            | FormItem 根元素样式                                                          |
 
@@ -144,7 +145,7 @@ Vue 模板也可直接使用具名组件。`ProFormRadio` 本身是可渲染的�
 
 在 ProForm 中请将 `name` 写在字段顶层，以便连接表单 store；仅设置 `formItemProps.name` 不会注册 ProForm 字段。标签换行通过父级 `<ProForm label-wrap>` 配置，当前不支持单个字段的 `labelWrap`。
 
-### `fieldProps` 与基础组件属性
+### `fieldProps` 与基础组件属性 {#field-props}
 
 各字段专属的原生属性通过 `fieldProps` 配置，例如 Input 的 `allowClear`、Select 的 `mode`、日期控件的 `disabledDate`。下方每个字段的「fieldProps 属性」链接直接指向 antdv-next 对应基础组件的 API；字段额外提供的 Pro 属性则在本页列出。
 
@@ -225,43 +226,56 @@ Vue 模板也可直接使用具名组件。`ProFormRadio` 本身是可渲染的�
 
 `fieldProps['onUpdate:value']`、`fieldProps['onUpdate:checked']` 或 `fieldProps['onUpdate:fileList']` 可与组件 `v-model` 同时使用，每次更新各调用一次。
 
-### 事件
+### 事件 {#events}
 
-| 事件                | 适用组件                  | 说明                                                 |
-| ------------------- | ------------------------- | ---------------------------------------------------- |
-| `update:modelValue` | 全部                      | 规范化后的字段值                                     |
-| `change`            | 全部                      | 原样转发基础控件的 change 参数                       |
-| `requestError`      | 使用 `request` 的选项字段 | 选项请求失败；已有选项不会被清空                     |
-| `captchaError`      | Captcha                   | 回调 reject 或返回 `false`；`false` 原样作为取消结果 |
-| `drop`              | 两个 Upload               | 原样转发拖拽事件                                     |
+| 事件                | 参数                   | 适用组件与来源                                                           |
+| ------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| `update:modelValue` | `(value: unknown)`     | 全部字段；字段核心规范化后的值，类型见各字段说明                         |
+| `change`            | `(...args: unknown[])` | 全部字段；原样转发[对应基础控件](#field-props)的 change 参数             |
+| `requestError`      | `(error: unknown)`     | 使用 [request](#options) 的选项字段；已有选项不会被清空                  |
+| `captchaError`      | `(error: unknown)`     | ProFormCaptcha；发送回调 reject 或返回 `false`，`false` 原样作为取消结果 |
+| `drop`              | `(event: DragEvent)`   | 两个上传字段；转发原生 [Upload][antd-upload] 拖拽事件                    |
 
 基础控件更新值后，字段核心先调用 `fieldProps` 中对应的更新处理器，再触发包装组件的 `update:modelValue`。`change`、`drop` 也先调用 `fieldProps` 处理器，再 emit 同名事件。
 
-### 插槽与实例方法
+### 插槽 {#slots}
 
-`label`、`extra`、`help`、`tooltip` 是 FormItem 插槽；其他具名插槽和默认插槽会转发给基础控件。`fieldMode="field"` 时不渲染 FormItem 专属插槽。
+| 插槽             | 参数                                 | 说明及来源                                                                                                               |
+| ---------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `label`          | 无                                   | [FormItem][antd-form-item] 标签，优先于 `label` 属性                                                                     |
+| `extra`          | 无                                   | [FormItem][antd-form-item] 额外说明，优先于 `extra` 属性                                                                 |
+| `help`           | 无                                   | [FormItem][antd-form-item] 帮助与校验信息，优先于 `help` 属性                                                            |
+| `tooltip`        | `tooltip?: FormItemProps['tooltip']` | [FormItem][antd-form-item] 标签提示；无可渲染标签时不显示                                                                |
+| `captcha`        | `{ seconds: number }`                | ProFormCaptcha 发送按钮内容                                                                                              |
+| `default`        | 由基础组件决定                       | UploadButton 替换按钮内容，UploadDragger 替换拖拽区；其他字段转发[对应基础组件](#field-props)的默认插槽                  |
+| 基础控件具名插槽 | 与原生组件一致                       | 除以上 FormItem / Captcha 专属插槽外，其余转发给[对应基础控件](#field-props)，例如 Select 的 `option`、Input 的 `prefix` |
 
-`#label`、`#extra`、`#help` 优先于同名属性。需要自定义标签内容时可以直接使用插槽；没有可渲染的标签时，不显示标签及其 tooltip。
+`fieldMode="field"` 时不创建 FormItem，`label`、`extra`、`help`、`tooltip` 插槽不渲染。字段使用内部 ProField 分支时，其默认插槽遵循 [ProField 插槽协议](./pro-field#slots)。
 
 ```vue
 <ProFormText name="title" :rules="[{ required: true, message: '请输入标题' }]">
-  <template #label>
-    <span>标题 <small>（用于列表展示）</small></span>
-  </template>
+  <template #label><span>标题 <small>（用于列表展示）</small></span></template>
   <template #extra>最多 30 个字</template>
 </ProFormText>
 ```
 
-- Captcha 增加 `captcha` 插槽，参数为 `{ seconds }`。
-- UploadButton 的默认插槽替换上传按钮内容。
-- UploadDragger 的默认插槽替换拖拽区内容。
-- ProFormSelect、ProFormTreeSelect、ProFormCheckbox、ProFormRadioGroup、ProFormSegmented 及选项类型的 ProFormField 通过 ref 暴露 `refresh(): Promise<void>`，强制重新请求选项并跳过缓存。
-- Captcha 通过 ref 暴露 `resetCountdown(): void`。
-- Captcha 同时提供 `focus()`、`startTiming()`、`endTiming()`；旧 resetCountdown 为停止倒计时的兼容入口。
+### 实例方法 {#instance}
+
+以下方法通过对应组件的 `ref` 调用。包装器没有自动暴露原生控件的全部实例方法。
+
+| 方法             | 参数 | 返回值          | 适用组件与来源                                                                                                                                                    |
+| ---------------- | ---- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `refresh`        | 无   | `Promise<void>` | ProFormSelect、ProFormTreeSelect、ProFormCheckbox、ProFormRadioGroup、ProFormSegmented、ProFormField、FieldControl；重新请求选项并跳过缓存，无 request 时立即完成 |
+| `resetCountdown` | 无   | `void`          | ProFormCaptcha、ProFormField、FieldControl；清除验证码倒计时并归零                                                                                                |
+| `startTiming`    | 无   | `void`          | ProFormCaptcha、ProFormField、FieldControl；按 `countDown` 开始倒计时，触发 `onTiming`                                                                            |
+| `endTiming`      | 无   | `void`          | ProFormCaptcha、ProFormField、FieldControl；与 `resetCountdown` 相同                                                                                              |
+| `focus`          | 无   | `void`          | ProFormCaptcha、ProFormField、FieldControl；当前控件提供 focus 时转发，否则无操作                                                                                 |
+
+ProFormField 的计时方法仅对验证码控件有实际效果；内部切换到没有对应方法的渲染器时安全返回。ProFormSearchSelect、ProFormCascader、ProFormCheckboxGroup、日期变体、时间、颜色、评分、数字区间等包装组件当前没有转发上述实例方法；请求协议本身不会给包装器增加 `refresh`。
 
 ## 选项、请求与只读
 
-### `options`、`valueEnum`、`request`
+### `options`、`valueEnum`、`request` {#options}
 
 ProFormSelect / ProFormSearchSelect、ProFormTreeSelect、ProFormCheckbox / ProFormCheckboxGroup、ProFormRadioGroup、ProFormSegmented、ProFormCascader 使用相同协议；动态 ProFormField 的选项类型也适用：
 
@@ -307,6 +321,22 @@ const alternate = {
 }
 ```
 
+### 选项与枚举项结构 {#option-types}
+
+| 类型 / 属性                     | 类型                   | 必填 / 默认值 | 说明及来源                                               |
+| ------------------------------- | ---------------------- | ------------- | -------------------------------------------------------- |
+| `ProFormFieldOption.label`      | `VNodeChild`           | 必填          | 标准选项显示内容；原生字段可按其 `fieldNames` 约定映射   |
+| `ProFormFieldOption.value`      | `unknown`              | 必填          | 标准选项值；可通过类型泛型指定值类型                     |
+| `ProFormFieldOption.disabled`   | `boolean`              | `false`       | 禁用该选项                                               |
+| `ProFormFieldOption.children`   | `ProFormFieldOption[]` | —             | 树和级联字段使用的扩展键；其他自定义键按原生控件协议保留 |
+| `ProFormValueEnumItem.text`     | `string`               | 必填          | 继承 `ProValueEnumItem` 的显示文本                       |
+| `ProFormValueEnumItem.value`    | `unknown`              | 枚举 key      | 显式指定值；用于保留数字 key 等场景                      |
+| `ProFormValueEnumItem.disabled` | `boolean`              | `false`       | 生成选项时的禁用状态                                     |
+| `ProFormValueEnumItem.color`    | `string`               | —             | [ProField](./pro-field#props) 只读状态色                 |
+| `ProFormValueEnumItem.status`   | `string`               | —             | [ProField](./pro-field#props) 只读 Badge 状态            |
+
+`valueEnum` 可直接把值映射为字符串，等同于只提供 `text`。`request` 接受标准选项、可规范化的对象或基础值数组；规范化与来源优先级见[选项请求协议](#options)。
+
 ### 只读与重置
 
 `readonly` 使用统一的 `ReadonlyField`，不会依赖各基础控件不同的只读实现。选项显示 label，数组使用逗号连接，日期区间使用 `~`，密码显示掩码，金额保留前缀，上传显示文件名。`0` 和 `false` 不会被当作空值。
@@ -315,13 +345,17 @@ const alternate = {
 
 字段都是受控组件：父级重置并传入新的 `modelValue` 后会立即更新。选项缓存不会因值重置而清空；Captcha 的倒计时需调用 `resetCountdown()` 显式取消。
 
-## ProFormField 动态字段
+## ProFormField 动态字段 {#dynamic-field}
 
 `ProFormField` 用于按 `valueType` 动态选择控件，支持上面的公共属性与选项属性。具体类型和格式化行为见 [ProField](./pro-field.md)。
 
-| Prop        | 类型                     | 默认值   | 说明                                                                                                             |
-| ----------- | ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------- |
-| `valueType` | `ProFieldValueTypeInput` | `'text'` | 类型名称或 `{ type, ...字段配置 }`，例如 `'select'`、`{ type: 'digit', min: 0 }`；显式 `fieldProps` 覆盖同义配置 |
+| Prop        | 类型                     | 默认值   | 说明                                                                                                                   |
+| ----------- | ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `fieldType` | `ProFormControlType`     | —        | 底层控件类型入口；`valueType` 优先；支持标准类型及 captcha / uploadButton / uploadDragger / radioGroup / checkboxGroup |
+| `loading`   | `boolean`                | `false`  | 传给内部字段控件的加载状态，具体展示取决于基础组件                                                                     |
+| `valueType` | `ProFieldValueTypeInput` | `'text'` | 类型名称或 `{ type, ...字段配置 }`，例如 `'select'`、`{ type: 'digit', min: 0 }`；显式 `fieldProps` 覆盖同义配置       |
+
+动态字段还接受本文专属字段表中的 `min`、`precision`、金额配置、`showTime`、`layout`、`radioType`、验证码配置及上传配置；其类型、默认值和作用域均以对应字段表为准。
 
 `fieldProps` 的基础组件由 `valueType` 决定，可查阅下方对应字段的链接。例如 `valueType="select"` 对应 [Select 属性][antd-select]。
 
@@ -372,17 +406,17 @@ const alternate = {
 
 `captchaTextRender(timing, count)` 定制按钮文案，`captchaProps` 配置按钮，`onTiming(count)` 接收倒计时。业务侧提供网络请求；loading、倒计时、disabled、readonly 任一成立时阻止重复点击，卸载会清理计时器。
 
-| Prop                | 类型                                                             | 默认值    | 说明                                                                          |
-| ------------------- | ---------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------- |
-| `onGetCaptcha`      | `(phone: string) => void \| boolean \| Promise<void \| boolean>` | 必填      | 发送验证码；返回 `false` 或 reject 会触发 `captchaError`，不开始倒计时        |
-| `phoneName`         | `ProFormFieldName`                                               | —         | ProForm 中的手机号字段路径；未配置时回调接收空字符串                          |
-| `countDown`         | `number`                                                         | `60`      | 倒计时秒数，向下取整且不小于 0                                                |
-| `captchaTextRender` | `(timing: boolean, count: number) => VNodeChild`                 | —         | 自定义所有状态的按钮文案，优先于 `captchaText` / `countDownText`              |
-| `captchaText`       | `VNodeChild`                                                     | intl 文案 | 空闲时的按钮文案                                                              |
-| `countDownText`     | `(seconds: number) => VNodeChild`                                | intl 文案 | 倒计时按钮文案                                                                |
-| `captchaProps`      | `Partial<ButtonProps>`                                           | —         | 发送按钮属性；同名配置优先于 `buttonProps`，loading / disabled 由内部状态控制 |
-| `buttonProps`       | `Partial<ButtonProps>`                                           | —         | 兼容的发送按钮属性入口                                                        |
-| `onTiming`          | `(count: number) => void`                                        | —         | 开始计时和每次倒计时时接收剩余秒数                                            |
+| Prop                | 类型                                                             | 默认值    | 说明                                                                                        |
+| ------------------- | ---------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `onGetCaptcha`      | `(phone: string) => void \| boolean \| Promise<void \| boolean>` | 必填      | 发送验证码；返回 `false` 或 reject 会触发 `captchaError`，不开始倒计时                      |
+| `phoneName`         | `ProFormFieldName`                                               | —         | ProForm 中的手机号字段路径；未配置时回调接收空字符串                                        |
+| `countDown`         | `number`                                                         | `60`      | 倒计时秒数，向下取整且不小于 0                                                              |
+| `captchaTextRender` | `(timing: boolean, count: number) => VNodeChild`                 | —         | 自定义所有状态的按钮文案，优先于 `captchaText` / `countDownText`                            |
+| `captchaText`       | `VNodeChild`                                                     | intl 文案 | 空闲时的按钮文案                                                                            |
+| `countDownText`     | `(seconds: number) => VNodeChild`                                | intl 文案 | 倒计时按钮文案                                                                              |
+| `captchaProps`      | `Partial<ButtonProps>`                                           | —         | [Button 属性][antd-button]；同名配置优先于 `buttonProps`，loading / disabled 由内部状态控制 |
+| `buttonProps`       | `Partial<ButtonProps>`                                           | —         | 兼容的 [Button 属性][antd-button] 入口                                                      |
+| `onTiming`          | `(count: number) => void`                                        | —         | 开始计时和每次倒计时时接收剩余秒数                                                          |
 
 ### ProFormDatePicker
 
@@ -474,11 +508,11 @@ const alternate = {
 | `icon`        | `VNodeChild`              | `UploadOutlined` | 上传入口图标                                               |
 | `title`       | `VNodeChild`              | intl 文案        | 上传入口文案                                               |
 | `max`         | `number`                  | 不限制           | 最大文件数，达到后隐藏上传入口；`fieldProps.maxCount` 优先 |
-| `buttonProps` | `Partial<ButtonProps>`    | —                | 仅传给上传触发按钮                                         |
+| `buttonProps` | `Partial<ButtonProps>`    | —                | 仅传给上传触发按钮，见 [Button 属性][antd-button]          |
 | `action`      | `UploadProps['action']`   | —                | 上传地址的顶层便利入口，`fieldProps.action` 优先           |
 | `accept`      | `UploadProps['accept']`   | —                | 接受的文件类型，`fieldProps.accept` 优先                   |
 | `listType`    | `UploadProps['listType']` | `'picture'`      | 文件列表样式，`fieldProps.listType` 优先                   |
-| `imageProps`  | `Omit<ImageProps, 'src'>` | —                | 内置图片预览配置                                           |
+| `imageProps`  | `Omit<ImageProps, 'src'>` | —                | 内置图片预览配置，见 [Image 属性][antd-image]              |
 
 ### ProFormUploadDragger
 
@@ -547,7 +581,16 @@ ProField 的 42 个内置类型和三种模式见 [ProField](./pro-field.md)。C
 | `ProFormCheckboxGroup` / `ProFormCheckbox.Group`                                                                              | 始终渲染 CheckboxGroup，支持 `layout='horizontal' / 'vertical'`，默认 horizontal                                    | [CheckboxGroupProps][antd-checkbox-group]                                         |
 | `ProFormSearchSelect` / `ProFormSelect.SearchSelect`                                                                          | 默认 multiple、labelInValue、showSearch；同义 fieldProps 优先                                                       | [SelectProps][antd-select]                                                        |
 
-`ProFormDigitRange` 使用紧凑数字输入组合，通过 `fieldProps.separator` / `separatorWidth` 设置分隔符和像素宽度，默认分别为 `~` / `30`；`fieldProps.style` 设置组合容器样式。
+### ProFormDigitRange 配置 {#digit-range}
+
+两个输入共用 [InputNumber 属性][antd-input-number]；以下配置属于数字区间组合本身，放在 `fieldProps` 中。
+
+| 属性                         | 类型                                | 默认值 | 说明及来源                                            |
+| ---------------------------- | ----------------------------------- | ------ | ----------------------------------------------------- |
+| `fieldProps.separator`       | `string`                            | `'~'`  | 数字区间的中间分隔内容                                |
+| `fieldProps.separatorWidth`  | `number`                            | `30`   | 分隔区宽度，单位 px                                   |
+| `fieldProps.placeholder`     | `string \| string[]`                | —      | 字符串供两端共用，数组分别设置两端的 InputNumber 占位 |
+| `fieldProps.class` / `style` | `HTMLAttributes['class' / 'style']` | —      | 作用于组合容器；其余原生 InputNumber 属性同时传给两端 |
 
 ### ProFormSearchSelect 专属属性
 
@@ -556,6 +599,40 @@ ProField 的 42 个内置类型和三种模式见 [ProField](./pro-field.md)。C
 | `mode` | `'multiple' \| 'tags' \| 'single'` | `'multiple'` | `single` 切为单选；`fieldProps.mode` 优先 |
 
 其 `fieldProps` 还默认设置 `labelInValue: true`、`showSearch: true`、`suffixIcon: null`、`autoClearSearchValue: true`、`optionLabelProp: 'label'`，可逐项覆盖。默认多选模式选中后返回带 `label` / `value` 的选中项数组；切为单选时返回单项。
+
+## 底层公开组件
+
+### FieldControl {#field-control}
+
+`FieldControl` 只渲染控件，不创建 FormItem，也不按 `name` 注册字段。需要标签、校验和 store 注册时使用 [ProFormField](#dynamic-field)。
+
+| 属性                                                                                                                                     | 类型                       | 默认值         | 说明及来源                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------- | -------------------------------------------------------------------------------------------- |
+| `fieldType`                                                                                                                              | `ProFormControlType`       | `'text'`       | 选择[字段注册表](#field-props)中的基础控件，优先于 `valueType`                               |
+| `valueType`                                                                                                                              | `ProFormControlType`       | `'text'`       | `fieldType` 未设置时的控件类型                                                               |
+| `modelValue`、`fieldProps`、`disabled`、`readonly`、`emptyText`、`readonlyRender`、`prefixCls`、`classes`、`classNames`、`styles`        | 同[公共属性](#props)       | 同公共属性     | 裸控件自身配置；没有 FormItem 相关属性                                                       |
+| `options`、`valueEnum`、`request`、`params`、`debounceTime`、`proFieldKey`、`cacheForSwr`、`searchValue`                                 | 同[选项请求属性](#options) | 同选项请求属性 | 选项及请求核心                                                                               |
+| `loading`                                                                                                                                | `boolean`                  | `false`        | 控件加载状态                                                                                 |
+| `min`、`precision`、`prefix`、`showTime`、`layout`、`radioType`                                                                          | 同本文对应字段表           | 同对应字段     | 数字、日期、选项控件的便利配置                                                               |
+| `onGetCaptcha`、`phoneName`、`countDown`、`captchaTextRender`、`captchaText`、`countDownText`、`captchaProps`、`buttonProps`、`onTiming` | 同 ProFormCaptcha 表       | 同验证码字段   | 验证码输入及按钮配置；`buttonProps` 也用于 UploadButton                                      |
+| `icon`、`title`、`description`、`max`、`imageProps`                                                                                      | 同上传字段表               | 同对应上传字段 | 上传触发与预览；`action`、`accept`、`listType` 等原生上传属性通过 `fieldProps` 或 attrs 传入 |
+
+它使用上面的[事件表](#events)、基础控件 / Captcha / 上传[插槽](#slots)和全部[实例方法](#instance)。其余 attrs 转发给所选控件；没有 FormItem 专属插槽。金额地区与符号等扩展通过 `fieldProps` 配置，详见 [ProFormMoney](#proformmoney)。
+
+### ReadonlyField {#readonly-field}
+
+| 属性             | 类型                             | 默认值                 | 说明及来源                                       |
+| ---------------- | -------------------------------- | ---------------------- | ------------------------------------------------ |
+| `value`          | `unknown`                        | —                      | 只读展示的值                                     |
+| `options`        | `ProFormFieldOption[]`           | `[]`                   | [标准选项](#option-types)，用于把值转换为标签    |
+| `type`           | `ProValueType \| 'upload'`       | —                      | 只读字段类型，交给 [ProField](./pro-field#props) |
+| `emptyText`      | `VNodeChild`                     | `'-'`                  | 空值占位                                         |
+| `moneyPrefix`    | `VNodeChild \| false`            | —                      | 合并到 `fieldProps.prefix` 的金额前缀            |
+| `readonlyRender` | `(value: unknown) => VNodeChild` | —                      | 自定义内容；返回 null / undefined 时使用默认渲染 |
+| `fieldProps`     | `Record<string, unknown>`        | —                      | [ProField 基础控件配置](./pro-field#field-props) |
+| `prefixCls`      | `string`                         | Provider 的 field 前缀 | ProField 样式前缀                                |
+
+其余 attrs 传给内部只读 [ProField](./pro-field#props)，但 `mode` 固定为 `read`，值、类型、options、render 等由上述属性控制。没有自有事件、插槽或暴露的实例方法。
 
 [antd-form-item]: https://www.antdv-next.com/components/form-cn#form-item-props
 [antd-input]: https://www.antdv-next.com/components/input-cn#input-props

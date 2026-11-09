@@ -26,21 +26,69 @@ Every Pro component inherits its nearest Antdv Next `ConfigProvider`: locale, th
 
 `theme.components.Result` customizes native Result. The native components map does not add `ProTable` or `ProCard` keys; use the Pro provider for Pro token overrides.
 
-## Props
+## Props {#props}
 
-| Prop             | Type / default    | Behavior                                                                      |
-| ---------------- | ----------------- | ----------------------------------------------------------------------------- |
-| `token`          | `ProToken`        | Local patch over resolved native tokens and ancestor Pro patches              |
-| `intl`           | `IntlType`        | Explicit local → explicit ancestor → nearest native locale → Chinese          |
-| `valueTypeMap`   | `ProValueTypeMap` | Inherit by name; replace the entire matching definition; preserve other names |
-| `prefixCls`      | string            | Pro namespace; `ant-pro` by default or `demo-pro` under native prefix `demo`  |
-| `dark`           | optional boolean  | Add dark algorithm while preserving compact; inherit when omitted             |
-| `hashed`         | optional boolean  | Inherit or override native hash class configuration                           |
-| `contentHash`    | string            | Version component of request cache keys                                       |
-| `autoClearCache` | false             | Clear only this provider's owned cache on unmount                             |
-| `needDeps`       | false             | Reuse the parent cache when no explicit overrides are supplied                |
+| Property         | Type              | Default     | Description / source                                                                                           |
+| ---------------- | ----------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `intl`           | `IntlType`        | —           | Pro language: local explicit → ancestor explicit → nearest native locale → Chinese.                            |
+| `token`          | `ProToken`        | `{}`        | Local patch over native tokens; ancestor and local patches merge; see [configuration types](#config-types).    |
+| `valueTypeMap`   | `ProValueTypeMap` | `{}`        | Inherits by type name; matching definitions are entirely replaced; see below.                                  |
+| `prefixCls`      | `string`          | `ant-pro`   | Pro namespace; defaults to demo-pro under native prefix demo.                                                  |
+| `dark`           | `boolean`         | `undefined` | true appends dark while retaining existing algorithms; false retains native algorithms.                        |
+| `hashed`         | `boolean`         | `undefined` | Inherits or overrides native theme.hashed.                                                                     |
+| `contentHash`    | `string`          | —           | Request cache-key content version; inherits from the parent when omitted.                                      |
+| `autoClearCache` | `boolean`         | `false`     | Clears only this provider’s owned cache on unmount.                                                            |
+| `needDeps`       | `boolean`         | `false`     | Reuses parent cache when a parent exists and intl/token/valueTypeMap/prefixCls/dark/hashed are not overridden. |
 
-`ProProvider` aliases the Vue provider component. `useProConfig()`, `useIntl()` and `useProPrefix()` expose reactive refs for setup consumers.
+`ProProvider` is an alias. This provider does not forward arbitrary native ConfigProvider attributes: wrap it in [Antdv Next ConfigProvider](https://www.antdv-next.com/components/config-provider) for locale, theme, direction, componentSize, componentDisabled or getPopupContainer.
+
+### Configuration types {#config-types}
+
+| Entry                                                 | Type                                                               | Behavior / source                                                                                                                                                                                             |
+| ----------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `intl.locale`                                         | `string`                                                           | Locale identifier.                                                                                                                                                                                            |
+| `intl.getMessage`                                     | `(id: string, defaultMessage?: string) => string`                  | Resolves a dotted message path.                                                                                                                                                                               |
+| `token`                                               | `Partial<GlobalToken>`                                             | Native [ConfigProvider theme tokens](https://www.antdv-next.com/components/config-provider).                                                                                                                  |
+| `token.layout`                                        | `DeepPartial<ProLayoutToken>`                                      | Reserved layout data; header/sider/pageContainer merge one level deeper; there is no ProLayout renderer. [Full type](https://github.com/bubblesplant/antv-next-pro/blob/main/packages/src/provider/types.ts). |
+| `token.themeId / proComponentsCls / antCls / iconCls` | `number / string / string / string`                                | Reserved metadata; not native component configuration entries.                                                                                                                                                |
+| `valueTypeMap[type].render`                           | `(text, context, defaultDom) => VNodeChild`                        | Custom read view; see [ProField](./pro-field#props).                                                                                                                                                          |
+| `valueTypeMap[type].formItemRender`                   | `(text, context, defaultDom) => VNodeChild`                        | Custom edit/update view.                                                                                                                                                                                      |
+| `valueTypeMap[type].renderFormItem`                   | `(text, context, defaultDom) => VNodeChild`                        | Legacy fallback; formItemRender takes precedence.                                                                                                                                                             |
+| `context.mode / value / fieldProps`                   | `'read' \| 'edit' \| 'update' / unknown / Record<string, unknown>` | Current field mode, value and input properties.                                                                                                                                                               |
+| `context.onChange / defaultRender`                    | `(value: unknown) => void / () => VNodeChild`                      | Writes back a field value / renders the built-in control.                                                                                                                                                     |
+
+### Slots {#slots}
+
+| Slot      | Scope | Behavior                                                   |
+| --------- | ----- | ---------------------------------------------------------- |
+| `default` | —     | Descendants receiving configuration; no extra DOM wrapper. |
+
+### Events {#events}
+
+No component events are emitted.
+
+### Instance and helpers {#instance}
+
+No component instance methods are exposed. Call these exported helpers in setup:
+
+| Helper                               | Signature / return                                                        | Description                                   |
+| ------------------------------------ | ------------------------------------------------------------------------- | --------------------------------------------- |
+| `useProConfig()`                     | `ProConfigContext`                                                        | Reactive resolved context; entries below.     |
+| `useIntl()`                          | `ComputedRef<IntlType>`                                                   | Current resolved language.                    |
+| `useProPrefix(suffix, custom?)`      | `(string, MaybeRefOrGetter<string \| undefined>?) => ComputedRef<string>` | Custom full prefix, or namespace + suffix.    |
+| `createIntl(locale, messages)`       | `(string, object) => IntlType`                                            | Messages → Chinese baseline → defaultMessage. |
+| `findIntlKeyByAntdLocaleKey(locale)` | `(string \| undefined) => string`                                         | Resolves the closest built-in locale key.     |
+
+| Context entry           | Type / purpose                                      |
+| ----------------------- | --------------------------------------------------- |
+| `intl`                  | `ComputedRef<IntlType>`                             |
+| `token`                 | `ComputedRef<GlobalToken & ProToken>`               |
+| `nativeToken / hashId`  | Native theme token/hash refs.                       |
+| `nativeConfig`          | Native configuration plus resolved disabled/size.   |
+| `prefixCls / direction` | `ComputedRef<string> / ComputedRef<'ltr' \| 'rtl'>` |
+| `valueTypeMap`          | `ComputedRef<ProValueTypeMap>`                      |
+| `cache`                 | `Map<string, ProRequestCacheEntry> \| undefined`    |
+| `contentHash`           | `ComputedRef<string \| undefined> \| undefined`     |
 
 ## Internationalization
 

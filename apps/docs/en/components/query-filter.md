@@ -58,35 +58,78 @@ See [SchemaForm](./schema-form) for column configuration. These examples demonst
 
 ## API
 
-The component also supports the [shared ProForm options](./pro-form), including `initialValues`, `request`, `params`, validation, value formatting, and URL synchronization.
+### Props {#props}
 
-| Property                          | Type                                                      | Default / description                                         |
-| --------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------- |
-| `modelValue` / `v-model`          | `Partial<T>`                                              | Current search values                                         |
-| `columns`                         | `SchemaFormColumn<T>[]`                                   | Optional schema fields                                        |
-| `onFinish`                        | `(values) => boolean \| void \| Promise<boolean \| void>` | Validated search callback; bind with `:on-finish`             |
-| `collapsed` / `v-model:collapsed` | `boolean`                                                 | Controlled collapsed state                                    |
-| `defaultCollapsed`                | `boolean`                                                 | `true`                                                        |
-| `defaultColsNumber`               | `number`                                                  | `3`; default column count in wider containers                 |
-| `span`                            | `number \| Record<string, number>`                        | Grid span with `xs/sm/md/lg/xl` breakpoints                   |
-| `labelWidth`                      | `number \| 'auto'`                                        | Label width; defaults to 80, numbers use px                   |
-| `split`                           | `boolean`                                                 | `false`; separator styling                                    |
-| `searchText` / `resetText`        | `VNodeChild`                                              | Localized search / reset labels                               |
-| `optionRender`                    | `false \| (props, form, doms) => VNodeChild`              | Customize search and reset actions; `false` hides them        |
-| `collapseRender`                  | `false \| (collapsed) => VNodeChild`                      | Customize collapse content; `false` hides the collapse action |
-| `submitter`                       | `false \| SubmitterProps`                                 | Configure search and reset actions and rendering              |
+Without columns this renders composition ProForm; with columns it renders BetaSchemaForm. Every shared configuration has a documented destination:
 
-`optionRender=false` keeps the collapse action. Set `collapseRender=false` to hide it. A custom `collapseRender` replaces the default text and arrow.
+| Entry                                 | Type / owner         | Documentation                                                                                                                                                                                                                                          |
+| ------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Shared ProForm props                  | `ProFormProps<T>`    | All initialValues/request/params/readonly/disabled/dateFormatter/syncToUrl/syncToInitialValues/onValuesChange/formRef/prefixCls/classes/classNames/styles definitions: [ProForm props](./pro-form#props)                                               |
+| Native form props in composition mode | `FormProps`          | Put layout/rules/labelCol/wrapperCol/labelAlign/labelWrap/colon/validateTrigger directly on QueryFilter; [native Form API](https://www.antdv-next.com/components/form)                                                                                 |
+| `formProps` with columns              | `Partial<FormProps>` | Inner native Form options: [SchemaForm props](./schema-form#props), [Form API](https://www.antdv-next.com/components/form). Model, submission, readonly and filter layout are coordinated by the wrapper; dedicated top-level settings take precedence |
+| Other schema configuration            | `SchemaFormProps<T>` | [SchemaForm props](./schema-form#props); fieldProps/formItemProps recipients follow [field API](./pro-form-fields#props)                                                                                                                               |
 
-| Event                           | Description                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| `update:modelValue` / `change`  | Search values changed                                        |
-| `update:collapsed` / `collapse` | Receives the new collapsed state                             |
-| `submit`                        | Observe submission; use `onFinish` to await business results |
-| `reset`                         | Restore the initialization snapshot                          |
-| `error` / `requestError`        | Submission error / initialization request error              |
+| Prop                | Type                                                         | Default          | Description / source                                                            |
+| ------------------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------------------------- |
+| `modelValue`        | `Partial<T>`                                                 | —                | Current v-model search values                                                   |
+| `columns`           | `SchemaFormColumn<T>[]`                                      | —                | Enables schema mode; [column options](./schema-form#columns)                    |
+| `onFinish`          | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —                | Awaitable search callback; bind with :on-finish                                 |
+| `layout`            | `FormProps['layout']`                                        | `'horizontal'`   | [Native layout](https://www.antdv-next.com/components/form), including vertical |
+| `collapsed`         | `boolean`                                                    | Uncontrolled     | Controlled v-model:collapsed state                                              |
+| `defaultCollapsed`  | `boolean`                                                    | `true`           | Initial uncontrolled state                                                      |
+| `defaultColsNumber` | `number`                                                     | `3`              | Default column count in wide containers                                         |
+| `span`              | `number \| Record<string, number>`                           | Responsive       | 24-column spans; xs/sm/md/lg/xl breakpoints                                     |
+| `labelWidth`        | `number \| 'auto'`                                           | `80`             | Label width in pixels                                                           |
+| `split`             | `boolean`                                                    | `false`          | Field separators                                                                |
+| `searchText`        | `VNodeChild`                                                 | Localized Search | Overrides submitter text                                                        |
+| `resetText`         | `VNodeChild`                                                 | Localized Reset  | Overrides submitter text                                                        |
+| `optionRender`      | `false \| (props, form, doms) => VNodeChild`                 | Default actions  | ProFormInstance and default button VNode array                                  |
+| `collapseRender`    | `false \| (collapsed: boolean) => VNodeChild`                | Label and arrow  | Collapse button content; false hides it                                         |
+| `submitter`         | `false \| SubmitterProps`                                    | Default actions  | [Submitter options](./pro-form#submitter), including ButtonProps links          |
 
-The default slot composes fields. Type the component ref as `SchemaFormInstance<T>` to access `getFieldsValue()`, `setFieldsValue()`, `validate()`, `submit()`, `reset()`, and other [ProForm instance methods](./pro-form#values-and-instance).
+optionRender=false preserves the collapse button. collapseRender=false hides it. Action precedence is optionRender → submitter.render → submitter slot → defaults. Top-level labels override submitter labels.
+
+### Events {#events}
+
+| Event               | Arguments                                 | Description                                                               |
+| ------------------- | ----------------------------------------- | ------------------------------------------------------------------------- |
+| `update:modelValue` | `values: Partial<T>`                      | Controlled value update                                                   |
+| `change`            | `values: Partial<T>`                      | Search values changed                                                     |
+| `update:collapsed`  | `collapsed: boolean`                      | Controlled collapse update                                                |
+| `collapse`          | `collapsed: boolean`                      | User toggled collapse                                                     |
+| `submit`            | `values: Partial<T>`                      | Observe submission; onFinish awaits business results                      |
+| `reset`             | `values: Partial<T>`                      | Initialization snapshot restored                                          |
+| `error`             | `error: unknown`                          | Validation/submission failure                                             |
+| `requestError`      | `error: unknown`                          | Initialization request failed                                             |
+| Schema-only events  | [SchemaForm events](./schema-form#events) | With columns, valuesChange/fieldChange/finish follow SchemaForm semantics |
+
+### Slots {#slots}
+
+| Slot                            | Scope                                   | Description                                      |
+| ------------------------------- | --------------------------------------- | ------------------------------------------------ |
+| `default`                       | None                                    | Composition fields                               |
+| `submitter` in composition mode | `{ form, values, submit, reset }`       | Standard form actions remain available           |
+| `submitter` with columns        | `{ values, current }`                   | Schema context; no composition form/submit/reset |
+| Dynamic fields with columns     | [SchemaForm slots](./schema-form#slots) | field-path, path and column-key render entries   |
+
+### Instance methods {#instance}
+
+The exported layout ref uses SchemaFormInstance. Complete signatures are documented by [SchemaForm](./schema-form#instance) and [ProForm](./pro-form#instance).
+
+| Member                                                    | Arguments / return          | Description                                                        |
+| --------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------ |
+| `nativeForm`                                              | `FormInstance \| undefined` | [Native Form instance](https://www.antdv-next.com/components/form) |
+| `validate()` / `validateFields(names?)`                   | `Promise<Partial<T>>`       | Validate raw values                                                |
+| `validateFieldsReturnFormatValue(names?)`                 | `Promise<Partial<T>>`       | Validate formatted values                                          |
+| `getFieldsValue()` / `getFieldValue(name)`                | `Partial<T>` / `unknown`    | Read raw values                                                    |
+| `getFieldsFormatValue()` / `getFieldFormatValue(name)`    | `Partial<T>` / `unknown`    | Read formatted/transformed values                                  |
+| `setFieldsValue(values)` / `setFieldValue(name, value)`   | `void`                      | Merge values / update one path                                     |
+| `submit()`                                                | `Promise<Partial<T>>`       | Validate and await onFinish                                        |
+| `reset()` / `resetFields()`                               | `void`                      | Restore initial snapshot                                           |
+| `clearValidate(names?)` / `scrollToField(name, options?)` | `void`                      | Clear errors / locate a field                                      |
+| `loading`                                                 | `Readonly<Ref<boolean>>`    | Submission state                                                   |
+
+The unified ref also contains open/close/next/prev/formMap forwarding for other layouts. They do not perform layout actions in QueryFilter.
 
 ## Related components
 

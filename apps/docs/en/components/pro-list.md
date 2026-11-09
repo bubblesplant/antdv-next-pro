@@ -55,49 +55,90 @@ The v3 renderer is `(dom, record, index, action, schema)`: the first argument is
 
 ## API
 
-| Prop                                                      | Behavior                                                                                       |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `dataSource` / `defaultDataSource` / `request` / `params` | ProTable controlled, local and remote data; request returns `{ data, total?, success? }`       |
-| `rowKey`                                                  | Stable record identifier; set it explicitly                                                    |
-| `columns` / `metas`                                       | `ProListColumn<T>[]` / `ProListMetas<T>`                                                       |
-| `grid`                                                    | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`; numbers specify items per row           |
-| `itemLayout`                                              | horizontal or vertical                                                                         |
-| `split`                                                   | Dividers and row radius; see the three states below                                            |
-| `showActions` / `showExtra`                               | always or hover; hover content also appears on keyboard focus within the row                   |
-| `itemRender`                                              | `(record, index, defaultDom) => VNodeChild`, replaces the entire item                          |
-| `itemTitleRender` / `itemHeaderRender`                    | The same signature for the title or header; false hides that region                            |
-| `onItem` / `onRow`                                        | `(record, index) => HTMLAttributes`, merged onto the list row                                  |
-| `rowClassName`                                            | String or `(record, index) => string`                                                          |
-| `rowSelection`                                            | ProTable selection configuration, including controlled keys, radio/checkbox and disabled items |
-| `expandable`                                              | Controlled expansion, callbacks and expandedRowRender                                          |
-| `prefixCls` / `classes` / `styles`                        | Prefix and semantic styles                                                                     |
+### Props {#props}
 
-ProList disables search, options and pagination by default; pass explicit configurations to enable them. Other request, toolbar and editing props follow ProTable. BaseProList additionally defaults cardProps, search and toolBarRender to false; each default can be overridden.
+Both components inherit [ProTable props](./pro-table#props), [column settings](./pro-table#columns), [events](./pro-table#events), and [instance methods](./pro-table#instance). The table body is replaced by a list; native table-cell layout properties do not automatically become list layout options. The properties below are added or handled differently.
 
-Omitting `split` gives no dividers and zero row radius. Setting it to `false` gives no dividers and themed row radius; setting it to `true` gives dividers and zero row radius.
+| Property           | Type                                                               | Default        | Description / source                                                                                                                |
+| ------------------ | ------------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `columns`          | `ProListColumn<T>[]`                                               | —              | List schema; overrides metas; see [list columns](#columns).                                                                         |
+| `metas`            | `ProListMetas<T>`                                                  | —              | Schema keyed by title/subTitle/avatar/description/content/actions/extra.                                                            |
+| `grid`             | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`              | —              | Enables grid cards; see grid options below.                                                                                         |
+| `itemCardProps`    | `ProCardProps`                                                     | —              | Per-grid-item [ProCard props](./pro-card#props); generated slots and root class are owned by the list; selection overrides checked. |
+| `itemLayout`       | `'horizontal' \| 'vertical'`                                       | `horizontal`   | Ordinary list item layout.                                                                                                          |
+| `split`            | `boolean`                                                          | `undefined`    | Omitted: no divider/radius; false: theme radius without divider; true: divider without radius.                                      |
+| `showActions`      | `'hover' \| 'always'`                                              | `always`       | hover reveals actions on hover or keyboard focus within the row.                                                                    |
+| `showExtra`        | `'hover' \| 'always'`                                              | `always`       | Extra-region visibility, using the same rule as showActions.                                                                        |
+| `itemRender`       | `(record: T, index: number, defaultDom: VNodeChild) => VNodeChild` | —              | Replaces an entire list item body.                                                                                                  |
+| `itemTitleRender`  | `false \| ProListItemRender<T>`                                    | —              | Replaces or hides the title.                                                                                                        |
+| `itemHeaderRender` | `false \| ProListItemRender<T>`                                    | —              | Replaces or hides the header.                                                                                                       |
+| `onItem`           | `(record: T, index: number) => HTMLAttributes`                     | —              | Returns row attributes, merged after onRow.                                                                                         |
+| `onRow`            | `(record: T, index: number) => HTMLAttributes`                     | —              | Returns list-row attributes, including event handlers.                                                                              |
+| `rowClassName`     | `string \| ((record: T, index: number) => string)`                 | —              | Appends a class to every list row.                                                                                                  |
+| `prefixCls`        | `string`                                                           | `ant-pro-list` | Full list prefix, inherited from native/Pro configuration.                                                                          |
+| `classes`          | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | List semantic classes; see [styles](#styles).                                                                                       |
+| `classNames`       | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | Legacy entry; classes takes precedence.                                                                                             |
+| `styles`           | `SemanticStyles \| ({ props }) => SemanticStyles`                  | —              | List semantic styles; see [styles](#styles).                                                                                        |
 
-With grid enabled, each item uses the existing ProCard. Pass card props through itemCardProps. Set cardActionProps="actions" on the actions schema, such as metas.actions, to place actions in the card footer; extra or an omitted value places them in the header extra region. Grid breakpoint numbers specify cards per row.
+### Shared properties and defaults
 
-The list root has a transparent background by default. Grid items retain their ProCard backgrounds and padding; the surrounding list rows add no extra padding or dividers.
+| Entry                                                        | Default                       | Destination / source                                                                                                                                                                                                      |
+| ------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dataSource / defaultDataSource / request / params / rowKey` | [ProTable](./pro-table#props) | Same data engine; request returns { data, total?, success?, nextToken? }.                                                                                                                                                 |
+| `search / options / pagination`                              | `false`                       | [ProTable props](./pro-table#props); enable explicitly.                                                                                                                                                                   |
+| `cardProps`                                                  | `false`                       | Outer [ProCard](./pro-card#props), not itemCardProps.                                                                                                                                                                     |
+| `BaseProList.toolBarRender`                                  | `false`                       | Hides the whole toolbar by default; can be overridden.                                                                                                                                                                    |
+| `form`                                                       | —                             | Native [Form props](https://www.antdv-next.com/components/form) plus [submitter](./pro-form#submitter); see ProTable.                                                                                                     |
+| `editable`                                                   | —                             | [Editable configuration](./pro-table#editable), using the shared field renderer.                                                                                                                                          |
+| `rowSelection`                                               | —                             | Shared [Table rowSelection API](https://www.antdv-next.com/components/table); list consumes type, selectedRowKeys, defaultSelectedRowKeys, getCheckboxProps, onSelect and onChange.                                       |
+| `expandable`                                                 | —                             | Shared [Table expandable API](https://www.antdv-next.com/components/table); list consumes defaultExpandedRowKeys, expandedRowKeys, rowExpandable, expandRowByClick, expandedRowRender, onExpand and onExpandedRowsChange. |
 
-## Events, slots and ref
+### List columns and metas {#columns}
 
-Data, pagination and editing events follow ProTable. Use `v-model:dataSource` for controlled data, `rowSelection.onChange` for selection, and expandable callbacks for expansion.
+| Property                                                                          | Type                                                                                      | Default                  | Description / source                                                                                                                                                                              |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listSlot`                                                                        | `'title' \| 'subTitle' \| 'description' \| 'avatar' \| 'content' \| 'actions' \| 'extra'` | —                        | Target list region; falls back to dataIndex.                                                                                                                                                      |
+| `cardActionProps`                                                                 | `'extra' \| 'actions'`                                                                    | `extra`                  | Grid action placement: header extra or card footer.                                                                                                                                               |
+| `dataIndex`                                                                       | `ProDataIndex`                                                                            | metas key                | Field path; metas key is used only when not explicitly supplied.                                                                                                                                  |
+| `valueType`                                                                       | `ProColumnValueType<T>`                                                                   | `avatar / option / text` | metas.avatar defaults to avatar, actions to option, and other regions to text.                                                                                                                    |
+| `valueEnum / fieldProps / formItemProps / request / params / render / renderText` | [ProColumns](./pro-table#columns)                                                         | —                        | Shared [column API](./pro-table#columns); fieldProps targets the [valueType input](./pro-form-fields#props); formItemProps targets native [FormItem](https://www.antdv-next.com/components/form). |
 
-| Slot                                                      | Scope                                                                                                      |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `title` / `description` / `content` / `extra` / `actions` | `{ record, index }`, replaces that list region                                                             |
-| `expandedRowRender`                                       | `{ record, index }`, replaces expanded content                                                             |
-| ProTable slots                                            | Also forwarded to the outer table framework; shared names may receive scopes from both rendering positions |
+### Grid configuration {#grid}
 
-The component ref exposes `ProTableInstance<T>`, including reload, reset, setPageInfo, clearSelected, getRowData, getRowsData, setRowData, startEditable, saveEditable and cancelEditable. BaseProList forwards the same instance API.
+| Property                       | Type     | Default             | Description                                                                  |
+| ------------------------------ | -------- | ------------------- | ---------------------------------------------------------------------------- |
+| `gutter`                       | `number` | `16`                | Gap in pixels.                                                               |
+| `column`                       | `number` | `1`                 | Initial cards per row.                                                       |
+| `xs / sm / md / lg / xl / xxl` | `number` | previous breakpoint | Cards per row at each breakpoint; omitted values inherit the previous count. |
 
-## Styling and configuration
+### Events {#events}
 
-Classes/styles accept a map or `({ props }) => map`. Consumed list parts are root, container, row, header, title, subTitle, description, content, extra, actions and expanded. Legacy classNames remains compatible; classes wins for matching parts.
+| Event / callback                  | Parameters                                | Description / source                                                              |
+| --------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------- |
+| ProTable events                   | [Full event table](./pro-table#events)    | Forwarded by both components, including data, loading, paging and editing events. |
+| `update:dataSource`               | `(rows: T[])`                             | Controlled data update; use v-model:dataSource.                                   |
+| `rowSelection.onChange`           | `(keys, rows, { type: 'single' })`        | Selection request; update controlled selectedRowKeys in the caller.               |
+| `rowSelection.onSelect`           | `(record, selected, selectedRows, event)` | Individual selection.                                                             |
+| `expandable.onExpand`             | `(expanded: boolean, record: T)`          | Expand request.                                                                   |
+| `expandable.onExpandedRowsChange` | `(keys: ProKey[])`                        | Expanded-key request; update controlled keys in the caller.                       |
 
-The default public prefix is ant-pro-list. A native ConfigProvider with prefixCls="demo" produces demo-pro-list; the list prefixCls can override it. Locale, direction, theme algorithms, global tokens and native component tokens follow ConfigProvider. Configure Pro extension tokens through [ProConfigProvider.token](./pro-config-provider).
+### Slots {#slots}
 
-## Boundaries
+| Slot                                              | Scope                                | Description / source                                                                             |
+| ------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `title / description / content / extra / actions` | `{ record: T, index: number }`       | Replaces a list region; ordinary description/content/extra require the matching meta.            |
+| `avatar / subTitle`                               | `{ record: T, index: number }`       | Grid-only region slots; ordinary lists use corresponding column render functions.                |
+| `expandedRowRender`                               | `{ record: T, index: number }`       | Expanded content, overriding expandable.expandedRowRender.                                       |
+| ProTable slots                                    | [Full slot table](./pro-table#slots) | Forwarded to the outer table frame as well; overlapping slot names may receive different scopes. |
 
-Only supported listSlot regions are rendered; arbitrary schema keys do not create extra regions. ItemCardProps and cardActionProps target grid cards; regular lists use their own action region. Inherited methods such as fullScreen and scrollTo act through the surrounding ProTable.
+### Instance {#instance}
+
+Both refs expose the complete [ProTableInstance method table](./pro-table#instance), including reload/reset, data access, paging, selection and editing. The outer ProTable determines the target of fullscreen and scrollTo.
+
+### Semantic styles {#styles}
+
+| Parts                                                                                                     | Behavior                                                                                       |
+| --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `root / container / row / header / title / subTitle / description / content / extra / actions / expanded` | List-renderer nodes. classes overrides classNames; styles accepts a map or ({ props }) => map. |
+
+The list root is transparent. Grid cards retain their own background and padding; itemCardProps and cardActionProps apply to grid cards. Language, direction and native tokens inherit [ConfigProvider](https://www.antdv-next.com/components/config-provider); Pro tokens use [ProConfigProvider](./pro-config-provider#props).

@@ -16,22 +16,81 @@ The shared renderer for ProTable, ProDescriptions and form fields. `read` displa
 
 ## API
 
-| Prop                                           | Behavior                                                                  |
-| ---------------------------------------------- | ------------------------------------------------------------------------- |
-| `text` / `modelValue` / `value`                | Explicit modelValue wins, then value and text                             |
-| `mode` / `readonly`                            | read (default), edit, update; readonly forces read                        |
-| `valueType`                                    | A type name or `{ type, ...configuration }`; fieldProps wins on conflicts |
-| `fieldProps`                                   | Native props; date format/valueFormat and money formatting options        |
-| `options` / `valueEnum`                        | Labels, Map keys, status badges and colors                                |
-| `request` / `params`                           | Remote labels in read and edit modes, without duplicate requests          |
-| `debounceTime` / `proFieldKey` / `cacheForSwr` | Request debounce, shared key and cache policy                             |
-| `render`                                       | `(text, context, dom) => VNodeChild` for read mode                        |
-| `formItemRender`                               | Edit renderer; call `context.onChange(value)` to update the model         |
-| `copyable` / `ellipsis`                        | Read text copying and ellipsis                                            |
-| `emptyText`                                    | Defaults to `-`; zero and false remain valid values                       |
-| `prefixCls` / `classes` / `styles`             | Instance prefix and root/control semantic styling; objects or callbacks   |
+### Props {#props}
 
-Events are `update:modelValue`, `change` and `requestError`. The component ref exposes `refresh()`. `renderFormItem` remains a deprecated alias of `formItemRender`.
+ProField does not create a FormItem. Field names, labels and validation belong to [ProFormField](./pro-form-fields#props) or [SchemaForm](./schema-form#props).
+
+| Prop             | Type                                 | Default            | Description / source                                                                            |
+| ---------------- | ------------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------- |
+| `text`           | `unknown`                            | —                  | Display value and fallback for controlled values                                                |
+| `modelValue`     | `unknown`                            | —                  | Explicit `v-model` value takes precedence                                                       |
+| `value`          | `unknown`                            | —                  | Compatibility value, below explicit `modelValue`                                                |
+| `mode`           | `'read' \| 'edit' \| 'update'`       | `'read'`           | Display or editing mode                                                                         |
+| `readonly`       | `boolean`                            | `false`            | Forces read mode                                                                                |
+| `valueType`      | `ProFieldValueTypeInput`             | `'text'`           | Name or `{ type, ...configuration }`; inferred as select with option sources when omitted       |
+| `fieldProps`     | `Record<string, unknown>`            | —                  | Passed to the actual [base control](#field-props); overrides matching valueType object options  |
+| `options`        | `ProFormFieldOption[]`               | —                  | Local [options](./pro-form-fields#options)                                                      |
+| `valueEnum`      | `ProFormValueEnum`                   | —                  | Object or Map of [labels, statuses and colors](./pro-form-fields#option-types)                  |
+| `request`        | `(params?) => Promise<Option[]>`     | —                  | Remote labels in both modes; [request rules](./pro-form-fields#options)                         |
+| `params`         | `Record<string, unknown>`            | —                  | Changing parameters reloads options                                                             |
+| `debounceTime`   | `number`                             | `0`                | Request debounce in milliseconds                                                                |
+| `proFieldKey`    | `string`                             | —                  | Shared request key within the configuration scope                                               |
+| `cacheForSwr`    | `boolean`                            | `true`             | Reuse scoped request cache                                                                      |
+| `onRequestError` | `(error: unknown) => void`           | —                  | Listener for `requestError`; templates may use `@request-error`                                 |
+| `render`         | `(text, context, dom) => VNodeChild` | —                  | Read renderer; overrides the provider renderer                                                  |
+| `formItemRender` | `(text, context, dom) => VNodeChild` | —                  | Edit renderer; call `context.onChange(value)`                                                   |
+| `renderFormItem` | Same as `formItemRender`             | —                  | Compatibility fallback below `formItemRender`                                                   |
+| `copyable`       | `boolean \| Record<string, unknown>` | `false`            | Read text [Typography copy configuration](https://www.antdv-next.com/components/typography)     |
+| `ellipsis`       | `boolean \| Record<string, unknown>` | `false`            | Read text [Typography ellipsis configuration](https://www.antdv-next.com/components/typography) |
+| `emptyText`      | `VNodeChild`                         | `'-'`              | Placeholder; zero and false remain valid                                                        |
+| `prefixCls`      | `string`                             | Provider generated | Complete prefix, normally `ant-pro-field`                                                       |
+| `classes`        | `object \| ({ props }) => object`    | —                  | `root/control` semantic classes                                                                 |
+| `classNames`     | Same as `classes`                    | —                  | Legacy classes, filling missing parts                                                           |
+| `styles`         | `object \| ({ props }) => object`    | —                  | `root/control` semantic styles; see [Provider](./pro-config-provider)                           |
+
+Value precedence: explicit `modelValue` → explicit `value` → edit-mode `fieldProps.value` → `text`. Root `class/style/id/data-*/aria-*` apply to the outer span. Style the base control through fieldProps or the control semantic part.
+
+### Native fieldProps API {#field-props}
+
+| valueType / mode                                          | Recipient and native API                                                                                                                                                            |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text/password/textarea/code/jsonCode`, edit-mode `image` | [Input / Password / TextArea](https://www.antdv-next.com/components/input); code uses TextArea, image uses a URL Input                                                              |
+| Edit-mode `digit/money/percent/second/progress`           | [InputNumber](https://www.antdv-next.com/components/input-number); [money extensions](./pro-form-fields#proformmoney)                                                               |
+| Edit-mode `digitRange`                                    | Two [InputNumber](https://www.antdv-next.com/components/input-number) controls; [separator extensions](./pro-form-fields#digit-range)                                               |
+| Dates, date ranges, edit-mode `fromNow`                   | [DatePicker / RangePicker](https://www.antdv-next.com/components/date-picker), including format/valueFormat/picker/showTime                                                         |
+| Edit-mode `time/timeRange`                                | [TimePicker / RangePicker](https://www.antdv-next.com/components/time-picker)                                                                                                       |
+| Edit-mode `select/treeSelect/cascader`                    | [Select](https://www.antdv-next.com/components/select), [TreeSelect](https://www.antdv-next.com/components/tree-select), [Cascader](https://www.antdv-next.com/components/cascader) |
+| Edit-mode `checkbox/radio/radioButton/segmented`          | [Checkbox](https://www.antdv-next.com/components/checkbox), [Radio](https://www.antdv-next.com/components/radio), [Segmented](https://www.antdv-next.com/components/segmented)      |
+| Edit-mode `slider/switch`                                 | [Slider](https://www.antdv-next.com/components/slider), [Switch](https://www.antdv-next.com/components/switch)                                                                      |
+| `rate/color`                                              | [Rate](https://www.antdv-next.com/components/rate), [ColorPicker](https://www.antdv-next.com/components/color-picker); readonly disables editing                                    |
+| Read-mode `image/avatar/progress`                         | [Image](https://www.antdv-next.com/components/image), [Avatar](https://www.antdv-next.com/components/avatar), [Progress](https://www.antdv-next.com/components/progress)            |
+| Read-mode text                                            | [Typography](https://www.antdv-next.com/components/typography) for copyable/ellipsis; date and numeric display also uses internal formatting                                        |
+
+The field core coordinates controlled values and update listeners. Manage values through v-model; other options follow the recipient's native API. Read modes consume display-related options only.
+
+### Events {#events}
+
+| Event               | Arguments        | Description            |
+| ------------------- | ---------------- | ---------------------- |
+| `update:modelValue` | `value: unknown` | Controlled edit update |
+| `change`            | `value: unknown` | Edit notification      |
+| `requestError`      | `error: unknown` | Failed option request  |
+
+### Slots {#slots}
+
+| Slot      | Scope                                                  | Description                                                               |
+| --------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `default` | `{ mode, value, onChange, fieldProps, defaultRender }` | Custom content; a matching explicit or provider renderer takes precedence |
+
+Render callbacks receive this scope as their second argument and the default VNode as the third argument. `defaultRender()` also returns the default content.
+
+### Instance methods {#instance}
+
+| Method      | Returns         | Description                                            |
+| ----------- | --------------- | ------------------------------------------------------ |
+| `refresh()` | `Promise<void>` | Reload read-mode labels or forward to the edit control |
+
+Function-wrapped atoms such as FieldText forward props, events and slots, but currently do not expose the inner ref. Use ProField itself when refresh is required.
 
 ## Built-in types
 
@@ -57,6 +116,68 @@ Named atoms such as `FieldText`, `FieldSelect`, `FieldMoney` and `FieldDatePicke
   :number-format-options="{ currency: 'EUR' }"
 />
 ```
+
+### Atom index {#atoms}
+
+The following atoms inherit [props](#props), [events](#events) and the [default slot](#slots), with a fixed valueType. Native options follow [fieldProps](#field-props). They do not create FormItems.
+
+| Export                 | Fixed valueType |
+| ---------------------- | --------------- |
+| `FieldText`            | `text`          |
+| `FieldCascader`        | `cascader`      |
+| `FieldCheckbox`        | `checkbox`      |
+| `FieldCode`            | `code`          |
+| `FieldColorPicker`     | `color`         |
+| `FieldDatePicker`      | `date`          |
+| `FieldDigit`           | `digit`         |
+| `FieldDigitRange`      | `digitRange`    |
+| `FieldFromNow`         | `fromNow`       |
+| `FieldImage`           | `image`         |
+| `FieldMoney`           | `money`         |
+| `FieldOptions`         | `option`        |
+| `FieldPassword`        | `password`      |
+| `FieldPercent`         | `percent`       |
+| `FieldProgress`        | `progress`      |
+| `FieldRadio`           | `radio`         |
+| `FieldRangePicker`     | `dateRange`     |
+| `FieldRate`            | `rate`          |
+| `FieldSecond`          | `second`        |
+| `FieldSegmented`       | `segmented`     |
+| `FieldSelect`          | `select`        |
+| `FieldSlider`          | `slider`        |
+| `FieldSwitch`          | `switch`        |
+| `FieldTextArea`        | `textarea`      |
+| `FieldTimePicker`      | `time`          |
+| `FieldTimeRangePicker` | `timeRange`     |
+| `FieldTreeSelect`      | `treeSelect`    |
+
+### FieldMoney additional props {#money-props}
+
+| Prop                  | Type                                                                      | Default                | Description / source                                                                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `locale`              | `string`                                                                  | Provider intl locale   | Unsupported locales fall back to zh-CN                                                                                                                                             |
+| `customSymbol`        | `string`                                                                  | Locale currency symbol | Custom symbol; matching fieldProps takes precedence                                                                                                                                |
+| `moneySymbol`         | `boolean`                                                                 | `true`                 | Show currency symbol; matching fieldProps takes precedence                                                                                                                         |
+| `numberFormatOptions` | `Intl.NumberFormatOptions`                                                | Two decimals           | [Intl.NumberFormat options](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat); matching fieldProps takes precedence |
+| `numberPopoverRender` | `boolean \| (props: InputNumberProps, defaultText: string) => VNodeChild` | Amount hint            | Focus hint in edit mode; false disables it. Callback props follow [InputNumber](https://www.antdv-next.com/components/input-number)                                                |
+
+### Standalone display members {#display-atoms}
+
+| Member                                                 | Props and defaults                                                                         | Slots, events, methods / source                                                               |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `FieldIndexColumn`                                     | `text?: number` (empty text when omitted), `border?: boolean=false`                        | `default()` replaces the index; HTML attrs target span; no custom events or methods           |
+| `FieldStatus.Success/Error/Processing/Default/Warning` | Other attrs go to [Badge](https://www.antdv-next.com/components/badge) with a fixed status | `default()` is status text; no custom events or methods; lowercase aliases are also available |
+| `ProFieldBadgeColor`                                   | `color?: string`; other attrs go to [Badge](https://www.antdv-next.com/components/badge)   | `default()` is text; no custom events or methods                                              |
+
+### Helpers {#helpers}
+
+| Function                                                   | Returns                | Description                                                                                                                           |
+| ---------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `createProField(renderer)`                                 | `Component`            | Custom field sharing props/slots; renderer is `(value, valueType, props, valueTypeMap) => VNodeChild` or `{ renderRead, renderEdit }` |
+| `defaultRenderText(value, valueType, props, valueTypeMap)` | `VNodeChild`           | Default ProField VNode using registered renderers                                                                                     |
+| `proFieldParsingValueEnumToArray(valueEnum)`               | `ProFormFieldOption[]` | Convert enums to option arrays                                                                                                        |
+| `preloadProFieldValueType(type)`                           | `Promise<void>`        | Preload one built-in type                                                                                                             |
+| `preloadAllProFieldValueTypes()`                           | `Promise<void>`        | Preload all built-in types                                                                                                            |
 
 ## Custom types and preloading
 

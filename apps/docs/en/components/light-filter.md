@@ -83,28 +83,98 @@ function search(values: Record<string, unknown>) {
 
 ## API
 
-The component also supports the [shared ProForm options](./pro-form), including `initialValues`, `request`, `params`, validation, value formatting, and URL synchronization.
+### Props {#props}
 
-| Property                 | Type                                                      | Default / description                                               |
-| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------- |
-| `modelValue` / `v-model` | `Partial<T>`                                              | Current filter values                                               |
-| `columns`                | `SchemaFormColumn<T>[]`                                   | Optional schema fields                                              |
-| `onFinish`               | `(values) => boolean \| void \| Promise<boolean \| void>` | Search callback on confirmation or clearing; bind with `:on-finish` |
-| `collapse`               | `boolean`                                                 | `false`; collect all fields in one popover                          |
-| `collapseLabel`          | `VNodeChild`                                              | Localized More label                                                |
-| `placement`              | `PopoverProps['placement']`                               | `'bottomLeft'`                                                      |
-| `footerRender`           | `false \| ({ confirm, clear }, doms) => VNodeChild`       | Customize popover actions; `false` hides the footer                 |
+Without columns this composes fields; with columns it uses BetaSchemaForm.
 
-Set a field's `secondary` property to place it under More. With `collapse=true`, all fields share one popover. This grouping option is separate from `QueryFilter`'s `v-model:collapsed` state.
+| Entry                                 | Type                 | Owner and documentation                                                                                                                                                                    |
+| ------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Shared ProForm props                  | `ProFormProps<T>`    | initialValues/request/params/readonly/disabled/dateFormatter/syncToUrl/syncToInitialValues/onValuesChange/formRef/prefixCls/classes/classNames/styles: [ProForm props](./pro-form#props)   |
+| Native Form props in composition mode | `FormProps`          | Put these directly on LightFilter; [Form API](https://www.antdv-next.com/components/form)                                                                                                  |
+| `formProps` with columns              | `Partial<FormProps>` | Inner [native Form](https://www.antdv-next.com/components/form); see [SchemaForm props](./schema-form#props). Model, submission, readonly and filter layout are coordinated by the wrapper |
+| Other schema configuration            | `SchemaFormProps<T>` | [SchemaForm props](./schema-form#props); fieldProps/formItemProps recipients follow [field API](./pro-form-fields#props)                                                                   |
 
-| Event                          | Description                                                  |
-| ------------------------------ | ------------------------------------------------------------ |
-| `update:modelValue` / `change` | Values changed, including unconfirmed edits                  |
-| `submit`                       | Observe submission; use `onFinish` to await business results |
-| `reset`                        | Restore the initialization snapshot through the instance     |
-| `error` / `requestError`       | Submission error / initialization request error              |
+| Prop              | Type                                                         | Default               | Description / source                                               |
+| ----------------- | ------------------------------------------------------------ | --------------------- | ------------------------------------------------------------------ |
+| `modelValue`      | `Partial<T>`                                                 | —                     | Current v-model values                                             |
+| `columns`         | `SchemaFormColumn<T>[]`                                      | —                     | Enables schema mode; [columns](./schema-form#columns)              |
+| `onFinish`        | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —                     | Awaitable query on confirm/clear; use :on-finish                   |
+| `collapse`        | `boolean`                                                    | `false`               | Collect every field in More                                        |
+| `collapseLabel`   | `VNodeChild`                                                 | Localized More        | More entry label                                                   |
+| `placement`       | `PopoverProps['placement']`                                  | `'bottomLeft'`        | [Popover placement](https://www.antdv-next.com/components/popover) |
+| `footerRender`    | `false \| ({ confirm, clear }, doms) => VNodeChild`          | Confirm/clear buttons | Customize popover actions; false hides them                        |
+| Field `secondary` | `boolean`                                                    | `false`               | Set on a child or schema column to put it under More               |
 
-The default slot composes fields. The component ref exposes `getFieldsValue()`, `setFieldsValue()`, `validate()`, `submit()`, and `reset()`. Use `ProFormInstance` for composed fields or `SchemaFormInstance<T>` for schema fields. See [ProForm instance methods](./pro-form#values-and-instance).
+collapse groups fields, independently of QueryFilter's v-model:collapsed. Confirm validates and submits, cancel restores the opening snapshot, and clear removes conditions before submitting. Values change during editing; queries run on confirm/clear. LightFilter uses footerRender for popover actions. Shared [submitter configuration](./pro-form#submitter) does not replace those actions.
+
+### Events {#events}
+
+| Event               | Arguments                                 | Description                                                           |
+| ------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| `update:modelValue` | `values: Partial<T>`                      | Controlled values, including unconfirmed edits                        |
+| `change`            | `values: Partial<T>`                      | Conditions changed                                                    |
+| `submit`            | `values: Partial<T>`                      | Notification; use onFinish to await results                           |
+| `reset`             | `values: Partial<T>`                      | Initial snapshot restored                                             |
+| `error`             | `error: unknown`                          | Validation/submission failure                                         |
+| `requestError`      | `error: unknown`                          | Initialization request failed                                         |
+| Schema-only events  | [SchemaForm events](./schema-form#events) | With columns, valuesChange/fieldChange/finish follow SchemaForm rules |
+
+### Slots {#slots}
+
+| Slot                        | Scope                                   | Description                                    |
+| --------------------------- | --------------------------------------- | ---------------------------------------------- |
+| `default`                   | None                                    | Composition fields                             |
+| Dynamic fields with columns | [SchemaForm scope](./schema-form#slots) | field-path, path and column-key render entries |
+
+Use footerRender for popover actions; LightFilter does not render a submitter-slot action area. See [LightWrapper](#light-wrapper) for the individual popover label slot.
+
+### Instance methods {#instance}
+
+The exported ref is SchemaFormInstance. Complete signatures follow [SchemaForm](./schema-form#instance) and [ProForm](./pro-form#instance).
+
+| Member                                                    | Returns                     | Description                                                        |
+| --------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------ |
+| `nativeForm`                                              | `FormInstance \| undefined` | [Native Form instance](https://www.antdv-next.com/components/form) |
+| `validate()` / `validateFields(names?)`                   | `Promise<Partial<T>>`       | Validate raw values                                                |
+| `validateFieldsReturnFormatValue(names?)`                 | `Promise<Partial<T>>`       | Validate formatted values                                          |
+| `getFieldsValue()` / `getFieldValue(name)`                | `Partial<T>` / `unknown`    | Raw values                                                         |
+| `getFieldsFormatValue()` / `getFieldFormatValue(name)`    | `Partial<T>` / `unknown`    | Formatted/transformed output                                       |
+| `setFieldsValue(values)` / `setFieldValue(name, value)`   | `void`                      | Update values                                                      |
+| `submit()`                                                | `Promise<Partial<T>>`       | Validate and await the query                                       |
+| `reset()` / `resetFields()`                               | `void`                      | Restore all initial conditions                                     |
+| `clearValidate(names?)` / `scrollToField(name, options?)` | `void`                      | Clear errors / locate a field                                      |
+| `loading`                                                 | `Readonly<Ref<boolean>>`    | Submission state                                                   |
+
+The unified ref also contains open/close/next/prev/formMap for other layouts. Individual filter popovers use LightWrapper.open instead.
+
+## LightWrapper {#light-wrapper}
+
+The root export is a filter popover using the nearest ProForm context. It reads name/fieldNames, captures an opening snapshot and restores it on cancel. Place standalone usage inside ProForm.
+
+### Props
+
+| Prop           | Type                               | Default        | Description / source                                                                                                                               |
+| -------------- | ---------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`         | `ProDataIndex`                     | —              | Single form path                                                                                                                                   |
+| `fieldNames`   | `ProDataIndex[]`                   | —              | Group paths; takes precedence over name                                                                                                            |
+| `label`        | `VNodeChild`                       | Empty          | Trigger label; label slot wins                                                                                                                     |
+| `disabled`     | `boolean`                          | `false`        | Disable trigger; also inherits form disabled                                                                                                       |
+| `open`         | `boolean`                          | Uncontrolled   | v-model:open state                                                                                                                                 |
+| `placement`    | `PopoverProps['placement']`        | `'bottomLeft'` | [Popover position](https://www.antdv-next.com/components/popover)                                                                                  |
+| `footerRender` | [LightFilter.footerRender](#props) | Confirm/clear  | Footer customization                                                                                                                               |
+| Other attrs    | `PopoverProps` / HTML attrs        | Native         | Forwarded to [Popover](https://www.antdv-next.com/components/popover); trigger/open/placement and opening listeners are coordinated by the wrapper |
+
+### Events and slots
+
+| Kind  | Name          | Arguments / purpose                                                                         |
+| ----- | ------------- | ------------------------------------------------------------------------------------------- |
+| Event | `update:open` | `(open: boolean)` controlled update                                                         |
+| Event | `confirm`     | `(value: unknown)` after successful validation/submission; grouped fields produce an object |
+| Event | `clear`       | No arguments; fields cleared, then query submitted                                          |
+| Slot  | `default`     | No scope; popover fields                                                                    |
+| Slot  | `label`       | `{ value }` custom trigger label                                                            |
+
+LightWrapper exposes no instance methods. Use footerRender for confirm/clear and v-model:open for visibility. Its displayed value comes from form context; it has no standalone value/allowClear props.
 
 ## Related components
 

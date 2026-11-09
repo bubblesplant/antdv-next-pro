@@ -55,49 +55,90 @@ const metas: ProListMetas<Project> = {
 
 ## API
 
-| 属性                                                      | 说明                                                                            |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `dataSource` / `defaultDataSource` / `request` / `params` | 继承 ProTable 的受控、本地和远程数据方式；请求返回 `{ data, total?, success? }` |
-| `rowKey`                                                  | 唯一记录标识，推荐显式设置                                                      |
-| `columns` / `metas`                                       | `ProListColumn<T>[]` / `ProListMetas<T>`                                        |
-| `grid`                                                    | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`；数字表示每行项数         |
-| `itemLayout`                                              | `horizontal` / `vertical`                                                       |
-| `split`                                                   | 分隔线与行圆角，见下方三态说明                                                  |
-| `showActions` / `showExtra`                               | `always` / `hover`；悬停模式也在键盘焦点进入行时显示                            |
-| `itemRender`                                              | `(record, index, defaultDom) => VNodeChild`，替换整项                           |
-| `itemTitleRender` / `itemHeaderRender`                    | 同上，分别替换标题、头部；`false` 隐藏该区域                                    |
-| `onItem` / `onRow`                                        | `(record, index) => HTMLAttributes`，合并绑定到列表行                           |
-| `rowClassName`                                            | 字符串或 `(record, index) => string`                                            |
-| `rowSelection`                                            | 继承 ProTable 的选择配置，支持受控 key、单选/多选和禁用项                       |
-| `expandable`                                              | 展开配置，支持受控 key、展开事件及 `expandedRowRender`                          |
-| `prefixCls` / `classes` / `styles`                        | 前缀与语义样式，见下文                                                          |
+### 属性 {#props}
 
-`ProList` 默认关闭 `search`、`options`、`pagination`，可显式开启；其他工具栏、请求和编辑属性参见 ProTable。`BaseProList` 在此基础上默认设置 `cardProps=false`、`search=false`、`toolBarRender=false`，这些默认值均可覆盖。
+两个组件继承 [ProTable 属性](./pro-table#props)、[列配置](./pro-table#columns)、[事件](./pro-table#events)和[实例方法](./pro-table#instance)。表格正文替换为列表，原生表格单元格排版属性不会自动成为列表排版配置。以下是新增或语义不同的属性。
 
-`split` 未传时无分隔线且行圆角为 0；显式设为 `false` 时无分隔线且使用主题圆角；设为 `true` 时显示分隔线且行圆角为 0。
+| 属性               | 类型                                                               | 默认值         | 说明 / 来源                                                                                                        |
+| ------------------ | ------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `columns`          | `ProListColumn<T>[]`                                               | —              | 列表字段 Schema；优先于 metas，字段扩展见[下表](#columns)。                                                        |
+| `metas`            | `ProListMetas<T>`                                                  | —              | 按 title/subTitle/avatar/description/content/actions/extra 组织 Schema。                                           |
+| `grid`             | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`              | —              | 启用网格卡片，断点配置见下表。                                                                                     |
+| `itemCardProps`    | `ProCardProps`                                                     | —              | 传给每个网格项 [ProCard](./pro-card#props)；内部区域插槽和根 class 由列表生成，启用选择后 checked 由选择状态覆盖。 |
+| `itemLayout`       | `'horizontal' \| 'vertical'`                                       | `horizontal`   | 普通列表正文排列。                                                                                                 |
+| `split`            | `boolean`                                                          | `undefined`    | 未传：无分隔线、无行圆角；false：无分隔线、主题圆角；true：分隔线、无圆角。                                        |
+| `showActions`      | `'hover' \| 'always'`                                              | `always`       | hover 时鼠标悬浮或键盘焦点进入行才显示。                                                                           |
+| `showExtra`        | `'hover' \| 'always'`                                              | `always`       | 附加区显示时机，与 showActions 同规则。                                                                            |
+| `itemRender`       | `(record: T, index: number, defaultDom: VNodeChild) => VNodeChild` | —              | 替换整个列表项正文。                                                                                               |
+| `itemTitleRender`  | `false \| ProListItemRender<T>`                                    | —              | 替换标题或以 false 隐藏标题。                                                                                      |
+| `itemHeaderRender` | `false \| ProListItemRender<T>`                                    | —              | 替换头部或以 false 隐藏头部。                                                                                      |
+| `onItem`           | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs；在 onRow 之后合并。                                                                              |
+| `onRow`            | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs，支持事件处理器。                                                                                 |
+| `rowClassName`     | `string \| ((record: T, index: number) => string)`                 | —              | 追加到每个列表行。                                                                                                 |
+| `prefixCls`        | `string`                                                           | `ant-pro-list` | 完整列表前缀；继承原生与 ProProvider 前缀。                                                                        |
+| `classes`          | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 列表语义类名，见[样式](#styles)。                                                                                  |
+| `classNames`       | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 兼容入口；同部位 classes 优先。                                                                                    |
+| `styles`           | `SemanticStyles \| ({ props }) => SemanticStyles`                  | —              | 列表语义样式，见[样式](#styles)。                                                                                  |
 
-启用 `grid` 时，每项使用现有 ProCard 呈现，`itemCardProps` 传入卡片属性。操作 schema（如 `metas.actions`）的 `cardActionProps="actions"` 将操作放在卡片底部；`extra` 或省略时放在卡片头部附加区域。`grid` 的断点数值决定每行卡片数。
+### 共享属性及默认值
 
-列表根背景默认透明；网格模式保留各项 ProCard 的背景与内边距，外层列表行不再叠加内边距或分隔线。
+| 配置项                                                       | 默认值                        | 实际去处 / 来源                                                                                                                                                                                                     |
+| ------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dataSource / defaultDataSource / request / params / rowKey` | [ProTable](./pro-table#props) | 同一数据引擎；request 返回 { data, total?, success?, nextToken? }。                                                                                                                                                 |
+| `search / options / pagination`                              | `false`                       | [ProTable 属性](./pro-table#props)，显式传入开启。                                                                                                                                                                  |
+| `cardProps`                                                  | `false`                       | 外层 [ProCard](./pro-card#props)，区别于 itemCardProps。                                                                                                                                                            |
+| `BaseProList.toolBarRender`                                  | `false`                       | 默认隐藏整个工具栏，可覆盖。                                                                                                                                                                                        |
+| `form`                                                       | —                             | 原生 [Form 属性](https://www.antdv-next.com/components/form-cn)及 [submitter](./pro-form#submitter)，详见 ProTable。                                                                                                |
+| `editable`                                                   | —                             | [编辑配置](./pro-table#editable)，使用共享字段渲染器。                                                                                                                                                              |
+| `rowSelection`                                               | —                             | 共享 [Table rowSelection API](https://www.antdv-next.com/components/table-cn)；列表消费 type、selectedRowKeys、defaultSelectedRowKeys、getCheckboxProps、onSelect、onChange。                                       |
+| `expandable`                                                 | —                             | 共享 [Table expandable API](https://www.antdv-next.com/components/table-cn)；列表消费 defaultExpandedRowKeys、expandedRowKeys、rowExpandable、expandRowByClick、expandedRowRender、onExpand、onExpandedRowsChange。 |
 
-## 事件、插槽与实例
+### 列与 metas {#columns}
 
-数据、分页、选择、编辑事件沿用 ProTable；受控 `dataSource` 的回传使用 `v-model:dataSource`。选择变化通过 `rowSelection.onChange` 接收，展开变化通过 `expandable` 的回调接收。
+| 属性                                                                              | 类型                                                                                      | 默认值                   | 说明 / 来源                                                                                                                                                                              |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listSlot`                                                                        | `'title' \| 'subTitle' \| 'description' \| 'avatar' \| 'content' \| 'actions' \| 'extra'` | —                        | 列表区域；省略时按 dataIndex 匹配区域名。                                                                                                                                                |
+| `cardActionProps`                                                                 | `'extra' \| 'actions'`                                                                    | `extra`                  | 网格操作区放在卡片头部 extra 或底部 actions。                                                                                                                                            |
+| `dataIndex`                                                                       | `ProDataIndex`                                                                            | metas 区域键             | 字段路径；metas 未显式提供时使用区域键。                                                                                                                                                 |
+| `valueType`                                                                       | `ProColumnValueType<T>`                                                                   | `avatar / option / text` | metas.avatar 默认为 avatar，actions 为 option，其余为 text。                                                                                                                             |
+| `valueEnum / fieldProps / formItemProps / request / params / render / renderText` | [ProColumns](./pro-table#columns)                                                         | —                        | 完整[共享列 API](./pro-table#columns)；fieldProps 交给 [valueType 对应控件](./pro-form-fields#props)，formItemProps 交给原生 [FormItem](https://www.antdv-next.com/components/form-cn)。 |
 
-| 插槽                                                      | 参数                                                                   |
-| --------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `title` / `description` / `content` / `extra` / `actions` | `{ record, index }`，替换对应列表区域                                  |
-| `expandedRowRender`                                       | `{ record, index }`，替换展开正文                                      |
-| ProTable 插槽                                             | 同时转发给外层表格框架；名称可能与列表区域重合，作用域需按实际位置处理 |
+### grid 配置 {#grid}
 
-组件 `ref` 为 `ProTableInstance<T>`：支持 `reload`、`reset`、`setPageInfo`、`clearSelected`、`getRowData`、`getRowsData`、`setRowData`，以及 `startEditable`、`saveEditable`、`cancelEditable` 等方法。`BaseProList` 转发同一实例能力。
+| 属性                           | 类型     | 默认值   | 说明                                         |
+| ------------------------------ | -------- | -------- | -------------------------------------------- |
+| `gutter`                       | `number` | `16`     | 卡片间距，像素。                             |
+| `column`                       | `number` | `1`      | 初始每行卡片数。                             |
+| `xs / sm / md / lg / xl / xxl` | `number` | 前一断点 | 对应断点的每行卡片数；未设置时沿用前一断点。 |
 
-## 样式与配置
+### 事件 {#events}
 
-`classes` / `styles` 支持对象或 `({ props }) => map`。列表消费的部位为 `root`、`container`、`row`、`header`、`title`、`subTitle`、`description`、`content`、`extra`、`actions`、`expanded`。旧 `classNames` 兼容，同名部位 `classes` 优先。
+| 事件 / 回调                       | 参数                                      | 说明 / 来源                                        |
+| --------------------------------- | ----------------------------------------- | -------------------------------------------------- |
+| ProTable 事件                     | [完整事件表](./pro-table#events)          | 两个组件完整转发，包括数据、加载、分页和编辑事件。 |
+| `update:dataSource`               | `(rows: T[])`                             | 受控数据更新，使用 v-model:dataSource。            |
+| `rowSelection.onChange`           | `(keys, rows, { type: 'single' })`        | 选择变化；受控 selectedRowKeys 由调用方更新。      |
+| `rowSelection.onSelect`           | `(record, selected, selectedRows, event)` | 单项选择。                                         |
+| `expandable.onExpand`             | `(expanded: boolean, record: T)`          | 展开请求。                                         |
+| `expandable.onExpandedRowsChange` | `(keys: ProKey[])`                        | 展开键变化；受控键由调用方更新。                   |
 
-默认公开前缀为 `ant-pro-list`；原生 ConfigProvider 设置 `prefixCls="demo"` 后为 `demo-pro-list`。`prefixCls` 可覆盖当前列表前缀。语言、方向、主题算法、全局及原生组件 token 继承原生 ConfigProvider，Pro 扩展 token 使用 [ProConfigProvider](./pro-config-provider) 的 `token`。
+### 插槽 {#slots}
 
-## 使用边界
+| 插槽                                              | 参数                            | 说明 / 来源                                                      |
+| ------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------- |
+| `title / description / content / extra / actions` | `{ record: T, index: number }`  | 替换列表区域；普通列表 description/content/extra 需有对应 meta。 |
+| `avatar / subTitle`                               | `{ record: T, index: number }`  | 网格模式的区域插槽；普通列表使用对应列 render 回调。             |
+| `expandedRowRender`                               | `{ record: T, index: number }`  | 展开内容，优先于 expandable.expandedRowRender。                  |
+| ProTable 插槽                                     | [完整插槽表](./pro-table#slots) | 同时转发外层表格框架；同名插槽在不同位置可能收到不同作用域。     |
 
-列表呈现 `listSlot` 对应的区域；任意其他 schema 键不会自动生成独立区域。`itemCardProps` 与 `cardActionProps` 用于网格卡片布局，普通列表使用自身操作区域。`fullScreen`、`scrollTo` 等继承方法的实际作用范围由外层 ProTable 决定。
+### 实例 {#instance}
+
+两个组件 ref 均暴露完整 [ProTableInstance 方法表](./pro-table#instance)，涵盖 reload/reset、数据读写、分页、选择和编辑。全屏、scrollTo 的作用范围由外层 ProTable 决定。
+
+### 语义样式 {#styles}
+
+| 部位                                                                                                      | 说明                                                                            |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `root / container / row / header / title / subTitle / description / content / extra / actions / expanded` | 列表渲染节点；classes 优先于 classNames，styles 接受对象或 ({ props }) => map。 |
+
+列表根背景透明。网格卡片保留自身背景和内边距，itemCardProps 与 cardActionProps 只用于网格卡片。语言、方向和原生 token 继承 [ConfigProvider](https://www.antdv-next.com/components/config-provider-cn)，Pro token 见 [ProConfigProvider](./pro-config-provider#props)。

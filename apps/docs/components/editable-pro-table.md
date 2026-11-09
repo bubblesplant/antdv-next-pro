@@ -111,49 +111,76 @@ EditableProTable 不维护单独的字段映射，而是通过 ProTable 复用 [
 
 ## API
 
-### 属性
+### 属性 {#props}
 
-| Prop                                        | 类型                                    | 说明                          |
-| ------------------------------------------- | --------------------------------------- | ----------------------------- |
-| `columns`                                   | `ProColumns<T>[]`                       | 与 ProTable 共用的列模型      |
-| `value` / `defaultValue`                    | `T[]`                                   | 受控值与非受控初始值          |
-| `editableKeys`                              | `ProKey[]`                              | 当前编辑行，支持双向绑定      |
-| `editable`                                  | `false \| EditableConfig<T>`            | 编辑模式和生命周期            |
-| `recordCreatorProps`                        | `false \| RecordCreatorProps<T>`        | 创建行配置                    |
-| `maxLength`                                 | `number`                                | 最大记录数                    |
-| `formItemProps`                             | `Record<string, unknown>`               | 外层 Antdv Next FormItem 配置 |
-| `onValuesChange`                            | `(values, changedRecord) => void`       | 完整数据变化回调              |
-| `onTableChange`                             | `(pagination, filters, sorter) => void` | 表格状态回调                  |
-| `request` / `params` / `postData`           | 与 ProTable 相同                        | 可选远程初始化/刷新           |
-| `toolbar` / `rowSelection` / `columnsState` | 与 ProTable 相同                        | 可按需重新启用相关能力        |
-| `polling` / `manualRequest`                 | 与 ProTable 相同                        | 远程请求控制                  |
-| `scroll` / `size` / `bordered`              | 与 ProTable 相同                        | 表格外观                      |
+| 属性                 | 类型                                                                            | 默认值               | 说明与来源                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`              | `T[]`                                                                           | —                    | 整表受控数据；使用 `v-model:value` 接收草稿、保存、新增和删除的更新。                                                                                      |
+| `defaultValue`       | `T[]`                                                                           | `[]`                 | 非受控初始数据。                                                                                                                                           |
+| `recordCreatorProps` | `false \| RecordCreatorProps<T>`                                                | `{}`                 | 创建按钮及新记录配置，见[创建行配置](#record-creator)；false 隐藏按钮。                                                                                    |
+| `maxLength`          | `number`                                                                        | —                    | 最大记录数，包括树形子节点；同时约束创建按钮和 addEditRecord。                                                                                             |
+| `formItemProps`      | `Record<string, unknown>`                                                       | —                    | 将整张表包成外层 FormItem；详细属性、事件与插槽见 [FormItem API](https://www.antdv-next.com/components/form-cn#form-item-props)，与列 formItemProps 不同。 |
+| `onValuesChange`     | `(values: T[], changedRecord: T) => void`                                       | —                    | 整表变化回调，与 values-change 为同一监听通道。                                                                                                            |
+| `onTableChange`      | `(pagination: ProTablePagination, filters: ProFilter, sorter: ProSort) => void` | —                    | 表格状态回调，与 table-change 为同一监听通道。                                                                                                             |
+| `columns`            | `ProColumns<T>[]`                                                               | `必填`               | 完整字段见 [ProTable 列属性](./pro-table#columns)。                                                                                                        |
+| `editable`           | `false \| EditableConfig<T>`                                                    | `{ type: 'single' }` | 见 [editable 全部配置](./pro-table#editable)，包括 onSave/onDelete/formProps/formRef；false 关闭编辑。                                                     |
+| `editableKeys`       | `ProKey[]`                                                                      | —                    | 编辑行 key，使用 `v-model:editable-keys`；优先于 editable.editableKeys。                                                                                   |
+| `options`            | `false \| ProTableOptions<T>`                                                   | `false`              | 默认关闭内置工具，可显式开启，完整配置见 [ProTable options](./pro-table#options)。                                                                         |
+| `toolbar`            | `false \| ProTableToolbarConfig`                                                | —                    | 默认不主动开启工具栏；有标题/操作/显式配置时显示，见 [toolbar](./pro-table#toolbar)。                                                                      |
 
-### 事件
+其余属性完整继承 [ProTable 属性表](./pro-table#props)，列配置见 [ProColumns](./pro-table#columns)，底层 Table 属性见 [antdv-next Table API](https://www.antdv-next.com/components/table-cn)。`dataSource/defaultDataSource/search/pagination` 被公开类型移除；数据使用 `value/defaultValue`，搜索和分页在实现中固定关闭。`request/params/postData/polling/manualRequest/revalidateOnFocus/rowSelection/columnsState/scroll/size/bordered` 等继续按 ProTable 约定工作。
 
-`onValuesChange` / `onTableChange` Props 与 `@values-change` / `@table-change` 是同一条 Vue 监听通道的两种写法，请任选一种。每次变化只派发一次，不要为同一个处理函数同时写两种语法：
+### 创建行 RecordCreatorProps {#record-creator}
 
-| 事件                   | 参数                          | 说明                         |
-| ---------------------- | ----------------------------- | ---------------------------- |
-| `update:value`         | `rows`                        | `v-model:value` 更新         |
-| `update:editable-keys` | `keys`                        | `v-model:editable-keys` 更新 |
-| `values-change`        | `rows, changedRecord`         | 任一记录变化                 |
-| `table-change`         | `pagination, filters, sorter` | 表格状态变化                 |
-| `request-error`        | `error`                       | 远程请求失败                 |
-| `editable-error`       | `error`                       | 编辑生命周期失败             |
+| 属性                | 类型                                           | 默认值           | 说明与来源                                                                                                                                  |
+| ------------------- | ---------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `record`            | `T \| ((index: number, dataSource: T[]) => T)` | `自动生成 key`   | 新行对象或每次新增时执行的工厂；应产生唯一 rowKey。                                                                                         |
+| `position`          | `'top' \| 'bottom'`                            | `bottom`         | 创建按钮和新记录位置。                                                                                                                      |
+| `parentKey`         | `ProKey`                                       | —                | 树形新记录的父节点 key。                                                                                                                    |
+| `newRecordType`     | `'cache' \| 'dataSource'`                      | `dataSource`     | cache 在保存成功后写入模型；dataSource 立即加入模型。                                                                                       |
+| `creatorButtonText` | `VNodeChild`                                   | `语言配置`       | 默认“添加一行数据”，可由 creator-button 插槽替换。                                                                                          |
+| `ButtonProps`       | `Omit<ButtonProps, 'onClick' \| 'position'>`   | `block + dashed` | 其他属性传给创建按钮，见 [Button API](https://www.antdv-next.com/components/button-cn)，如 disabled/loading/icon/size；点击逻辑由表格管理。 |
 
-### 插槽
+### 事件 {#events}
 
-EditableProTable 会将插槽全部转发给内部 ProTable，因此可以使用：
+| 事件                   | 参数                                                                  | 说明                                        |
+| ---------------------- | --------------------------------------------------------------------- | ------------------------------------------- |
+| `update:value`         | `rows: T[]`                                                           | 完整数据更新（包含编辑草稿）。              |
+| `update:editable-keys` | `keys: ProKey[]`                                                      | 编辑 key 更新。                             |
+| `values-change`        | `rows: T[], changedRecord: T`                                         | 整表值变化，与 onValuesChange 是同一监听。  |
+| `table-change`         | `pagination: ProTablePagination, filters: ProFilter, sorter: ProSort` | 表格状态变化，与 onTableChange 是同一监听。 |
+| `request-error`        | `error: unknown`                                                      | 请求失败。                                  |
+| `editable-error`       | `error: unknown`                                                      | 编辑生命周期抛错。                          |
 
-- `toolbar-title`、`toolbar-actions`。
-- `header-${columnKey}`。
-- `cell-${columnKey}` 或 `${columnKey}`，参数为 `{ value, record, index, column, editable }`。
-- 底层 Antdv Next Table 的其他插槽。
+`onValuesChange` / `@values-change`、`onTableChange` / `@table-change` 各自是同一条 Vue 监听通道，请各选一种写法。其余底层通知（如 `load`、`selection-change`、`validation-error`）见 [ProTable 事件](./pro-table#events)；底层 `change` 在此被适配为 `table-change`。
 
-### 组件实例
+### 插槽 {#slots}
 
-`EditableProTableInstance<T>` 包含 ProTable 的全部实例方法，并额外提供整表读写：
+| 插槽                 | 参数         | 说明与来源                                                                                                                                                                       |
+| -------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `creator-button`     | `无`         | 替换新增按钮内容。                                                                                                                                                               |
+| `before-table`       | `无`         | 保留调用方前置内容，随后渲染顶部创建按钮。                                                                                                                                       |
+| `after-table`        | `无`         | 底部创建按钮之后追加内容。                                                                                                                                                       |
+| `其他 ProTable 插槽` | `保持原参数` | 全部透传，见 [ProTable 插槽表](./pro-table#slots)，包括 toolbar-title/toolbar-actions、动态表头与单元格，以及原生 [Table 插槽](https://www.antdv-next.com/components/table-cn)。 |
+
+### 组件实例 EditableProTableInstance {#instance}
+
+| 方法                                                                        | 返回值                                 | 说明                                                                      |
+| --------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------- |
+| `getSortFilter()`                                                           | `{ sort: ProSort; filter: ProFilter }` | 读取排序和筛选。                                                          |
+| `reload(resetPageIndex?: boolean)`                                          | `Promise<void>`                        | 重新请求，可选重置页码。                                                  |
+| `reset()`                                                                   | `Promise<void>`                        | 重置查询、排序、筛选。                                                    |
+| `setPageInfo(page: Partial<ProTablePagination>)`                            | `void`                                 | 透传 ProTable 分页状态设置；本组件不显示分页。                            |
+| `clearSelected()`                                                           | `void`                                 | 清空选择。                                                                |
+| `fullScreen()`                                                              | `Promise<void>`                        | 切换全屏。                                                                |
+| `scrollTo(target: ProKey \| { key: ProKey } \| { top: number })`            | `void`                                 | 定位行或滚动像素。                                                        |
+| `startEditable(key: ProKey)`                                                | `boolean`                              | 进入行编辑。                                                              |
+| `saveEditable(key: ProKey)`                                                 | `Promise<boolean>`                     | 校验并保存，失败返回 false。                                              |
+| `cancelEditable(key: ProKey)`                                               | `void`                                 | 取消并恢复原值。                                                          |
+| `addEditRecord(record: T, options?: Omit<RecordCreatorProps<T>, 'record'>)` | `boolean`                              | 创建并进入编辑，遵循 maxLength，options 见[创建行配置](#record-creator)。 |
+| `getRowData(indexOrKey: number \| ProKey)`                                  | `T \| undefined`                       | 数字先按精确 rowKey 查找，再回退为顶层索引。                              |
+| `getRowsData()`                                                             | `T[]`                                  | 读取当前完整数据。                                                        |
+| `setRowData(indexOrKey: number \| ProKey, value: Partial<T>)`               | `boolean`                              | 按同样 key/索引规则找到记录后浅合并，并更新 value。                       |
 
 ```ts
 const editableRef = ref<EditableProTableInstance<Member>>()
@@ -163,11 +190,3 @@ const first = editableRef.value?.getRowData(0)
 const all = editableRef.value?.getRowsData()
 editableRef.value?.setRowData(memberId, { allocation: 100 })
 ```
-
-| 方法                            | 说明                                                    |
-| ------------------------------- | ------------------------------------------------------- |
-| `getRowData(indexOrKey)`        | 数字先按精确 rowKey 查找，再回退为顶层索引              |
-| `getRowsData()`                 | 读取当前完整数据副本                                    |
-| `setRowData(indexOrKey, value)` | 按同样的 key/索引规则查找，浅合并后更新 `v-model:value` |
-
-继承的方法包括 `reload`、`reset`、`setPageInfo`、`clearSelected`、`fullScreen`、`scrollTo`、`startEditable`、`saveEditable`、`cancelEditable` 与 `addEditRecord`。

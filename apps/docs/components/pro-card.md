@@ -107,51 +107,96 @@ const collapsed = ref(false)
 
 ## API
 
-| 属性                         | 类型                                       | 说明                           |
-| ---------------------------- | ------------------------------------------ | ------------------------------ |
-| `title/subTitle/extra`       | `VNodeChild`                               | 同名插槽优先                   |
-| `tooltip`                    | `string \| TooltipProps`                   | 对象配置传给实际 Tooltip       |
-| `prefixCls`                  | `string`                                   | 完整 Pro 卡片前缀              |
-| `layout`                     | `'default' \| 'center'`                    | 内容布局                       |
-| `direction`                  | `'row' \| 'column'`                        | 子卡排列方向                   |
-| `wrap`                       | `boolean`                                  | 允许子卡换行                   |
-| `colSpan`                    | `number \| string \| 响应式对象`           | 子列栅格或宽度                 |
-| `colStyle`                   | `CSSProperties`                            | 父卡对子列包装节点的样式       |
-| `gutter`                     | `响应式数字 \| 响应式数字[]`               | 横向间距或两轴间距             |
-| `split`                      | `'vertical' \| 'horizontal'`               | 分割方向                       |
-| `checked/disabled/boxShadow` | `boolean`                                  | 选择、禁用与阴影               |
-| `tabs`                       | `TabsProps & { cardProps?: ProCardProps }` | 标签页；cardProps 仅使用 ghost |
-| `size`                       | `'default' \| 'small'`                     | 默认继承 ConfigProvider        |
-| `type`                       | `'default' \| 'inner'`                     | 普通或内嵌样式                 |
-| `variant`                    | `'outlined' \| 'borderless'`               | 优先于兼容属性 bordered        |
-| `bordered/headerBordered`    | `boolean`                                  | 卡片边框与标题分割线           |
-| `ghost/hoverable/loading`    | `boolean`                                  | 透明、悬浮与加载状态           |
-| `collapsible`                | `boolean \| 'header' \| 'icon'`            | 折叠触发方式                   |
-| `collapsed/defaultCollapsed` | `boolean`                                  | 受控状态或非受控初值           |
-| `collapsibleIconRender`      | `({ collapsed }) => VNodeChild`            | 自定义折叠图标                 |
-| `cover/actions`              | 对应 `CardProps` 类型                      | 封面与底部操作，支持同名插槽   |
-| `classes/styles`             | 语义对象或 `({ props }) => 语义对象`       | 类名与样式                     |
-| `classNames`                 | 语义类名对象                               | 旧入口；同部位 classes 优先    |
-| `headStyle/bodyStyle`        | `CSSProperties`                            | 旧入口；同部位 styles 优先     |
+### 属性 {#props}
 
-语义位置为 `root/header/body/extra/title/actions/cover`。内层结构使用对应前缀的 `title-heading/content/sub-title/collapsible-icon` 等类名。根 `class` 独立追加；折叠时内容 `display:none` 优先于自定义样式。
+| 属性                    | 类型                                                         | 默认值                | 说明 / 来源                                                                                                             |
+| ----------------------- | ------------------------------------------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `title`                 | `VNodeChild`                                                 | —                     | 标题；`title` 插槽优先。                                                                                                |
+| `subTitle`              | `VNodeChild`                                                 | —                     | 副标题；`subTitle` 插槽优先。                                                                                           |
+| `extra`                 | `VNodeChild`                                                 | —                     | 标题右侧内容；`extra` 插槽优先。                                                                                        |
+| `tooltip`               | `string \| TooltipProps`                                     | —                     | 提示字符串或 [Tooltip 属性](https://www.antdv-next.com/components/tooltip-cn)。                                         |
+| `prefixCls`             | `string`                                                     | `ant-pro-card`        | 完整前缀；继承 ProProvider / 原生前缀。                                                                                 |
+| `layout`                | `'default' \| 'center'`                                      | `default`             | 正文居中布局。                                                                                                          |
+| `direction`             | `'row' \| 'column'`                                          | `row`                 | 子卡片排列方向。                                                                                                        |
+| `wrap`                  | `boolean`                                                    | `false`               | 子卡片允许换行。                                                                                                        |
+| `colSpan`               | `ProResponsiveValue<number \| string>`                       | —                     | 在父卡中占用 24 栅格或指定宽度；0 隐藏。                                                                                |
+| `colStyle`              | `CSSProperties`                                              | —                     | 父卡对子卡列包装节点应用的样式。                                                                                        |
+| `gutter`                | `ProResponsiveValue<number> \| ProResponsiveValue<number>[]` | `0`                   | 横向间距或 `[横向, 纵向]`；响应式键 `xs/sm/md/lg/xl/xxl`。                                                              |
+| `split`                 | `'vertical' \| 'horizontal'`                                 | —                     | 子卡之间的分割方向。                                                                                                    |
+| `checked`               | `boolean`                                                    | `undefined`           | 传入即启用受控选择；通过 `checked` 事件请求变化。                                                                       |
+| `disabled`              | `boolean`                                                    | `继承 ConfigProvider` | 禁用选择和折叠。                                                                                                        |
+| `boxShadow`             | `boolean`                                                    | `false`               | 使用主题 `boxShadowTertiary`。                                                                                          |
+| `tabs`                  | `TabsProps & { cardProps?: ProCardProps }`                   | —                     | 传给 [Tabs](https://www.antdv-next.com/components/tabs-cn)；`items` 优先于 TabPane 子节点，`cardProps` 仅消费 `ghost`。 |
+| `collapsibleIconRender` | `({ collapsed: boolean }) => VNodeChild`                     | —                     | 自定义折叠图标；同名插槽优先。                                                                                          |
+| `cover`                 | `CardProps['cover']`                                         | —                     | 传给 [Card](https://www.antdv-next.com/components/card-cn)；折叠时隐藏，同名插槽优先。                                  |
+| `actions`               | `CardProps['actions']`                                       | —                     | 传给 [Card](https://www.antdv-next.com/components/card-cn) 底部操作区；折叠时隐藏，同名插槽优先。                       |
+| `size`                  | `'default' \| 'small'`                                       | `继承 ConfigProvider` | `default` 转为原生 `medium`。                                                                                           |
+| `type`                  | `'default' \| 'inner'`                                       | `default`             | 原生 [Card](https://www.antdv-next.com/components/card-cn) 类型。                                                       |
+| `variant`               | `'outlined' \| 'borderless'`                                 | `继承 Card`           | 优先于 `bordered`；`ghost` 强制无边框。                                                                                 |
+| `bordered`              | `boolean`                                                    | `undefined`           | 兼容边框入口；未传时跟随原生 Card。                                                                                     |
+| `headerBordered`        | `boolean`                                                    | `false`               | 显示标题分割线；`type=inner` 同样显示。                                                                                 |
+| `ghost`                 | `boolean`                                                    | `false`               | 透明、无边框、无阴影及零内容内边距。                                                                                    |
+| `hoverable`             | `boolean`                                                    | `false`               | 传给原生 Card 的悬浮效果。                                                                                              |
+| `loading`               | `boolean`                                                    | `false`               | 原生 Card 骨架；有 `loading` 插槽时渲染该插槽。                                                                         |
+| `collapsible`           | `boolean \| 'header' \| 'icon'`                              | `false`               | true/header 点击标题折叠；icon 仅图标触发。                                                                             |
+| `collapsed`             | `boolean`                                                    | `undefined`           | 受控折叠状态，支持 `v-model:collapsed`。                                                                                |
+| `defaultCollapsed`      | `boolean`                                                    | `false`               | 非受控初始折叠状态。                                                                                                    |
+| `headStyle`             | `CSSProperties`                                              | —                     | 旧标题样式，`styles.header` 优先。                                                                                      |
+| `bodyStyle`             | `CSSProperties`                                              | —                     | 旧内容样式，`styles.body` 优先。                                                                                        |
+| `classes`               | `SemanticClasses \| ({ props }) => SemanticClasses`          | —                     | 语义类名，优先于 `classNames`。                                                                                         |
+| `classNames`            | `Partial<Record<ProCardSemanticName, string>>`               | —                     | 兼容语义类名入口。                                                                                                      |
+| `styles`                | `SemanticStyles \| ({ props }) => SemanticStyles`            | —                     | 语义样式；部位见下表。                                                                                                  |
 
-```vue
-<ProCard
-  title="紧凑内容"
-  class="business-card"
-  :classes="({ props }) => ({ body: props.loading ? 'body-loading' : 'body-ready' })"
-  :styles="{ body: { padding: '16px' } }"
-/>
-```
+其他 attrs 透传到根 [Antdv Next Card](https://www.antdv-next.com/components/card-cn)。组件接管 title、extra、cover、actions、variant、size、type、loading、classes 和 styles，应使用本页对应入口。`class/style/id/data-*/aria-*` 作用于根节点。响应式断点为 0/576/768/992/1200/1600px。
 
-| 事件               | 参数                                                     |
-| ------------------ | -------------------------------------------------------- |
-| `update:collapsed` | `(collapsed: boolean)`                                   |
-| `collapse`         | `(collapsed: boolean)`，用户切换折叠                     |
-| `checked`          | `(event: MouseEvent \| KeyboardEvent)`，请求更新受控选择 |
-| `tabChange`        | `(key: string)`                                          |
+### 事件 {#events}
 
-插槽：`default/title/subTitle/extra/cover/actions/loading/collapsibleIcon`。`collapsibleIcon` 接收 `{ collapsed: boolean }`，优先于 `collapsibleIconRender`。
+| 事件               | 参数                                   | 说明                               |
+| ------------------ | -------------------------------------- | ---------------------------------- |
+| `update:collapsed` | `(collapsed: boolean)`                 | 折叠状态更新。                     |
+| `collapse`         | `(collapsed: boolean)`                 | 用户切换折叠。                     |
+| `checked`          | `(event: MouseEvent \| KeyboardEvent)` | 选择请求；父组件更新 checked。     |
+| `tabChange`        | `(key: string)`                        | 活动标签变化；保留 tabs.onChange。 |
 
-导出包括 `ProCard/ProCardGroup/ProCardDivider/ProCardTabPane`，以及 `ProCardProps/ProCardSlots/ProCardSemanticName`。默认插件注册对应组件。
+### 插槽 {#slots}
+
+| 插槽              | 参数                     | 说明                         |
+| ----------------- | ------------------------ | ---------------------------- |
+| `default`         | —                        | 正文或历史 TabPane 子组件。  |
+| `title`           | —                        | 覆盖 title。                 |
+| `subTitle`        | —                        | 覆盖 subTitle。              |
+| `extra`           | —                        | 覆盖 extra。                 |
+| `cover`           | —                        | 覆盖 cover；折叠时隐藏。     |
+| `actions`         | —                        | 覆盖 actions；折叠时隐藏。   |
+| `loading`         | —                        | loading 时替换骨架。         |
+| `collapsibleIcon` | `{ collapsed: boolean }` | 覆盖 collapsibleIconRender。 |
+
+### 实例 {#instance}
+
+无额外公开实例方法。通过 `v-model:collapsed` 控制折叠，通过 `tabs.activeKey` 控制标签。
+
+### 组合成员 {#members}
+
+| 属性                             | 类型                         | 默认值                      | 说明 / 来源                                                            |
+| -------------------------------- | ---------------------------- | --------------------------- | ---------------------------------------------------------------------- |
+| `ProCard.Group` / `ProCardGroup` | `ProCardProps`               | `ghost=true, direction=row` | [完整卡片属性](#props)；强制 ghost，仅显式 column 改为纵向。           |
+| `ProCard.Divider.type`           | `'vertical' \| 'horizontal'` | `vertical`                  | 分割方向；其他 attrs 绑定 separator div。                              |
+| `ProCard.TabPane.tab`            | `VNodeChild`                 | —                           | 父卡读取的历史标签标题。                                               |
+| `ProCard.TabPane.cardProps`      | `ProCardProps`               | —                           | [面板卡片配置](#props)；同名 attrs 优先。                              |
+| `ProCard.TabPane key / disabled` | `string \| number / boolean` | —                           | 父卡读取 VNode key 和 disabled attrs 生成导航；新代码推荐 tabs.items。 |
+
+Group、TabPane 转发卡片插槽和事件；Divider 无插槽、事件或实例方法。组合成员不新增实例方法。
+
+### 语义样式 {#styles}
+
+| 部位      | 作用节点     |
+| --------- | ------------ |
+| `root`    | 根 Card      |
+| `header`  | 标题区域     |
+| `body`    | 正文区域     |
+| `extra`   | 标题附加区域 |
+| `title`   | 标题         |
+| `actions` | 底部操作区   |
+| `cover`   | 封面         |
+
+`classes` 优先于旧 `classNames`；`styles.header/body` 优先于 headStyle/bodyStyle。折叠时正文 display:none 保持优先。原生主题使用 [ConfigProvider](https://www.antdv-next.com/components/config-provider-cn) 与 `theme.components.Card`；Pro token 见 [ProConfigProvider](./pro-config-provider#props)。
