@@ -72,38 +72,38 @@ Named components work directly in Vue templates. `ProFormRadio` is a renderable 
 
 ## Common API
 
-### Common props
+### Common props {#props}
 
 Each field combines a FormItem with a base control such as Input or Select by default. Common props cover field features, form-item settings and base-control settings: `label` and `rules` configure the form item, while `fieldProps` configures the base control.
 
 These props apply to all field wrappers. `ProFormRadio.Button` is a native RadioButton and follows [Radio props][antd-radio] instead of this table.
 
-| Prop             | Type                                                | Default                                   | Description                                                                                                                                           |
-| ---------------- | --------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modelValue`     | Component-specific                                  | `undefined`                               | Standard `v-model` value; within ProForm, falls back to the store value at `name` when no explicit binding is supplied                                |
-| `name`           | `string \| number \| readonly (string \| number)[]` | —                                         | FormItem name, including nested paths; also connects to the ProForm store                                                                             |
-| `label`          | `VNodeChild`                                        | —                                         | FormItem label; accepts text or VNodes, or use the `#label` slot, which takes precedence                                                              |
-| `rules`          | `FormItemProps['rules']`                            | —                                         | Validation rules; see [FormItem props][antd-form-item]                                                                                                |
-| `fieldMode`      | `'form-item' \| 'field'`                            | `'form-item'`                             | Render a form item or a bare control                                                                                                                  |
-| `ignoreFormItem` | `boolean`                                           | `false`                                   | Forces bare-control mode when `true`, taking precedence over `fieldMode`                                                                              |
-| `fieldProps`     | `Partial<BaseControlProps> & { class?, style? }`    | —                                         | Passed to Input, Select and other base controls; each field below links to the matching antdv-next props                                              |
-| `formItemProps`  | `Partial<FormItemProps>`                            | —                                         | Passed only to FormItem; see [FormItem props][antd-form-item]                                                                                         |
-| `placeholder`    | The base control's `placeholder` type               | —                                         | The top-level value is currently not forwarded; use `fieldProps.placeholder`; range fields accept string arrays                                       |
-| `disabled`       | `boolean`                                           | Inherited, otherwise `false`              | Preserve the control shape while disabling interaction; inherits ProForm / ConfigProvider settings                                                    |
-| `readonly`       | `boolean`                                           | Inherited from ProForm, otherwise `false` | Use the shared readonly renderer                                                                                                                      |
-| `emptyText`      | `VNodeChild`                                        | `'-'`                                     | Placeholder for `undefined`, `null` and empty strings                                                                                                 |
-| `readonlyRender` | `(value) => VNodeChild`                             | —                                         | Custom readonly output; `null` / `undefined` falls back to default formatting                                                                         |
-| `width`          | `number \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`    | —                                         | Numbers are pixels; presets are 104 / 216 / 328 / 440 / 552px, limited to the container width                                                         |
-| `prefixCls`      | `string`                                            | Generated by ProConfigProvider            | Custom field style prefix                                                                                                                             |
-| `classes`        | `ProSemanticSource<ProSemanticClasses>`             | —                                         | Semantic-part class names; accepts an object or `({ props }) => object`; see the styling notes below                                                  |
-| `classNames`     | `ProSemanticSource<ProSemanticClasses>`             | —                                         | Legacy semantic classes; fills parts not specified by `classes`                                                                                       |
-| `styles`         | `ProSemanticSource<ProSemanticStyles>`              | —                                         | Semantic-part styles; accepts an object or `({ props }) => object`                                                                                    |
-| `convertValue`   | `(value, values) => unknown`                        | —                                         | Converts incoming values when ProForm initializes, synchronizes external values or registers a field                                                  |
-| `transform`      | `(value, values) => unknown`                        | —                                         | Converts values for ProForm formatted reads or submission; returning a plain object removes the original field and merges that object into the output |
-| `preserve`       | `boolean`                                           | Preserved                                 | Within ProForm, `false` removes the field's store value when it unmounts                                                                              |
-| `proFieldProps`  | `Record<string, unknown>`                           | —                                         | ProField configuration; `mode: 'read'` or `readonly: true` selects readonly display                                                                   |
+| Prop             | Type                                                | Default                                   | Description                                                                                                                                                          |
+| ---------------- | --------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modelValue`     | Component-specific                                  | `undefined`                               | Standard `v-model` value; within ProForm, falls back to the store value at `name` when no explicit binding is supplied                                               |
+| `name`           | `string \| number \| readonly (string \| number)[]` | —                                         | FormItem name, including nested paths; also connects to the ProForm store                                                                                            |
+| `label`          | `VNodeChild`                                        | —                                         | FormItem label; accepts text or VNodes, or use the `#label` slot, which takes precedence                                                                             |
+| `rules`          | `FormItemProps['rules']`                            | —                                         | Validation rules; see [FormItem props][antd-form-item]                                                                                                               |
+| `fieldMode`      | `'form-item' \| 'field'`                            | `'form-item'`                             | Render a form item or a bare control                                                                                                                                 |
+| `ignoreFormItem` | `boolean`                                           | `false`                                   | Forces bare-control mode when `true`, taking precedence over `fieldMode`                                                                                             |
+| `fieldProps`     | `Partial<BaseControlProps> & { class?, style? }`    | —                                         | Passed to Input, Select and other base controls; each field below links to the matching antdv-next props                                                             |
+| `formItemProps`  | `Partial<FormItemProps>`                            | —                                         | Passed only to FormItem; see [FormItem props][antd-form-item]                                                                                                        |
+| `placeholder`    | The base control's `placeholder` type               | —                                         | The top-level value is currently not forwarded; use `fieldProps.placeholder`; range fields accept string arrays                                                      |
+| `disabled`       | `boolean`                                           | Inherited, otherwise `false`              | Preserve the control shape while disabling interaction; inherits ProForm / ConfigProvider settings                                                                   |
+| `readonly`       | `boolean`                                           | Inherited from ProForm, otherwise `false` | Use the shared readonly renderer                                                                                                                                     |
+| `emptyText`      | `VNodeChild`                                        | `'-'`                                     | Placeholder for `undefined`, `null` and empty strings                                                                                                                |
+| `readonlyRender` | `(value) => VNodeChild`                             | —                                         | Custom readonly output; `null` / `undefined` falls back to default formatting                                                                                        |
+| `width`          | `number \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`    | —                                         | Numbers are pixels; presets are 104 / 216 / 328 / 440 / 552px, limited to the container width                                                                        |
+| `prefixCls`      | `string`                                            | Generated by ProConfigProvider            | Custom field style prefix                                                                                                                                            |
+| `classes`        | `ProSemanticSource<ProSemanticClasses>`             | —                                         | Semantic-part class names; accepts an object or `({ props }) => object`; see the styling notes below                                                                 |
+| `classNames`     | `ProSemanticSource<ProSemanticClasses>`             | —                                         | Legacy semantic classes; fills parts not specified by `classes`                                                                                                      |
+| `styles`         | `ProSemanticSource<ProSemanticStyles>`              | —                                         | Semantic-part styles; accepts an object or `({ props }) => object`                                                                                                   |
+| `convertValue`   | `(value, values) => unknown`                        | —                                         | Converts incoming values when ProForm initializes, synchronizes external values or registers a field                                                                 |
+| `transform`      | `(value, values) => unknown`                        | —                                         | Converts values for ProForm formatted reads or submission; returning a plain object removes the original field and merges that object into the output                |
+| `preserve`       | `boolean`                                           | Preserved                                 | Within ProForm, `false` removes the field's store value when it unmounts                                                                                             |
+| `proFieldProps`  | `Record<string, unknown>`                           | —                                         | [ProField configuration](./pro-field#props); `mode: 'read'` or `readonly: true` forces readonly display; other settings merge when the internal renderer is ProField |
 
-### Common form-item props
+### Common form-item props {#form-item-props}
 
 In addition to `name`, `label` and `rules` above, the following props configure the FormItem inside every field wrapper. All can be set through `formItemProps`; see [antdv-next FormItem props][antd-form-item] for the complete native definitions.
 
@@ -123,6 +123,7 @@ In addition to `name`, `label` and `rules` above, the following props configure 
 | `validateFirst`    | `boolean \| 'parallel'`                                   | `false`                                    | `true` stops after the first failing rule; `'parallel'` validates in parallel and uses the first failure                  |
 | `validateTrigger`  | `'change' \| 'blur' \| 'focus' \| TriggerType[] \| false` | Inherited from Form, ultimately `'change'` | Validation trigger events; accepts an array; `false` disables event-triggered validation                                  |
 | `validateDebounce` | `number`                                                  | No delay                                   | Debounce time in milliseconds for event-triggered validation                                                              |
+| `id`               | `string`                                                  | Generated                                  | Native FormItem field ID; see [FormItem props][antd-form-item]                                                            |
 | `class`            | `HTMLAttributes['class']`                                 | —                                          | FormItem root class                                                                                                       |
 | `style`            | `HTMLAttributes['style']`                                 | —                                          | FormItem root styles                                                                                                      |
 
@@ -144,7 +145,7 @@ The following native form-item settings are not included in the field's top-leve
 
 Within ProForm, set `name` on the field itself to connect to the form store; setting only `formItemProps.name` does not register a ProForm field. Configure label wrapping on the parent with `<ProForm label-wrap>`; per-field `labelWrap` is currently unsupported.
 
-### `fieldProps` and base-component props
+### `fieldProps` and base-component props {#field-props}
 
 Configure native field-specific props through `fieldProps`, such as Input's `allowClear`, Select's `mode` and a date picker's `disabledDate`. Each field's **fieldProps API** link below points directly to its matching antdv-next base-component API. Additional Pro props are documented on this page.
 
@@ -229,43 +230,56 @@ Every field wrapper exposes `modelValue / update:modelValue`. The field core ada
 
 `fieldProps['onUpdate:value']`, `fieldProps['onUpdate:checked']`, or `fieldProps['onUpdate:fileList']` can coexist with component `v-model` and are each called once per update.
 
-### Events
+### Events {#events}
 
-| Event               | Components                    | Description                                                                          |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------ |
-| `update:modelValue` | All                           | Normalized field value                                                               |
-| `change`            | All                           | Original base-control change arguments                                               |
-| `requestError`      | Option fields using `request` | Option request failed; valid existing options remain                                 |
-| `captchaError`      | Captcha                       | Callback rejected or returned `false`; `false` stays an explicit cancellation result |
-| `drop`              | Both Upload fields            | Original drop event                                                                  |
+| Event               | Arguments              | Components and source                                                                           |
+| ------------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `update:modelValue` | `(value: unknown)`     | All fields; normalized by the field core, with the value type documented per field              |
+| `change`            | `(...args: unknown[])` | All fields; original change arguments from the [base component](#field-props)                   |
+| `requestError`      | `(error: unknown)`     | Option fields using [request](#options); existing options remain                                |
+| `captchaError`      | `(error: unknown)`     | ProFormCaptcha; rejection or `false` from the send callback, preserving `false` as cancellation |
+| `drop`              | `(event: DragEvent)`   | Upload fields; original [Upload][antd-upload] drop event                                        |
 
 For model updates and forwarded events, the `fieldProps` handler runs before the wrapper emits the corresponding event.
 
-### Slots and instance methods
+### Slots {#slots}
 
-`label`, `extra`, `help`, and `tooltip` are FormItem slots. Other named slots and the default slot are forwarded to the base control. FormItem-only slots are not rendered in `fieldMode="field"`.
+| Slot                     | Scope                                | Description and source                                                                                                       |
+| ------------------------ | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `label`                  | None                                 | [FormItem][antd-form-item] label; overrides the matching prop                                                                |
+| `extra`                  | None                                 | [FormItem][antd-form-item] extra content; overrides the matching prop                                                        |
+| `help`                   | None                                 | [FormItem][antd-form-item] help and validation content; overrides the matching prop                                          |
+| `tooltip`                | `tooltip?: FormItemProps['tooltip']` | [FormItem][antd-form-item] label tooltip; hidden without a renderable label                                                  |
+| `captcha`                | `{ seconds: number }`                | ProFormCaptcha send-button content                                                                                           |
+| `default`                | Base-component-specific              | Replaces the UploadButton button or UploadDragger area; other fields forward the [base component](#field-props) default slot |
+| Base-control named slots | Same as the native component         | All other named slots go to the [base control](#field-props), such as Select `option` or Input `prefix`                      |
 
-`#label`, `#extra` and `#help` take precedence over matching props. Use a slot to customize label content; when no renderable label is provided, neither the label nor its tooltip is displayed.
+FormItem-only slots do not render in `fieldMode="field"`. Fields using the internal ProField branch follow the [ProField default-slot protocol](./pro-field#slots).
 
 ```vue
 <ProFormText name="title" :rules="[{ required: true, message: 'Enter a title' }]">
-  <template #label>
-    <span>Title <small>(shown in the list)</small></span>
-  </template>
+  <template #label><span>Title <small>(shown in the list)</small></span></template>
   <template #extra>Up to 30 characters</template>
 </ProFormText>
 ```
 
-- Captcha adds a `captcha` slot with `{ seconds }`.
-- UploadButton's default slot replaces the upload-button content.
-- UploadDragger's default slot replaces the drag area.
-- ProFormSelect, ProFormTreeSelect, ProFormCheckbox, ProFormRadioGroup, ProFormSegmented and option types rendered by ProFormField expose `refresh(): Promise<void>` through a component ref. It forces a new option request and bypasses the cache.
-- Captcha exposes `resetCountdown(): void`.
-- Captcha also exposes `focus()`, `startTiming()` and `endTiming()`; resetCountdown remains a compatibility stop/reset method.
+### Instance methods {#instance}
+
+Call these through the corresponding component ref. Wrappers do not expose every native control method.
+
+| Method           | Arguments | Returns         | Components and source                                                                                                                                                                               |
+| ---------------- | --------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `refresh`        | None      | `Promise<void>` | ProFormSelect, ProFormTreeSelect, ProFormCheckbox, ProFormRadioGroup, ProFormSegmented, ProFormField, FieldControl; requests options again, bypassing cache; resolves immediately without a request |
+| `resetCountdown` | None      | `void`          | ProFormCaptcha, ProFormField, FieldControl; clears the captcha timer and resets to zero                                                                                                             |
+| `startTiming`    | None      | `void`          | ProFormCaptcha, ProFormField, FieldControl; starts `countDown` and calls `onTiming`                                                                                                                 |
+| `endTiming`      | None      | `void`          | ProFormCaptcha, ProFormField, FieldControl; same as `resetCountdown`                                                                                                                                |
+| `focus`          | None      | `void`          | ProFormCaptcha, ProFormField, FieldControl; delegates if the active control exposes focus                                                                                                           |
+
+ProFormField timing methods apply to captcha controls. Forwarding safely returns when a renderer lacks the method. ProFormSearchSelect, ProFormCascader, ProFormCheckboxGroup, date variants, time, color, rate and numeric-range wrappers currently expose none of these instance methods. Supporting requests does not itself add `refresh` to a wrapper.
 
 ## Options, requests, and readonly display
 
-### `options`, `valueEnum`, and `request`
+### `options`, `valueEnum`, and `request` {#options}
 
 ProFormSelect / ProFormSearchSelect, ProFormTreeSelect, ProFormCheckbox / ProFormCheckboxGroup, ProFormRadioGroup, ProFormSegmented and ProFormCascader share one protocol. It also applies to option types rendered by dynamic ProFormField:
 
@@ -311,6 +325,22 @@ const alternate = {
 }
 ```
 
+### Option and enum-item structures {#option-types}
+
+| Type / property                 | Type                   | Required / default | Description and source                                                                   |
+| ------------------------------- | ---------------------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| `ProFormFieldOption.label`      | `VNodeChild`           | Required           | Standard option label; native fields may remap it through fieldNames                     |
+| `ProFormFieldOption.value`      | `unknown`              | Required           | Standard option value; the type generic can narrow it                                    |
+| `ProFormFieldOption.disabled`   | `boolean`              | `false`            | Disables the option                                                                      |
+| `ProFormFieldOption.children`   | `ProFormFieldOption[]` | —                  | Extension key for tree/cascader children; custom keys follow the native control protocol |
+| `ProFormValueEnumItem.text`     | `string`               | Required           | Display text inherited from ProValueEnumItem                                             |
+| `ProFormValueEnumItem.value`    | `unknown`              | Enum key           | Explicit value, useful for retaining numeric keys                                        |
+| `ProFormValueEnumItem.disabled` | `boolean`              | `false`            | Disabled state when generating options                                                   |
+| `ProFormValueEnumItem.color`    | `string`               | —                  | [ProField](./pro-field#props) readonly status color                                      |
+| `ProFormValueEnumItem.status`   | `string`               | —                  | [ProField](./pro-field#props) readonly Badge status                                      |
+
+A string enum entry is equivalent to supplying only `text`. A request may return standard options, normalizable objects or primitive values; see the [option request protocol](#options) for precedence.
+
 ### Readonly and reset
 
 `readonly` uses one `ReadonlyField` instead of relying on inconsistent native readonly support. Choice fields show labels, arrays use commas, date ranges use `~`, passwords are masked, money keeps its prefix, and uploads show file names. `0` and `false` are not considered empty.
@@ -319,15 +349,19 @@ Switching to readonly preserves the instance `prefixCls` and `classes.control` /
 
 Fields are controlled: when the parent resets and passes a new `modelValue`, the display updates immediately. Resetting the value does not clear the option cache. Captcha countdowns are cancelled explicitly with `resetCountdown()`.
 
-## Dynamic ProFormField
+## Dynamic ProFormField {#dynamic-field}
 
 `ProFormField` selects a control through `valueType` and supports the common and option props above. See [ProField](./pro-field.md) for supported types and formatting behavior.
 
 | Prop        | Type                     | Default  | Description                                                                                                                                                 |
 | ----------- | ------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fieldType` | `ProFormControlType`     | —        | Base-control selector; valueType takes precedence; supports standard types and captcha / uploadButton / uploadDragger / radioGroup / checkboxGroup          |
+| `loading`   | `boolean`                | `false`  | Loading state passed to the internal field control; display follows the base component                                                                      |
 | `valueType` | `ProFieldValueTypeInput` | `'text'` | A type name or `{ type, ...fieldConfiguration }`, such as `'select'` or `{ type: 'digit', min: 0 }`; explicit `fieldProps` overrides matching configuration |
 
 The base component for `fieldProps` depends on `valueType`. Follow the links for the matching fields below; for example, `valueType="select"` uses [Select props][antd-select].
+
+The dynamic field also accepts the field-specific props documented below: `min`, `precision`, money settings, `showTime`, `layout`, `radioType`, captcha settings and upload settings. Types, defaults and applicability follow those individual tables.
 
 ## The 19 components
 
@@ -376,17 +410,17 @@ An Input and send-button composition. `onGetCaptcha(phone)` is required and coun
 
 `captchaTextRender(timing, count)` customizes text, captchaProps configures the button and onTiming receives countdown values. The consumer implements the network request. Loading, countdown, disabled and readonly prevent repeated sends; unmount cleans the timer.
 
-| Prop                | Type                                                             | Default      | Description                                                                                         |
-| ------------------- | ---------------------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------- |
-| `onGetCaptcha`      | `(phone: string) => void \| boolean \| Promise<void \| boolean>` | Required     | Sends a captcha; returning `false` or rejecting emits `captchaError` without starting the countdown |
-| `phoneName`         | `ProFormFieldName`                                               | —            | Phone-field path in ProForm; the callback receives an empty string when omitted                     |
-| `countDown`         | `number`                                                         | `60`         | Countdown duration in seconds, rounded down and clamped to zero or above                            |
-| `captchaTextRender` | `(timing: boolean, count: number) => VNodeChild`                 | —            | Button text for every state; takes precedence over `captchaText` / `countDownText`                  |
-| `captchaText`       | `VNodeChild`                                                     | intl message | Button text while idle                                                                              |
-| `countDownText`     | `(seconds: number) => VNodeChild`                                | intl message | Button text during the countdown                                                                    |
-| `captchaProps`      | `Partial<ButtonProps>`                                           | —            | Send-button props; matching values override `buttonProps`; loading / disabled follow internal state |
-| `buttonProps`       | `Partial<ButtonProps>`                                           | —            | Compatibility entry point for send-button props                                                     |
-| `onTiming`          | `(count: number) => void`                                        | —            | Receives remaining seconds when timing starts and on each countdown tick                            |
+| Prop                | Type                                                             | Default      | Description                                                                                                   |
+| ------------------- | ---------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------- |
+| `onGetCaptcha`      | `(phone: string) => void \| boolean \| Promise<void \| boolean>` | Required     | Sends a captcha; returning `false` or rejecting emits `captchaError` without starting the countdown           |
+| `phoneName`         | `ProFormFieldName`                                               | —            | Phone-field path in ProForm; the callback receives an empty string when omitted                               |
+| `countDown`         | `number`                                                         | `60`         | Countdown duration in seconds, rounded down and clamped to zero or above                                      |
+| `captchaTextRender` | `(timing: boolean, count: number) => VNodeChild`                 | —            | Button text for every state; takes precedence over `captchaText` / `countDownText`                            |
+| `captchaText`       | `VNodeChild`                                                     | intl message | Button text while idle                                                                                        |
+| `countDownText`     | `(seconds: number) => VNodeChild`                                | intl message | Button text during the countdown                                                                              |
+| `captchaProps`      | `Partial<ButtonProps>`                                           | —            | [Button props][antd-button]; matching values override `buttonProps`; loading / disabled follow internal state |
+| `buttonProps`       | `Partial<ButtonProps>`                                           | —            | Compatibility [Button props][antd-button] entry                                                               |
+| `onTiming`          | `(count: number) => void`                                        | —            | Receives remaining seconds when timing starts and on each countdown tick                                      |
 
 ### ProFormDatePicker
 
@@ -478,11 +512,11 @@ The library supplies no upload backend. Without `action` or `customRequest`, its
 | `icon`        | `VNodeChild`              | `UploadOutlined` | Upload-trigger icon                                                                        |
 | `title`       | `VNodeChild`              | intl message     | Upload-trigger text                                                                        |
 | `max`         | `number`                  | Unlimited        | Maximum file count; hides the trigger when reached; `fieldProps.maxCount` takes precedence |
-| `buttonProps` | `Partial<ButtonProps>`    | —                | Passed only to the upload trigger button                                                   |
+| `buttonProps` | `Partial<ButtonProps>`    | —                | Passed only to the upload trigger button; see [Button props][antd-button]                  |
 | `action`      | `UploadProps['action']`   | —                | Top-level convenience prop for the upload URL; `fieldProps.action` takes precedence        |
 | `accept`      | `UploadProps['accept']`   | —                | Accepted file types; `fieldProps.accept` takes precedence                                  |
 | `listType`    | `UploadProps['listType']` | `'picture'`      | File-list appearance; `fieldProps.listType` takes precedence                               |
-| `imageProps`  | `Omit<ImageProps, 'src'>` | —                | Built-in image-preview configuration                                                       |
+| `imageProps`  | `Omit<ImageProps, 'src'>` | —                | Built-in image-preview configuration; see [Image props][antd-image]                        |
 
 ### ProFormUploadDragger
 
@@ -532,8 +566,6 @@ See [ProField](./pro-field.md) for 42 built-in valueTypes and their three modes.
 
 ## Additional fields and composed members
 
-`ProFormDigitRange` uses a compact numeric-input group. Set `fieldProps.separator` / `separatorWidth` to customize its separator and width in pixels (default `~` / `30`); a placeholder array configures each endpoint independently, and `fieldProps.style` styles the group container.
-
 <ClientOnly><ProFormFieldsExtendedDemo /></ClientOnly>
 
 <<< ../../examples/ProFormFieldsExtendedDemo.vue
@@ -553,6 +585,17 @@ These components also support common props. Option-capable fields additionally s
 | `ProFormCheckboxGroup` / `ProFormCheckbox.Group`                                                                              | Always renders CheckboxGroup; supports `layout='horizontal' / 'vertical'`, defaulting to horizontal                                                       | [CheckboxGroupProps][antd-checkbox-group]                                          |
 | `ProFormSearchSelect` / `ProFormSelect.SearchSelect`                                                                          | Defaults to multiple, labelInValue and showSearch; matching fieldProps take precedence                                                                    | [SelectProps][antd-select]                                                         |
 
+### ProFormDigitRange settings {#digit-range}
+
+Both inputs share [InputNumber props][antd-input-number]. The group itself adds these `fieldProps` settings:
+
+| Property                     | Type                                | Default | Description and source                                                       |
+| ---------------------------- | ----------------------------------- | ------- | ---------------------------------------------------------------------------- |
+| `fieldProps.separator`       | `string`                            | `'~'`   | Content between the numeric inputs                                           |
+| `fieldProps.separatorWidth`  | `number`                            | `30`    | Separator width in pixels                                                    |
+| `fieldProps.placeholder`     | `string \| string[]`                | —       | Shared text, or an array with one placeholder per InputNumber                |
+| `fieldProps.class` / `style` | `HTMLAttributes['class' / 'style']` | —       | Styles the group container; other native InputNumber props reach both inputs |
+
 ### ProFormSearchSelect-specific props
 
 | Prop   | Type                               | Default      | Description                                                               |
@@ -560,6 +603,40 @@ These components also support common props. Option-capable fields additionally s
 | `mode` | `'multiple' \| 'tags' \| 'single'` | `'multiple'` | `single` switches to single selection; `fieldProps.mode` takes precedence |
 
 Its `fieldProps` also defaults to `labelInValue: true`, `showSearch: true`, `suffixIcon: null`, `autoClearSearchValue: true` and `optionLabelProp: 'label'`; each can be overridden. In the default multiple mode, selecting options returns an array of selected items with `label` / `value`; single mode returns one item.
+
+## Public low-level components
+
+### FieldControl {#field-control}
+
+FieldControl renders a bare control, creates no FormItem, and does not register a field by name. Use [ProFormField](#dynamic-field) for labels, validation and store registration.
+
+| Property                                                                                                                                 | Type                         | Default                   | Description and source                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| `fieldType`                                                                                                                              | `ProFormControlType`         | `'text'`                  | Selects the registered [base control](#field-props); takes precedence over valueType   |
+| `valueType`                                                                                                                              | `ProFormControlType`         | `'text'`                  | Control type when fieldType is omitted                                                 |
+| `modelValue`, `fieldProps`, `disabled`, `readonly`, `emptyText`, `readonlyRender`, `prefixCls`, `classes`, `classNames`, `styles`        | See [common props](#props)   | Same as common props      | Bare-control settings; no FormItem props                                               |
+| `options`, `valueEnum`, `request`, `params`, `debounceTime`, `proFieldKey`, `cacheForSwr`, `searchValue`                                 | See [option props](#options) | Same as option props      | Option and request core                                                                |
+| `loading`                                                                                                                                | `boolean`                    | `false`                   | Control loading state                                                                  |
+| `min`, `precision`, `prefix`, `showTime`, `layout`, `radioType`                                                                          | See individual field tables  | Same as each field        | Numeric, date and option-control convenience settings                                  |
+| `onGetCaptcha`, `phoneName`, `countDown`, `captchaTextRender`, `captchaText`, `countDownText`, `captchaProps`, `buttonProps`, `onTiming` | See ProFormCaptcha table     | Same as captcha           | Captcha input/button settings; buttonProps also serves UploadButton                    |
+| `icon`, `title`, `description`, `max`, `imageProps`                                                                                      | See upload tables            | Same as each upload field | Upload trigger and preview; native action, accept and listType use fieldProps or attrs |
+
+It provides the [events](#events), base-control / captcha / upload [slots](#slots) and all [instance methods](#instance) listed above. Other attrs reach the chosen control. It has no FormItem slots. Money locale and symbol extensions use `fieldProps`; see [ProFormMoney](#proformmoney).
+
+### ReadonlyField {#readonly-field}
+
+| Property         | Type                             | Default               | Description and source                                     |
+| ---------------- | -------------------------------- | --------------------- | ---------------------------------------------------------- |
+| `value`          | `unknown`                        | —                     | Value to display                                           |
+| `options`        | `ProFormFieldOption[]`           | `[]`                  | [Standard options](#option-types) for resolving labels     |
+| `type`           | `ProValueType \| 'upload'`       | —                     | Readonly type passed to [ProField](./pro-field#props)      |
+| `emptyText`      | `VNodeChild`                     | `'-'`                 | Empty-value placeholder                                    |
+| `moneyPrefix`    | `VNodeChild \| false`            | —                     | Money prefix merged into fieldProps.prefix                 |
+| `readonlyRender` | `(value: unknown) => VNodeChild` | —                     | Custom content; null / undefined uses the default renderer |
+| `fieldProps`     | `Record<string, unknown>`        | —                     | [ProField base-control settings](./pro-field#field-props)  |
+| `prefixCls`      | `string`                         | Provider field prefix | ProField style prefix                                      |
+
+Other attrs reach the readonly [ProField](./pro-field#props). Mode is fixed to read; the properties above control the value, type, options and renderer. It adds no events, slots or exposed instance methods.
 
 [antd-form-item]: https://www.antdv-next.com/components/form#form-item-props
 [antd-input]: https://www.antdv-next.com/components/input#input-props

@@ -107,51 +107,96 @@ Checked cards use the theme's `controlItemBgActive/controlOutline` for their bac
 
 ## API
 
-| Prop                         | Type                                                | Behavior                                          |
-| ---------------------------- | --------------------------------------------------- | ------------------------------------------------- |
-| `title/subTitle/extra`       | `VNodeChild`                                        | Named slots take precedence                       |
-| `tooltip`                    | `string \| TooltipProps`                            | Object options reach the actual Tooltip           |
-| `prefixCls`                  | `string`                                            | Complete Pro card prefix                          |
-| `layout`                     | `'default' \| 'center'`                             | Content alignment                                 |
-| `direction`                  | `'row' \| 'column'`                                 | Child-card direction                              |
-| `wrap`                       | `boolean`                                           | Allows wrapping                                   |
-| `colSpan`                    | `number \| string \| responsive map`                | Grid span or column width                         |
-| `colStyle`                   | `CSSProperties`                                     | Parent styles applied to child column wrappers    |
-| `gutter`                     | `responsive number \| responsive number[]`          | Horizontal or two-axis spacing                    |
-| `split`                      | `'vertical' \| 'horizontal'`                        | Separator direction                               |
-| `checked/disabled/boxShadow` | `boolean`                                           | Controlled selection, disabled state, shadow      |
-| `tabs`                       | `TabsProps & { cardProps?: ProCardProps }`          | Tabs; cardProps uses ghost only                   |
-| `size`                       | `'default' \| 'small'`                              | Inherits ConfigProvider by default                |
-| `type`                       | `'default' \| 'inner'`                              | Regular or inner card                             |
-| `variant`                    | `'outlined' \| 'borderless'`                        | Takes precedence over legacy bordered             |
-| `bordered/headerBordered`    | `boolean`                                           | Card border and header separator                  |
-| `ghost/hoverable/loading`    | `boolean`                                           | Transparent, hover, and loading states            |
-| `collapsible`                | `boolean \| 'header' \| 'icon'`                     | Collapse trigger                                  |
-| `collapsed/defaultCollapsed` | `boolean`                                           | Controlled state or uncontrolled initial value    |
-| `collapsibleIconRender`      | `({ collapsed }) => VNodeChild`                     | Custom collapse icon                              |
-| `cover/actions`              | Corresponding `CardProps` types                     | Cover and bottom actions, also available as slots |
-| `classes/styles`             | Semantic object or `({ props }) => semantic object` | Semantic classes and styles                       |
-| `classNames`                 | Semantic class object                               | Legacy entry; classes wins for the same part      |
-| `headStyle/bodyStyle`        | `CSSProperties`                                     | Legacy entry; styles wins for the same part       |
+### Props {#props}
 
-Semantic parts are `root/header/body/extra/title/actions/cover`. Inner structure uses prefixed `title-heading/content/sub-title/collapsible-icon` classes. Root `class` remains independent. A collapsed body's `display:none` overrides custom styles.
+| Property                | Type                                                         | Default                       | Description / source                                                                                                                         |
+| ----------------------- | ------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`                 | `VNodeChild`                                                 | —                             | Heading; the title slot takes precedence.                                                                                                    |
+| `subTitle`              | `VNodeChild`                                                 | —                             | Subtitle; the subTitle slot takes precedence.                                                                                                |
+| `extra`                 | `VNodeChild`                                                 | —                             | Header actions; the extra slot takes precedence.                                                                                             |
+| `tooltip`               | `string \| TooltipProps`                                     | —                             | Tooltip text or [Tooltip props](https://www.antdv-next.com/components/tooltip).                                                              |
+| `prefixCls`             | `string`                                                     | `ant-pro-card`                | Full prefix, inherited from the Pro/native provider.                                                                                         |
+| `layout`                | `'default' \| 'center'`                                      | `default`                     | Centers ordinary content when set to center.                                                                                                 |
+| `direction`             | `'row' \| 'column'`                                          | `row`                         | Direction of child cards.                                                                                                                    |
+| `wrap`                  | `boolean`                                                    | `false`                       | Allows child cards to wrap.                                                                                                                  |
+| `colSpan`               | `ProResponsiveValue<number \| string>`                       | —                             | 24-column span or CSS width inside a parent card; 0 hides the column.                                                                        |
+| `colStyle`              | `CSSProperties`                                              | —                             | Style applied by the parent to child column wrappers.                                                                                        |
+| `gutter`                | `ProResponsiveValue<number> \| ProResponsiveValue<number>[]` | `0`                           | Horizontal gap or [horizontal, vertical]; responsive keys: xs/sm/md/lg/xl/xxl.                                                               |
+| `split`                 | `'vertical' \| 'horizontal'`                                 | —                             | Divider direction between child cards.                                                                                                       |
+| `checked`               | `boolean`                                                    | `undefined`                   | Enables controlled selection; handle the checked event to update it.                                                                         |
+| `disabled`              | `boolean`                                                    | Inherited from ConfigProvider | Disables selection and collapse; inherits ConfigProvider when omitted.                                                                       |
+| `boxShadow`             | `boolean`                                                    | `false`                       | Enables the theme boxShadowTertiary shadow.                                                                                                  |
+| `tabs`                  | `TabsProps & { cardProps?: ProCardProps }`                   | —                             | Passes to [Tabs](https://www.antdv-next.com/components/tabs); items take precedence over TabPane children; only cardProps.ghost is consumed. |
+| `collapsibleIconRender` | `({ collapsed: boolean }) => VNodeChild`                     | —                             | Custom collapse icon; the collapsibleIcon slot takes precedence.                                                                             |
+| `cover`                 | `CardProps['cover']`                                         | —                             | Native [Card cover](https://www.antdv-next.com/components/card); hidden when collapsed; the slot takes precedence.                           |
+| `actions`               | `CardProps['actions']`                                       | —                             | Native [Card actions](https://www.antdv-next.com/components/card); hidden when collapsed; the slot takes precedence.                         |
+| `size`                  | `'default' \| 'small'`                                       | Inherited from ConfigProvider | Inherits ConfigProvider; default maps to native medium.                                                                                      |
+| `type`                  | `'default' \| 'inner'`                                       | `default`                     | Native [Card type](https://www.antdv-next.com/components/card).                                                                              |
+| `variant`               | `'outlined' \| 'borderless'`                                 | Inherited from Card           | Overrides bordered; ghost forces borderless.                                                                                                 |
+| `bordered`              | `boolean`                                                    | `undefined`                   | Legacy border setting; omitted values follow native Card.                                                                                    |
+| `headerBordered`        | `boolean`                                                    | `false`                       | Shows a header divider; inner cards also show it.                                                                                            |
+| `ghost`                 | `boolean`                                                    | `false`                       | Transparent background with no border, shadow or body padding.                                                                               |
+| `hoverable`             | `boolean`                                                    | `false`                       | Enables native Card hover styling.                                                                                                           |
+| `loading`               | `boolean`                                                    | `false`                       | Native Card skeleton, replaced by the loading slot when present.                                                                             |
+| `collapsible`           | `boolean \| 'header' \| 'icon'`                              | `false`                       | true/header uses the header; icon restricts toggling to the icon.                                                                            |
+| `collapsed`             | `boolean`                                                    | `undefined`                   | Controlled collapsed state; supports v-model:collapsed.                                                                                      |
+| `defaultCollapsed`      | `boolean`                                                    | `false`                       | Initial uncontrolled collapsed state.                                                                                                        |
+| `headStyle`             | `CSSProperties`                                              | —                             | Legacy header styles; styles.header takes precedence.                                                                                        |
+| `bodyStyle`             | `CSSProperties`                                              | —                             | Legacy body styles; styles.body takes precedence.                                                                                            |
+| `classes`               | `SemanticClasses \| ({ props }) => SemanticClasses`          | —                             | Semantic class names, overriding classNames.                                                                                                 |
+| `classNames`            | `Partial<Record<ProCardSemanticName, string>>`               | —                             | Legacy semantic class-name map.                                                                                                              |
+| `styles`                | `SemanticStyles \| ({ props }) => SemanticStyles`            | —                             | Semantic styles; see supported parts below.                                                                                                  |
 
-```vue
-<ProCard
-  title="Compact content"
-  class="business-card"
-  :classes="({ props }) => ({ body: props.loading ? 'body-loading' : 'body-ready' })"
-  :styles="{ body: { padding: '16px' } }"
-/>
-```
+Other attributes pass through to the root [Antdv Next Card](https://www.antdv-next.com/components/card). The component owns title, extra, cover, actions, variant, size, type, loading, classes and styles; use the documented Pro properties for these entries. `class/style/id/data-*/aria-*` target the root. Responsive breakpoints are 0/576/768/992/1200/1600px.
 
-| Event              | Payload                                                               |
-| ------------------ | --------------------------------------------------------------------- |
-| `update:collapsed` | `(collapsed: boolean)`                                                |
-| `collapse`         | `(collapsed: boolean)` on user toggle                                 |
-| `checked`          | `(event: MouseEvent \| KeyboardEvent)` requesting a controlled update |
-| `tabChange`        | `(key: string)`                                                       |
+### Events {#events}
 
-Slots: `default/title/subTitle/extra/cover/actions/loading/collapsibleIcon`. `collapsibleIcon` receives `{ collapsed: boolean }` and takes precedence over `collapsibleIconRender`.
+| Event              | Parameters                             | Description                                           |
+| ------------------ | -------------------------------------- | ----------------------------------------------------- |
+| `update:collapsed` | `(collapsed: boolean)`                 | Controlled collapse update.                           |
+| `collapse`         | `(collapsed: boolean)`                 | User collapse toggle.                                 |
+| `checked`          | `(event: MouseEvent \| KeyboardEvent)` | Selection request; update checked in the parent.      |
+| `tabChange`        | `(key: string)`                        | Active tab changed; native tabs.onChange is retained. |
 
-Exports include `ProCard/ProCardGroup/ProCardDivider/ProCardTabPane` and `ProCardProps/ProCardSlots/ProCardSemanticName`. The default plugin registers the components.
+### Slots {#slots}
+
+| Slot              | Scope                    | Description                                |
+| ----------------- | ------------------------ | ------------------------------------------ |
+| `default`         | —                        | Card body or legacy TabPane children.      |
+| `title`           | —                        | Overrides title.                           |
+| `subTitle`        | —                        | Overrides subTitle.                        |
+| `extra`           | —                        | Overrides extra.                           |
+| `cover`           | —                        | Overrides cover; hidden while collapsed.   |
+| `actions`         | —                        | Overrides actions; hidden while collapsed. |
+| `loading`         | —                        | Replaces the skeleton when loading.        |
+| `collapsibleIcon` | `{ collapsed: boolean }` | Overrides collapsibleIconRender.           |
+
+### Instance {#instance}
+
+No component-specific instance methods are exposed. Control collapse with `v-model:collapsed` and tabs through `tabs.activeKey`.
+
+### Composition members {#members}
+
+| Property                         | Type                         | Default                     | Description / source                                                                       |
+| -------------------------------- | ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------ |
+| `ProCard.Group` / `ProCardGroup` | `ProCardProps`               | `ghost=true, direction=row` | [Card props](#props); ghost is always enabled; direction only preserves column explicitly. |
+| `ProCard.Divider.type`           | `'vertical' \| 'horizontal'` | `vertical`                  | Divider orientation; other attrs target the separator div.                                 |
+| `ProCard.TabPane.tab`            | `VNodeChild`                 | —                           | Legacy tab label read by the parent.                                                       |
+| `ProCard.TabPane.cardProps`      | `ProCardProps`               | —                           | [Panel card props](#props); explicit attrs override matching cardProps.                    |
+| `ProCard.TabPane key / disabled` | `string \| number / boolean` | —                           | VNode key and attrs read by parent tab navigation; prefer tabs.items.                      |
+
+Group and TabPane forward Card slots and events; Divider has no slots, events or methods. None adds instance methods.
+
+### Semantic styles {#styles}
+
+| Part      | Target         |
+| --------- | -------------- |
+| `root`    | Root Card      |
+| `header`  | Header         |
+| `body`    | Body           |
+| `extra`   | Header extra   |
+| `title`   | Title          |
+| `actions` | Footer actions |
+| `cover`   | Cover          |
+
+`classes` overrides legacy `classNames`; `styles.header/body` overrides headStyle/bodyStyle. Collapsed body display remains hidden. Native theme configuration uses [ConfigProvider](https://www.antdv-next.com/components/config-provider) and `theme.components.Card`; Pro tokens use [ProConfigProvider](./pro-config-provider#props).

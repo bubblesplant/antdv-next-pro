@@ -53,23 +53,44 @@ Reserve enough height for the expanded search form, toolbar and pagination. On n
 
 The parent must have a definite available height: a fixed height, `calc(100vh - 160px)`, or the remaining space in a bounded flex layout. Set `min-height: 0` on intermediate flex items so they can shrink. Use the base ProTable for pages that grow naturally with their content.
 
-## API
+## API and forwarding
 
-ProTable provides the collapse arrows and labels. Options such as `search` and `scroll` are passed through unchanged. Set `scroll.y: '100%'` explicitly for a fixed header and internal body scrolling.
+This wrapper adds no public business properties. Generic parameters, defaults, controlled behavior and precedence match ProTable; only the `adaptive-table` class and layout styles are added.
 
-Props, events, slots and generic parameters match [ProTable](./pro-table). Refs use `ProTableInstance<T>` and retain methods such as `reload()`, `reset()`, `setPageInfo()`, `scrollTo()` and editing actions.
+### Properties {#props}
 
-The `#toolbar-actions="{ action, selectedRows }"` scoped slot is forwarded directly, providing table actions and the current selection inside templates. The `toolBarRender(action, rows)` callback remains supported; the slot takes precedence when both are provided.
+| Property                      | Type                       | Default           | Description and source                                                                                                                                                                                                      |
+| ----------------------------- | -------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `class`                       | `ClassValue`               | —                 | Merges caller classes and adds adaptive-table.                                                                                                                                                                              |
+| `style`                       | `StyleValue`               | —                 | Passed to the ProTable root.                                                                                                                                                                                                |
+| `columns`                     | `ProColumns<T>[]`          | required          | Every column property is listed in [ProTable columns](./pro-table#columns).                                                                                                                                                 |
+| `scroll.x`                    | `number \| string \| true` | —                 | Forwards horizontal scroll width.                                                                                                                                                                                           |
+| `scroll.y`                    | `number \| string`         | —                 | Forwards scroll-body height; explicitly set it, e.g. `'100%'`, for internal scrolling.                                                                                                                                      |
+| All ProTable properties       | `ProTableProps<T, P>`      | ProTable defaults | See [ProTable properties](./pro-table#props), and nested [search](./pro-table#search), [form](./pro-table#form), [toolbar](./pro-table#toolbar), [pagination](./pro-table#pagination) and [editable](./pro-table#editable). |
+| Other native Table properties | `TableProps<T>`            | native defaults   | Forwarded through ProTable; see [antdv-next Table API](https://www.antdv-next.com/components/table).                                                                                                                        |
 
-| Setting                                         | Behavior                                                             |
-| ----------------------------------------------- | -------------------------------------------------------------------- |
-| Root class                                      | Adds `adaptive-table` and preserves the caller's `class` and `style` |
-| `scroll.y`                                      | Passed through; the caller configures the body scroll height         |
-| `scroll.x`                                      | Passed through for horizontal scrolling                              |
-| Search, toolbar, pagination and selection alert | Keep their natural height                                            |
-| `search: false` / `pagination: false`           | Retain the base behavior                                             |
+### Events {#events}
 
-Styles target the default Card, Spin and Table structure. Additional wrappers introduced by `tableRender`, `tableViewRender` or `searchFormRender` need matching flex height constraints. Native virtual tables require an explicit numeric `scroll.y`.
+| Event                  | Arguments        | Source                                                                             |
+| ---------------------- | ---------------- | ---------------------------------------------------------------------------------- |
+| `update:data-source`   | `rows: T[]`      | Controlled rows; see [ProTable events](./pro-table#events).                        |
+| `update:editable-keys` | `keys: ProKey[]` | Controlled editing keys; see [ProTable events](./pro-table#events).                |
+| All other events       | unchanged        | [Complete ProTable events and callbacks](./pro-table#events), forwarded unchanged. |
+
+### Slots {#slots}
+
+| Slot              | Arguments                                            | Source                                                                                                                                      |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `toolbar-actions` | `{ action: ProTableInstance<T>, selectedRows: T[] }` | Before toolBarRender; see [ProTable slots](./pro-table#slots).                                                                              |
+| All other slots   | unchanged                                            | Includes toolbar-title, dynamic header-/cell-, before-table/after-table and native slots; see the [complete slot table](./pro-table#slots). |
+
+### Instance {#instance}
+
+| Instance type         | Methods and return types                                                                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ProTableInstance<T>` | Inherits [all ProTable methods](./pro-table#instance): reload/reset, pagination, selection, scrolling, fullscreen, editing and row access; adds no methods. |
+
+Search, toolbar, pagination and selection alerts keep their natural heights. Styles target the default Card, Spin and Table structure; wrappers added through `tableRender/tableViewRender/searchFormRender` need matching flex height constraints. Native virtual tables require numeric `scroll.y`.
 
 ## Upstream synchronization
 

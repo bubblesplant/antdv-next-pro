@@ -76,21 +76,42 @@ const rows: User[] = [{ id: 1, name: '林默' }]
 
 ## API 与透传
 
-查询折叠箭头和文案由 `ProTable` 提供。`search`、`scroll` 等配置原样透传；需要固定表头和表体内部滚动时，由调用方设置 `scroll.y: '100%'`。
+本组件没有新增公开业务属性；全部泛型、默认值、受控行为及覆盖优先级与 ProTable 一致。只追加 `adaptive-table` 类名及布局样式。
 
-属性、事件、插槽及泛型与 [ProTable](./pro-table) 一致，组件 ref 使用 `ProTableInstance<T>`，支持 `reload()`、`reset()`、`setPageInfo()`、`scrollTo()` 和编辑等方法。
+### 属性 {#props}
 
-`#toolbar-actions="{ action, selectedRows }"` 作用域插槽同样直接透传，可在模板内刷新、重置或操作选中行。兼容 `toolBarRender(action, rows)` 回调；同时提供时优先使用插槽。
+| 属性                | 类型                       | 默认值           | 说明与来源                                                                                                                                                                                                               |
+| ------------------- | -------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `class`             | `ClassValue`               | —                | 合并调用方 class 并追加 adaptive-table。                                                                                                                                                                                 |
+| `style`             | `StyleValue`               | —                | 原样传给 ProTable 外层根节点。                                                                                                                                                                                           |
+| `columns`           | `ProColumns<T>[]`          | 必填             | 列属性逐项见 [ProTable 列表](./pro-table#columns)。                                                                                                                                                                      |
+| `scroll.x`          | `number \| string \| true` | —                | 透传横向滚动宽度。                                                                                                                                                                                                       |
+| `scroll.y`          | `number \| string`         | —                | 透传表体滚动高度；固定表头和内部滚动需显式设置，例如 `'100%'`。                                                                                                                                                          |
+| 全部 ProTable 属性  | `ProTableProps<T, P>`      | 与 ProTable 一致 | 逐项见 [ProTable 属性表](./pro-table#props)，嵌套配置见 [search](./pro-table#search)、[form](./pro-table#form)、[toolbar](./pro-table#toolbar)、[pagination](./pro-table#pagination)、[editable](./pro-table#editable)。 |
+| 其他原生 Table 属性 | `TableProps<T>`            | 原生默认值       | 经 ProTable 透传，完整来源为 [antdv-next Table API](https://www.antdv-next.com/components/table-cn)。                                                                                                                    |
 
-| 项目                                  | 行为                                                       |
-| ------------------------------------- | ---------------------------------------------------------- |
-| 根元素类名                            | 自动追加 `adaptive-table`，合并调用方的 `class` 与 `style` |
-| `scroll.y`                            | 原样透传，由调用方配置表体滚动高度                         |
-| `scroll.x`                            | 原样保留，用于横向滚动                                     |
-| 查询区、工具栏、分页、选择提示        | 保留自身高度，随内容变化自动调整表体空间                   |
-| `search: false` / `pagination: false` | 保持 ProTable 的原有行为                                   |
+### 事件 {#events}
 
-布局样式针对默认 Card、Spin 和 Table 结构。若通过 `tableRender`、`tableViewRender` 或 `searchFormRender` 新增 DOM 包裹层，需要为自定义布局接续 Flex 高度约束。原生虚拟表格需要自行提供数值类型的 `scroll.y`。
+| 事件                   | 参数             | 来源                                                       |
+| ---------------------- | ---------------- | ---------------------------------------------------------- |
+| `update:data-source`   | `rows: T[]`      | 受控数据回传；见 [ProTable 事件表](./pro-table#events)。   |
+| `update:editable-keys` | `keys: ProKey[]` | 受控编辑 key；见 [ProTable 事件表](./pro-table#events)。   |
+| 全部其他事件           | 保持原参数       | [完整 ProTable 事件及回调](./pro-table#events)，原样转发。 |
+
+### 插槽 {#slots}
+
+| 插槽              | 参数                                                 | 来源                                                                                                           |
+| ----------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `toolbar-actions` | `{ action: ProTableInstance<T>, selectedRows: T[] }` | 优先于 toolBarRender，见 [ProTable 插槽表](./pro-table#slots)。                                                |
+| 其他全部插槽      | 保持原参数                                           | 包括 toolbar-title、动态 header-/cell-、before-table/after-table 及原生插槽；[完整插槽表](./pro-table#slots)。 |
+
+### 组件实例 {#instance}
+
+| 实例类型              | 方法与返回值来源                                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `ProTableInstance<T>` | 完整继承 [ProTable 实例表](./pro-table#instance)，包括 reload/reset、分页、选择、滚动、全屏、编辑和数据读写方法；没有新增方法。 |
+
+查询区、工具栏、分页和选择提示保留自身高度。样式针对默认 Card、Spin 和 Table 结构；通过 `tableRender/tableViewRender/searchFormRender` 新增包裹层时，需要接续 Flex 高度约束。原生虚拟表格需提供数值类型的 `scroll.y`。
 
 ## 二次封装与同步
 

@@ -78,7 +78,7 @@ const editable: EditableConfig<Member> = {
 
 `saveEditable` returns `false` when validation fails. Lifecycle exceptions emit `editable-error`. The component-level `formItemProps` wraps the whole EditableProTable in an Antdv Next FormItem for outer-form integration.
 
-### Record creator
+### Creating records {#record-creator-example}
 
 ```ts
 const recordCreatorProps: RecordCreatorProps<Member> = {
@@ -111,49 +111,76 @@ Column `formItemProps` only provide cell validation and field configuration; the
 
 ## API
 
-### Props
+### Properties {#props}
 
-| Prop                                        | Type                                    | Description                                     |
-| ------------------------------------------- | --------------------------------------- | ----------------------------------------------- |
-| `columns`                                   | `ProColumns<T>[]`                       | Shared ProTable column model                    |
-| `value` / `defaultValue`                    | `T[]`                                   | Controlled value and uncontrolled initial value |
-| `editableKeys`                              | `ProKey[]`                              | Current editing keys; supports two-way binding  |
-| `editable`                                  | `false \| EditableConfig<T>`            | Editing mode and lifecycle                      |
-| `recordCreatorProps`                        | `false \| RecordCreatorProps<T>`        | Creator configuration                           |
-| `maxLength`                                 | `number`                                | Maximum row count                               |
-| `formItemProps`                             | `Record<string, unknown>`               | Outer Antdv Next FormItem props                 |
-| `onValuesChange`                            | `(values, changedRecord) => void`       | Whole-table change callback                     |
-| `onTableChange`                             | `(pagination, filters, sorter) => void` | Table-state callback                            |
-| `request` / `params` / `postData`           | Same as ProTable                        | Optional remote initialization/refresh          |
-| `toolbar` / `rowSelection` / `columnsState` | Same as ProTable                        | Opt into related capabilities                   |
-| `polling` / `manualRequest`                 | Same as ProTable                        | Remote request controls                         |
-| `scroll` / `size` / `bordered`              | Same as ProTable                        | Table presentation                              |
+| Property             | Type                                                                            | Default              | Description and source                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`              | `T[]`                                                                           | —                    | Controlled table rows; accept draft/save/add/delete updates with `v-model:value`.                                                                         |
+| `defaultValue`       | `T[]`                                                                           | `[]`                 | Initial uncontrolled rows.                                                                                                                                |
+| `recordCreatorProps` | `false \| RecordCreatorProps<T>`                                                | `{}`                 | Creator button and record options; see [record creation](#record-creator). False hides the button.                                                        |
+| `maxLength`          | `number`                                                                        | —                    | Maximum rows, including tree descendants; enforced by the button and addEditRecord.                                                                       |
+| `formItemProps`      | `Record<string, unknown>`                                                       | —                    | Wraps the entire table in a FormItem; see [FormItem API](https://www.antdv-next.com/components/form#form-item-props). Distinct from column formItemProps. |
+| `onValuesChange`     | `(values: T[], changedRecord: T) => void`                                       | —                    | Table-values callback; the same listener channel as values-change.                                                                                        |
+| `onTableChange`      | `(pagination: ProTablePagination, filters: ProFilter, sorter: ProSort) => void` | —                    | Table state callback; the same listener channel as table-change.                                                                                          |
+| `columns`            | `ProColumns<T>[]`                                                               | `Required`           | See the complete [ProTable column schema](./pro-table#columns).                                                                                           |
+| `editable`           | `false \| EditableConfig<T>`                                                    | `{ type: 'single' }` | See every [editable option](./pro-table#editable), including onSave/onDelete/formProps/formRef; false disables editing.                                   |
+| `editableKeys`       | `ProKey[]`                                                                      | —                    | Editing row keys via `v-model:editable-keys`; overrides editable.editableKeys.                                                                            |
+| `options`            | `false \| ProTableOptions<T>`                                                   | `false`              | Built-in tools are off by default; explicitly enable [ProTable options](./pro-table#options).                                                             |
+| `toolbar`            | `false \| ProTableToolbarConfig`                                                | —                    | No implicit toolbar; title/actions/explicit options can show it. See [toolbar](./pro-table#toolbar).                                                      |
 
-### Events
+All remaining properties inherit the complete [ProTable properties table](./pro-table#props). See [ProColumns](./pro-table#columns) for columns and [antdv-next Table API](https://www.antdv-next.com/components/table) for native properties. Public types omit `dataSource/defaultDataSource/search/pagination`; use `value/defaultValue` for rows. Search and pagination are always disabled internally. `request/params/postData/polling/manualRequest/revalidateOnFocus/rowSelection/columnsState/scroll/size/bordered` retain their ProTable behavior.
 
-`onValuesChange` / `onTableChange` props and `@values-change` / `@table-change` are two syntaxes for the same Vue listener channel. Choose one syntax; every change is dispatched exactly once, so do not bind the same handler through both forms:
+### RecordCreatorProps {#record-creator}
 
-| Event                  | Arguments                     | Description                    |
-| ---------------------- | ----------------------------- | ------------------------------ |
-| `update:value`         | `rows`                        | `v-model:value` update         |
-| `update:editable-keys` | `keys`                        | `v-model:editable-keys` update |
-| `values-change`        | `rows, changedRecord`         | Any row mutation               |
-| `table-change`         | `pagination, filters, sorter` | Table-state change             |
-| `request-error`        | `error`                       | Remote request failure         |
-| `editable-error`       | `error`                       | Editing lifecycle failure      |
+| Property            | Type                                           | Default          | Description and source                                                                                                                                            |
+| ------------------- | ---------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `record`            | `T \| ((index: number, dataSource: T[]) => T)` | `Generated key`  | New row or a factory called on each insertion; ensure a unique rowKey.                                                                                            |
+| `position`          | `'top' \| 'bottom'`                            | `bottom`         | Creator button and new row position.                                                                                                                              |
+| `parentKey`         | `ProKey`                                       | —                | Parent key for a new tree row.                                                                                                                                    |
+| `newRecordType`     | `'cache' \| 'dataSource'`                      | `dataSource`     | Cache writes to the model after saving; dataSource inserts immediately.                                                                                           |
+| `creatorButtonText` | `VNodeChild`                                   | `Locale`         | Creator label; defaults to localized Add row and can be replaced by the creator-button slot.                                                                      |
+| `ButtonProps`       | `Omit<ButtonProps, 'onClick' \| 'position'>`   | `block + dashed` | Other properties pass to the creator [Button](https://www.antdv-next.com/components/button), including disabled/loading/icon/size; the table owns click handling. |
 
-### Slots
+### Events {#events}
 
-EditableProTable forwards every slot to its inner ProTable:
+| Event                  | Arguments                                                             | Description                                                |
+| ---------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `update:value`         | `rows: T[]`                                                           | Full row updates, including editing drafts.                |
+| `update:editable-keys` | `keys: ProKey[]`                                                      | Editing-key update.                                        |
+| `values-change`        | `rows: T[], changedRecord: T`                                         | Table values changed; the same listener as onValuesChange. |
+| `table-change`         | `pagination: ProTablePagination, filters: ProFilter, sorter: ProSort` | Table state changed; the same listener as onTableChange.   |
+| `request-error`        | `error: unknown`                                                      | Request failed.                                            |
+| `editable-error`       | `error: unknown`                                                      | An editing lifecycle callback failed.                      |
 
-- `toolbar-title` and `toolbar-actions`.
-- `header-${columnKey}`.
-- `cell-${columnKey}` or `${columnKey}` with `{ value, record, index, column, editable }`.
-- Other slots supported by the underlying Antdv Next Table.
+`onValuesChange` / `@values-change` and `onTableChange` / `@table-change` are two syntaxes for their respective Vue listener channels; choose one each. Other underlying notifications such as `load`, `selection-change` and `validation-error` follow [ProTable events](./pro-table#events); underlying `change` is adapted as `table-change`.
 
-### Component instance
+### Slots {#slots}
 
-`EditableProTableInstance<T>` includes all ProTable methods and adds whole-table access:
+| Slot                   | Arguments   | Description and source                                                                                                                                                                              |
+| ---------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `creator-button`       | `None`      | Replaces creator-button content.                                                                                                                                                                    |
+| `before-table`         | `None`      | Preserves caller content before the optional top creator button.                                                                                                                                    |
+| `after-table`          | `None`      | Content after the optional bottom creator button.                                                                                                                                                   |
+| `Other ProTable slots` | `Unchanged` | Forwarded unchanged; see [ProTable slots](./pro-table#slots), including toolbar-title/toolbar-actions, dynamic headers/cells and native [Table slots](https://www.antdv-next.com/components/table). |
+
+### EditableProTableInstance {#instance}
+
+| Method                                                                      | Return                                 | Description                                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `getSortFilter()`                                                           | `{ sort: ProSort; filter: ProFilter }` | Reads sorting and filters.                                                              |
+| `reload(resetPageIndex?: boolean)`                                          | `Promise<void>`                        | Reloads, optionally resetting the page.                                                 |
+| `reset()`                                                                   | `Promise<void>`                        | Resets search, sorting and filters.                                                     |
+| `setPageInfo(page: Partial<ProTablePagination>)`                            | `void`                                 | ProTable page-state setter; this component does not render pagination.                  |
+| `clearSelected()`                                                           | `void`                                 | Clears selection.                                                                       |
+| `fullScreen()`                                                              | `Promise<void>`                        | Toggles fullscreen.                                                                     |
+| `scrollTo(target: ProKey \| { key: ProKey } \| { top: number })`            | `void`                                 | Scrolls to a row or pixel offset.                                                       |
+| `startEditable(key: ProKey)`                                                | `boolean`                              | Starts row editing.                                                                     |
+| `saveEditable(key: ProKey)`                                                 | `Promise<boolean>`                     | Validates and saves; returns false on failure.                                          |
+| `cancelEditable(key: ProKey)`                                               | `void`                                 | Cancels and restores original values.                                                   |
+| `addEditRecord(record: T, options?: Omit<RecordCreatorProps<T>, 'record'>)` | `boolean`                              | Creates an editable row, respecting maxLength; see [creation options](#record-creator). |
+| `getRowData(indexOrKey: number \| ProKey)`                                  | `T \| undefined`                       | Numbers first match an exact rowKey, then a top-level index.                            |
+| `getRowsData()`                                                             | `T[]`                                  | Reads all current rows.                                                                 |
+| `setRowData(indexOrKey: number \| ProKey, value: Partial<T>)`               | `boolean`                              | Finds a row using the same key/index rules, shallow-merges and updates value.           |
 
 ```ts
 const editableRef = ref<EditableProTableInstance<Member>>()
@@ -163,11 +190,3 @@ const first = editableRef.value?.getRowData(0)
 const all = editableRef.value?.getRowsData()
 editableRef.value?.setRowData(memberId, { allocation: 100 })
 ```
-
-| Method                          | Description                                                                     |
-| ------------------------------- | ------------------------------------------------------------------------------- |
-| `getRowData(indexOrKey)`        | Numeric input resolves an exact row key first, then a top-level index           |
-| `getRowsData()`                 | Read a copy of all current rows                                                 |
-| `setRowData(indexOrKey, value)` | Resolve with the same key/index rule, shallow-merge, and update `v-model:value` |
-
-Inherited methods are `reload`, `reset`, `setPageInfo`, `clearSelected`, `fullScreen`, `scrollTo`, `startEditable`, `saveEditable`, `cancelEditable`, and `addEditRecord`.
