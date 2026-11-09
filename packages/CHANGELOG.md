@@ -1,5 +1,11 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.5
+
+### Patch Changes
+
+- [#26](https://github.com/bubblesplant/antdv-next-pro/pull/26) [`4eb2e92`](https://github.com/bubblesplant/antdv-next-pro/commit/4eb2e92f2706a96422e916d85c6d2d81e8e66f33) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 文档补充
+
 ## 0.3.4
 
 ### Patch Changes
