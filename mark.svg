@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Antdv Next Pro">
+  <rect width="64" height="64" rx="14" fill="#10233d"/>
+  <path d="M15 45 29 16h7l14 29h-9l-3-7H26l-3 7h-8Zm14-14h7l-3.5-9-3.5 9Z" fill="#fff"/>
+  <path d="M44 15v13M37.5 21.5h13" stroke="#45d0d8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M8 55h48" stroke="#ffb547" stroke-width="4" stroke-linecap="round"/>
+</svg>
