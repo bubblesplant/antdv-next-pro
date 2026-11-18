@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormUploadButtonProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormUploadButton', inheritAttrs: false })
-const props = defineProps<ProFormUploadButtonProps>()
+const { ...props } = defineProps<ProFormUploadButtonProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormUploadButtonProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

@@ -517,6 +517,9 @@ for (const [format, loaded] of [
     'DragSortTable',
     'ProFormCascader',
     'FieldMoney',
+    'FieldText',
+    'FieldSelect',
+    'ProFieldBadgeColor',
     'DropdownFooter',
   ]) {
     assert.equal(registrations.get(name), loaded[name], `${format} 全局注册 ${name} 不正确`)

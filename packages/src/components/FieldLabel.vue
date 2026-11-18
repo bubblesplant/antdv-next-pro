@@ -3,13 +3,57 @@ import type { FieldLabelProps } from './types'
 import { CloseOutlined, DownOutlined } from '@antdv-next/icons'
 import RenderNode from '../table/RenderNode.vue'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
-const props = withDefaults(defineProps<FieldLabelProps>(), { label: undefined, value: undefined })
+const {
+  label = undefined,
+  value = undefined,
+  disabled,
+  expanded,
+  ellipsis,
+  onClear,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<FieldLabelProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get label() {
+    return label
+  },
+  get value() {
+    return value
+  },
+  get disabled() {
+    return disabled
+  },
+  get expanded() {
+    return expanded
+  },
+  get ellipsis() {
+    return ellipsis
+  },
+  get onClear() {
+    return onClear
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { prefix, direction, intl, nativeConfig, classes, styles, themeVars } = useAuxiliaryStyle(
   props,
   'core-field-label',
 )
 function clear() {
-  if (!props.disabled) props.onClear?.()
+  if (!disabled) onClear?.()
 }
 </script>
 <template>

@@ -6,15 +6,39 @@ import { Row } from 'antdv-next'
 
 import SchemaFormChildren from './SchemaFormChildren.vue'
 import { useFormPrefix } from '../pro-form/utils'
-const props = withDefaults(defineProps<FieldsProps>(), {
-  grid: false,
-  readonly: false,
-  schemaSlots: () => ({}),
-})
-
+const {
+  columns,
+  model,
+  layoutType,
+  grid = false,
+  readonly = false,
+  schemaSlots = {},
+} = defineProps<FieldsProps>()
 const emit = defineEmits<{
   fieldChange: [path: Array<string | number>, value: unknown]
 }>()
+
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get columns() {
+    return columns
+  },
+  get model() {
+    return model
+  },
+  get layoutType() {
+    return layoutType
+  },
+  get grid() {
+    return grid
+  },
+  get readonly() {
+    return readonly
+  },
+  get schemaSlots() {
+    return schemaSlots
+  },
+}
 
 const { prefix } = useFormPrefix('form', () => undefined)
 

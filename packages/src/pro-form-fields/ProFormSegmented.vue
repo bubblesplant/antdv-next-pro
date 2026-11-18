@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormSegmentedProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormSegmented', inheritAttrs: false })
-const props = defineProps<ProFormSegmentedProps>()
+const { ...props } = defineProps<ProFormSegmentedProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormSegmentedProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

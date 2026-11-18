@@ -1,102 +1,67 @@
-import { defineComponent, h, type Component } from 'vue'
-import ProFormField from './ProFormField.vue'
-import type { ProFormControlType } from './fieldRegistry'
-import type {
-  ProFormCascaderProps,
-  ProFormColorPickerProps,
-  ProFormRateProps,
-  ProFormDigitRangeProps,
-  ProFormTimePickerProps,
-  ProFormTimeRangePickerProps,
-  ProFormDatePickerProps,
-  ProFormDateRangePickerProps,
-  ProFormRadioProps,
-  ProFormCheckboxGroupProps,
-} from './types'
+import type { Component, ComponentOptionsMixin, DefineComponent } from 'vue'
+import type { ProFormTimePickerProps, ProFormTimeRangePickerProps } from './types'
+import ProFormCascader from './ProFormCascader.vue'
+import ProFormCheckboxGroup from './ProFormCheckboxGroup.vue'
+import ProFormColorPicker from './ProFormColorPicker.vue'
+import ProFormDateMonthPicker from './ProFormDateMonthPicker.vue'
+import ProFormDateMonthRangePicker from './ProFormDateMonthRangePicker.vue'
+import ProFormDateQuarterPicker from './ProFormDateQuarterPicker.vue'
+import ProFormDateQuarterRangePicker from './ProFormDateQuarterRangePicker.vue'
+import ProFormDateWeekPicker from './ProFormDateWeekPicker.vue'
+import ProFormDateWeekRangePicker from './ProFormDateWeekRangePicker.vue'
+import ProFormDateYearPicker from './ProFormDateYearPicker.vue'
+import ProFormDateYearRangePicker from './ProFormDateYearRangePicker.vue'
+import ProFormDigitRange from './ProFormDigitRange.vue'
+import ProFormRadioSingle from './ProFormRadioSingle.vue'
+import ProFormRate from './ProFormRate.vue'
+import ProFormTimePickerRaw from './ProFormTimePicker.vue'
+import ProFormTimeRangePicker from './ProFormTimeRangePicker.vue'
 
-function createField<Props extends object>(name: string, fieldType: ProFormControlType) {
-  return defineComponent(
-    (props: Props, { attrs, slots, emit }) =>
-      () =>
-        h(
-          ProFormField,
-          {
-            ...props,
-            ...attrs,
-            fieldType,
-            'onUpdate:modelValue': (value: unknown) => emit('update:modelValue', value),
-            onChange: (...args: unknown[]) => emit('change', ...args),
-          },
-          slots,
-        ),
-    { name, inheritAttrs: false, emits: ['update:modelValue', 'change'] },
-  )
+type TimePickerComponent<Props extends { modelValue?: unknown }> = DefineComponent<
+  Props,
+  Record<never, never>,
+  Record<never, never>,
+  Record<never, never>,
+  Record<never, never>,
+  ComponentOptionsMixin,
+  ComponentOptionsMixin,
+  {
+    'update:modelValue': (value: Props['modelValue']) => void
+    change: (...args: unknown[]) => void
+  }
+>
+
+export const ProFormTimePicker = Object.assign(ProFormTimePickerRaw, {
+  RangePicker: ProFormTimeRangePicker,
+}) as TimePickerComponent<ProFormTimePickerProps> & {
+  RangePicker: TimePickerComponent<ProFormTimeRangePickerProps>
 }
 
-export const ProFormCascader: ReturnType<typeof createField<ProFormCascaderProps>> =
-  createField<ProFormCascaderProps>('ProFormCascader', 'cascader')
-export const ProFormColorPicker = createField<ProFormColorPickerProps>(
-  'ProFormColorPicker',
-  'colorPicker',
-)
-export const ProFormRate = createField<ProFormRateProps>('ProFormRate', 'rate')
-export const ProFormDigitRange = createField<ProFormDigitRangeProps>(
-  'ProFormDigitRange',
-  'digitRange',
-)
-export const ProFormTimeRangePicker = createField<ProFormTimeRangePickerProps>(
-  'ProFormTimeRangePicker',
-  'timeRange',
-)
-export const ProFormTimePicker = Object.assign(
-  createField<ProFormTimePickerProps>('ProFormTimePicker', 'time'),
-  { RangePicker: ProFormTimeRangePicker },
-)
-export const ProFormDateWeekPicker = createField<ProFormDatePickerProps>(
-  'ProFormDateWeekPicker',
-  'dateWeek',
-)
-export const ProFormDateMonthPicker = createField<ProFormDatePickerProps>(
-  'ProFormDateMonthPicker',
-  'dateMonth',
-)
-export const ProFormDateQuarterPicker = createField<ProFormDatePickerProps>(
-  'ProFormDateQuarterPicker',
-  'dateQuarter',
-)
-export const ProFormDateYearPicker = createField<ProFormDatePickerProps>(
-  'ProFormDateYearPicker',
-  'dateYear',
-)
-export const ProFormDateWeekRangePicker = createField<ProFormDateRangePickerProps>(
-  'ProFormDateWeekRangePicker',
-  'dateWeekRange',
-)
-export const ProFormDateMonthRangePicker = createField<ProFormDateRangePickerProps>(
-  'ProFormDateMonthRangePicker',
-  'dateMonthRange',
-)
-export const ProFormDateQuarterRangePicker = createField<ProFormDateRangePickerProps>(
-  'ProFormDateQuarterRangePicker',
-  'dateQuarterRange',
-)
-export const ProFormDateYearRangePicker = createField<ProFormDateRangePickerProps>(
-  'ProFormDateYearRangePicker',
-  'dateYearRange',
-)
-export const ProFormRadioSingle = createField<ProFormRadioProps>('ProFormRadio', 'radio')
-export const ProFormCheckboxGroup = createField<ProFormCheckboxGroupProps>(
-  'ProFormCheckboxGroup',
-  'checkboxGroup',
-)
+export {
+  ProFormCascader,
+  ProFormCheckboxGroup,
+  ProFormColorPicker,
+  ProFormDateMonthPicker,
+  ProFormDateMonthRangePicker,
+  ProFormDateQuarterPicker,
+  ProFormDateQuarterRangePicker,
+  ProFormDateWeekPicker,
+  ProFormDateWeekRangePicker,
+  ProFormDateYearPicker,
+  ProFormDateYearRangePicker,
+  ProFormDigitRange,
+  ProFormRadioSingle,
+  ProFormRate,
+  ProFormTimeRangePicker,
+}
 
 export const additionalFieldComponents: Record<string, Component> = {
   ProFormCascader,
   ProFormColorPicker,
   ProFormRate,
   ProFormDigitRange,
-  ProFormTimePicker,
   ProFormTimeRangePicker,
+  ProFormTimePicker,
   ProFormDateWeekPicker,
   ProFormDateMonthPicker,
   ProFormDateQuarterPicker,

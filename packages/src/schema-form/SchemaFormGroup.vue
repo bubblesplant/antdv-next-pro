@@ -9,15 +9,15 @@ import { schemaChildren } from './utils'
 import { useFormPrefix } from '../pro-form/utils'
 
 defineOptions({ inheritAttrs: false })
-const props = defineProps<{
+const { context } = defineProps<{
   context: FieldProps
   state: CompositeState
   rootAttrs: Record<string, unknown>
 }>()
 const { prefix } = useFormPrefix('form-group', () => undefined)
 const groupProps = computed(() => {
-  const fieldProps = props.context.column.fieldProps
-  return (typeof fieldProps === 'function' ? fieldProps(props.context.model) : fieldProps) ?? {}
+  const fieldProps = context.column.fieldProps
+  return (typeof fieldProps === 'function' ? fieldProps(context.model) : fieldProps) ?? {}
 })
 </script>
 

@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormUploadDraggerProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormUploadDragger', inheritAttrs: false })
-const props = defineProps<ProFormUploadDraggerProps>()
+const { ...props } = defineProps<ProFormUploadDraggerProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormUploadDraggerProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

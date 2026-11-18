@@ -5,19 +5,57 @@ import { Button } from 'antdv-next'
 import RenderNode from '../table/RenderNode.vue'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<DropdownFooterProps>(), {
-  footerRender: undefined,
-  confirmText: undefined,
-  clearText: undefined,
-})
+const {
+  disabled,
+  onConfirm,
+  onClear,
+  confirmText = undefined,
+  clearText = undefined,
+  footerRender = undefined,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<DropdownFooterProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get disabled() {
+    return disabled
+  },
+  get onConfirm() {
+    return onConfirm
+  },
+  get onClear() {
+    return onClear
+  },
+  get confirmText() {
+    return confirmText
+  },
+  get clearText() {
+    return clearText
+  },
+  get footerRender() {
+    return footerRender
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { prefix, direction, intl, classes, styles, themeVars } = useAuxiliaryStyle(
   props,
   'core-field-dropdown-footer',
 )
 const customFooter = computed(() =>
-  typeof props.footerRender === 'function'
-    ? props.footerRender(props.onConfirm, props.onClear)
-    : undefined,
+  typeof footerRender === 'function' ? footerRender(onConfirm, onClear) : undefined,
 )
 </script>
 <template>
@@ -36,7 +74,7 @@ const customFooter = computed(() =>
         :disabled="disabled"
         :class="classes.clear"
         :style="[{ visibility: onClear ? 'visible' : 'hidden' }, styles.clear]"
-        @click.stop="onClear"
+        @click.stop="onClear?.($event)"
         ><RenderNode
           :content="clearText ?? intl.getMessage('form.lightFilter.clear', '清空')" /></Button
       ><Button

@@ -15,16 +15,32 @@ import { resolveRowKey } from './utils'
 import { useTableRef } from './useTableRef'
 import ProTable from '../ProTable.vue'
 defineOptions({ inheritAttrs: false })
-const props = defineProps<DragSortTableProps<T, P>>()
+const {
+  dragSortKey,
+  dragSortHandlerRender,
+  onDragSortEnd,
+  onDataSourceChange,
+  prefixCls,
+  columns: columnsProp,
+  dataSource,
+  defaultDataSource,
+  rowKey,
+  search,
+  editable,
+  size,
+  onRow: onRowProp,
+  ...restProps
+} = defineProps<DragSortTableProps<T, P>>()
+
 const emit = defineEmits<{
   'update:dataSource': [rows: T[]]
   dataSourceChange: [rows: T[]]
   dragSortEnd: [beforeIndex: number, afterIndex: number, rows: T[]]
 }>()
 const table = ref<ProTableInstance<T>>()
-const rows = shallowRef<T[]>(props.dataSource ?? props.defaultDataSource ?? [])
+const rows = shallowRef<T[]>(dataSource ?? defaultDataSource ?? [])
 const dragging = ref<ProKey>()
-const prefix = useProPrefix('table', () => props.prefixCls)
+const prefix = useProPrefix('table', () => prefixCls)
 const intl = useIntl()
 const { token } = useProConfig()
 const handleStyles = computed<CSSProperties>(() => ({
@@ -39,7 +55,22 @@ const handleStyles = computed<CSSProperties>(() => ({
 }))
 const instance = getCurrentInstance()
 const bindings = computed(() => {
-  Object.values(props)
+  Object.values({
+    ...restProps,
+    dragSortKey,
+    dragSortHandlerRender,
+    onDragSortEnd,
+    onDataSourceChange,
+    prefixCls,
+    columns: columnsProp,
+    dataSource,
+    defaultDataSource,
+    rowKey,
+    search,
+    editable,
+    size,
+    onRow: onRowProp,
+  })
   return Object.fromEntries(
     Object.entries(instance?.vnode.props ?? {}).filter(
       ([key]) =>
@@ -59,14 +90,14 @@ const bindings = computed(() => {
   )
 })
 watch(
-  () => props.dataSource,
+  () => dataSource,
   (value) => {
     if (value) rows.value = value
   },
   { deep: true },
 )
 function key(record: T) {
-  return resolveRowKey(record, props.rowKey)
+  return resolveRowKey(record, rowKey)
 }
 async function move(from: ProKey | undefined, to: ProKey | undefined) {
   if (from === undefined || to === undefined || from === to) return
@@ -76,7 +107,7 @@ async function move(from: ProKey | undefined, to: ProKey | undefined) {
   if (before < 0 || after < 0) return
   const [row] = source.splice(before, 1)
   source.splice(after, 0, row!)
-  if (props.dataSource === undefined) rows.value = source
+  if (dataSource === undefined) rows.value = source
   emit('update:dataSource', source)
   emit('dataSourceChange', source)
   emit('dragSortEnd', before, after, source)
@@ -107,12 +138,12 @@ function handle(record: T, index: number) {
       onDragend: () => (dragging.value = undefined),
       onKeydown: (event: KeyboardEvent) => keyboard(event, record),
     },
-    [props.dragSortHandlerRender ? props.dragSortHandlerRender(record, index) : h(HolderOutlined)],
+    [dragSortHandlerRender ? dragSortHandlerRender(record, index) : h(HolderOutlined)],
   )
 }
 const columns = computed<ProColumns<T>[]>(() => {
-  const field = props.dragSortKey ?? '__dragSort'
-  const source = props.columns.map((column) => ({ ...column }))
+  const field = dragSortKey ?? '__dragSort'
+  const source = columnsProp.map((column) => ({ ...column }))
   const index = source.findIndex((column) => column.key === field || column.dataIndex === field)
   const drag: ProColumns<T> = {
     ...(index >= 0 ? source[index] : {}),
@@ -127,7 +158,7 @@ const columns = computed<ProColumns<T>[]>(() => {
   return source
 })
 function onRow(record: T, index?: number) {
-  const original = props.onRow?.(record, index) ?? {}
+  const original = onRowProp?.(record, index) ?? {}
   return {
     ...original,
     onDragover: (event: DragEvent) => {
@@ -149,7 +180,7 @@ defineExpose<ProTableInstance<T>>(useTableRef(table))
     ref="table"
     v-bind="{ ...bindings, ...$attrs }"
     :columns="columns"
-    :data-source="props.dataSource ?? rows"
+    :data-source="dataSource ?? rows"
     :on-row="onRow"
     @load="rows = $event"
     ><template v-for="(_, name) in $slots" #[name]="scope"

@@ -9,29 +9,60 @@ import { StepsForm, StepForm } from '../pro-form/StepsForm'
 import { useSchemaFormRef } from './useSchemaFormRef'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<SchemaLayoutProps<T>>(), {
-  submitter: undefined,
-  syncToUrl: undefined,
-  syncToInitialValues: undefined,
-  open: undefined,
-  readonly: undefined,
-  grid: undefined,
-  disabled: undefined,
-  collapsed: undefined,
-  defaultCollapsed: undefined,
-  split: undefined,
-  collapse: undefined,
-  urlSync: undefined,
-  title: undefined,
-  trigger: undefined,
-  searchText: undefined,
-  resetText: undefined,
-  optionRender: undefined,
-  collapseRender: undefined,
-  collapseLabel: undefined,
-  footerRender: undefined,
-})
+const {
+  columns,
+  trigger = undefined,
+  name,
+  layoutType,
+  open = undefined,
+  title = undefined,
+  grid = undefined,
+  readonly = undefined,
+  disabled = undefined,
+  urlSync = undefined,
+  syncToUrl = undefined,
+  syncToInitialValues = undefined,
+  submitter = undefined,
+  collapsed = undefined,
+  defaultCollapsed = undefined,
+  split = undefined,
+  searchText = undefined,
+  resetText = undefined,
+  optionRender = undefined,
+  collapseRender = undefined,
+  collapse = undefined,
+  collapseLabel = undefined,
+  footerRender = undefined,
+  ...restProps
+} = defineProps<SchemaLayoutProps<T>>()
+
 const slots = defineSlots<SchemaFormSlots<T>>()
+const props = computed(() => ({
+  ...restProps,
+  columns,
+  trigger,
+  name,
+  layoutType,
+  open,
+  title,
+  grid,
+  readonly,
+  disabled,
+  urlSync,
+  syncToUrl,
+  syncToInitialValues,
+  submitter,
+  collapsed,
+  defaultCollapsed,
+  split,
+  searchText,
+  resetText,
+  optionRender,
+  collapseRender,
+  collapse,
+  collapseLabel,
+  footerRender,
+}))
 const attrs = useAttrs()
 const { formRef, formApi } = useSchemaFormRef<T>()
 const layouts: Record<string, Component> = {
@@ -44,10 +75,10 @@ const layouts: Record<string, Component> = {
   StepsForm,
   StepForm,
 }
-const composition = computed(() => layouts[props.layoutType ?? 'Form'])
+const composition = computed(() => layouts[layoutType ?? 'Form'])
 const compositionProps = computed(() => ({
   ...attrs,
-  ...props,
+  ...props.value,
   columns: undefined,
   layoutType: undefined,
 }))
@@ -56,13 +87,13 @@ defineExpose(formApi)
 
 <template>
   <SchemaForm v-if="columns" ref="formRef" v-bind="{ ...attrs, ...props }" :columns="columns">
-    <template v-for="(_, name) in slots" #[name]="slotProps">
-      <slot :name="name" v-bind="slotProps ?? {}" />
+    <template v-for="(_, slotName) in slots" #[slotName]="slotProps">
+      <slot :name="slotName" v-bind="slotProps ?? {}" />
     </template>
   </SchemaForm>
   <component :is="composition" v-else ref="formRef" v-bind="compositionProps">
-    <template v-for="(_, name) in slots" #[name]="slotProps">
-      <slot :name="name" v-bind="slotProps ?? {}" />
+    <template v-for="(_, slotName) in slots" #[slotName]="slotProps">
+      <slot :name="slotName" v-bind="slotProps ?? {}" />
     </template>
   </component>
 </template>

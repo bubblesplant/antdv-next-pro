@@ -1,21 +1,28 @@
-import { Badge, Popover, type InputNumberProps } from 'antdv-next'
-import { defineComponent, h, type VNodeChild } from 'vue'
-import { useProConfig, useProPrefix } from '../provider/context'
-import type { ProValueTypeMap } from '../provider/types'
+import { h, type FunctionalComponent, type VNodeChild } from 'vue'
 import type { ProValueType } from '../types'
-import { resolveProFieldValueType } from './valueType'
 import { getValueEnumOptions } from '../pro-form-fields/options'
 import type { ProFormValueEnum } from '../pro-form-fields/types'
 import ProField, { type ProFieldProps } from './ProField'
-import { formatMoney, type FieldMoneyOptions } from './money'
+import CustomProField from './CustomProField.vue'
+import FieldStatusBadge from './FieldStatusBadge.vue'
+import type { ProFieldDualRender, ProFieldRenderText } from './types'
 
+export { default as FieldMoney } from './FieldMoney.vue'
+export { default as FieldIndexColumn } from './FieldIndexColumn.vue'
+export type {
+  FieldMoneyProps,
+  ProFieldMoneyProps,
+  ProFieldRenderText,
+  ProFieldDualRender,
+} from './types'
+
+// Runtime aliases retain a single VNode delegation boundary; their implementation is an SFC.
 function field(name: string, valueType: ProValueType) {
-  return defineComponent(
-    (props: ProFieldProps, { attrs, slots }) =>
-      () =>
-        h(ProField, { ...props, ...attrs, valueType }, slots),
-    { name, inheritAttrs: false },
-  )
+  const component: FunctionalComponent<ProFieldProps> = (props, { attrs, slots }) =>
+    h(ProField, { ...props, ...attrs, valueType }, slots)
+  component.displayName = name
+  component.inheritAttrs = false
+  return component
 }
 export const FieldText = field('FieldText', 'text')
 export const FieldCascader = field('FieldCascader', 'cascader')
@@ -27,73 +34,6 @@ export const FieldDigit = field('FieldDigit', 'digit')
 export const FieldDigitRange = field('FieldDigitRange', 'digitRange')
 export const FieldFromNow = field('FieldFromNow', 'fromNow')
 export const FieldImage = field('FieldImage', 'image')
-export interface FieldMoneyProps extends ProFieldProps, FieldMoneyOptions {}
-export type ProFieldMoneyProps = FieldMoneyProps
-export const FieldMoney = defineComponent(
-  (props: FieldMoneyProps, { attrs, slots }) => {
-    const config = useProConfig()
-    return () => {
-      const {
-        locale,
-        customSymbol,
-        moneySymbol,
-        numberFormatOptions,
-        numberPopoverRender,
-        ...rest
-      } = props
-      const fieldProps = {
-        locale,
-        customSymbol,
-        moneySymbol,
-        numberFormatOptions,
-        ...props.fieldProps,
-      }
-      const definedProps = Object.fromEntries(
-        Object.entries(rest).filter(([, value]) => value !== undefined),
-      )
-      const dom = h(ProField, { ...definedProps, ...attrs, valueType: 'money', fieldProps }, slots)
-      if (
-        (props.mode !== 'edit' && props.mode !== 'update') ||
-        numberPopoverRender === false ||
-        props.readonly
-      )
-        return dom
-      const value = props.modelValue ?? props.value ?? props.text
-      const text = formatMoney(value, locale ?? config.intl.value.locale, {
-        ...fieldProps,
-        numberFormatOptions: { ...numberFormatOptions, notation: 'compact' },
-      })
-      return h(
-        Popover,
-        {
-          trigger: 'focus',
-          content:
-            typeof numberPopoverRender === 'function'
-              ? h('span', [numberPopoverRender({ ...fieldProps, value } as InputNumberProps, text)])
-              : text,
-        },
-        { default: () => dom },
-      )
-    }
-  },
-  {
-    name: 'FieldMoney',
-    inheritAttrs: false,
-    props: [
-      'text',
-      'modelValue',
-      'value',
-      'mode',
-      'readonly',
-      'fieldProps',
-      'locale',
-      'customSymbol',
-      'moneySymbol',
-      'numberFormatOptions',
-      'numberPopoverRender',
-    ],
-  },
-)
 export const FieldOptions = field('FieldOptions', 'option')
 export const FieldPassword = field('FieldPassword', 'password')
 export const FieldPercent = field('FieldPercent', 'percent')
@@ -111,53 +51,12 @@ export const FieldTimePicker = field('FieldTimePicker', 'time')
 export const FieldTimeRangePicker = field('FieldTimeRangePicker', 'timeRange')
 export const FieldTreeSelect = field('FieldTreeSelect', 'treeSelect')
 
-export const FieldIndexColumn = defineComponent({
-  name: 'FieldIndexColumn',
-  props: { text: Number, border: Boolean },
-  setup(props, { attrs, slots }) {
-    const prefix = useProPrefix('field-index-column')
-    return () =>
-      h(
-        'span',
-        {
-          ...attrs,
-          class: [
-            prefix.value,
-            props.border && `${prefix.value}-border`,
-            (props.text ?? 0) > 3 && 'top-three',
-            attrs.class,
-          ],
-          style: [
-            {
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '18px',
-              height: '18px',
-            },
-            props.border
-              ? {
-                  color: '#fff',
-                  borderRadius: '9px',
-                  backgroundColor: (props.text ?? 0) > 3 ? '#979797' : '#314659',
-                  fontSize: '12px',
-                }
-              : undefined,
-            attrs.style,
-          ],
-        },
-        slots.default?.() ?? String(props.text ?? ''),
-      )
-  },
-})
-
 function statusComponent(status: 'success' | 'error' | 'processing' | 'default' | 'warning') {
-  return defineComponent({
-    name: `FieldStatus${status}`,
-    setup(_, { attrs, slots }) {
-      return () => h(Badge, { ...attrs, status, text: h('span', slots.default?.()) })
-    },
-  })
+  const component: FunctionalComponent = (_, { attrs, slots }) =>
+    h(FieldStatusBadge, { ...attrs, status }, slots)
+  component.displayName = `FieldStatus${status}`
+  component.inheritAttrs = false
+  return component
 }
 const Success = statusComponent('success'),
   Error = statusComponent('error'),
@@ -176,78 +75,34 @@ export const FieldStatus = {
   default: Default,
   warning: Warning,
 }
-export const ProFieldBadgeColor = defineComponent({
-  name: 'ProFieldBadgeColor',
-  props: { color: String },
-  setup(props, { attrs, slots }) {
-    return () => h(Badge, { ...attrs, color: props.color, text: h('span', slots.default?.()) })
-  },
-})
+export const ProFieldBadgeColor: FunctionalComponent<{ color?: string }> = (
+  props,
+  { attrs, slots },
+) => h(FieldStatusBadge, { ...attrs, color: props.color }, slots)
+ProFieldBadgeColor.displayName = 'ProFieldBadgeColor'
+ProFieldBadgeColor.props = ['color']
+ProFieldBadgeColor.inheritAttrs = false
 export type ProFieldStatusType = keyof typeof FieldStatus
 export type ProFieldEmptyText = VNodeChild
 export type ProFieldPropsType = ProFieldProps
-export type ProFieldRenderText = (
-  value: unknown,
-  valueType: ProValueType,
-  props: ProFieldProps,
-  valueTypeMap: ProValueTypeMap,
-) => VNodeChild
-export interface ProFieldDualRender {
-  renderRead: ProFieldRenderText
-  renderEdit: ProFieldRenderText
-}
 
 export function createProField(renderer: ProFieldRenderText | ProFieldDualRender) {
-  return defineComponent(
-    (props: ProFieldProps, { attrs, slots }) => {
-      const config = useProConfig()
-      return () => {
-        const render =
-          typeof renderer === 'function'
-            ? renderer
-            : props.mode === 'edit' || props.mode === 'update'
-              ? renderer.renderEdit
-              : renderer.renderRead
-        return h(
-          ProField,
-          {
-            ...props,
-            ...attrs,
-            render: (value) =>
-              render(
-                value,
-                resolveProFieldValueType(props.valueType).type,
-                props,
-                config.valueTypeMap.value,
-              ),
-            formItemRender: (value) =>
-              render(
-                value,
-                resolveProFieldValueType(props.valueType).type,
-                props,
-                config.valueTypeMap.value,
-              ),
-          },
-          slots,
-        )
-      }
-    },
-    {
-      name: 'CustomProField',
-      inheritAttrs: false,
-      props: [
-        'text',
-        'modelValue',
-        'valueType',
-        'mode',
-        'fieldProps',
-        'valueEnum',
-        'options',
-        'request',
-        'params',
-      ],
-    },
-  )
+  const component: FunctionalComponent<ProFieldProps> = (props, { attrs, slots }) =>
+    h(CustomProField, { ...props, ...attrs, renderer }, slots)
+  component.displayName = 'CustomProField'
+  component.inheritAttrs = false
+  component.props = [
+    'text',
+    'modelValue',
+    'valueType',
+    'mode',
+    'fieldProps',
+    'valueEnum',
+    'options',
+    'request',
+    'params',
+  ]
+  return component
 }
 
 export const defaultRenderText: ProFieldRenderText = (text, valueType, props, valueTypeMap) => {

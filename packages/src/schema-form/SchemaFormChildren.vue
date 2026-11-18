@@ -5,7 +5,7 @@ import type { FormRecord } from './utils'
 import SchemaFormField from './SchemaFormField.vue'
 import { normalizePath } from './utils'
 
-defineProps<{
+const { columns, context, prefix } = defineProps<{
   columns: SchemaFormColumn<FormRecord>[]
   context: Omit<FieldProps, 'column'>
   prefix?: Array<string | number>

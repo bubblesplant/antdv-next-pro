@@ -5,7 +5,7 @@ import { mergeProps } from 'vue'
 import SchemaFormItem from './SchemaFormItem.vue'
 
 defineOptions({ inheritAttrs: false })
-defineProps<{
+const { state, grid, colProps, rootAttrs } = defineProps<{
   state: FormItemState
   grid: boolean
   colProps?: Record<string, unknown>

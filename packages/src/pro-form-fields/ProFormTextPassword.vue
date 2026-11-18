@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormTextPasswordProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormTextPassword', inheritAttrs: false })
-const props = defineProps<ProFormTextPasswordProps>()
+const { ...props } = defineProps<ProFormTextPasswordProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormTextPasswordProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

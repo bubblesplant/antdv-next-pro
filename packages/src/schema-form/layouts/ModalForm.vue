@@ -4,35 +4,64 @@ import SchemaLayout from '../SchemaLayout.vue'
 import { useSchemaFormRef } from '../useSchemaFormRef'
 
 defineOptions({ name: 'AntdvNextProModalForm', inheritAttrs: false })
-const props = withDefaults(defineProps<SchemaLayoutProps<T>>(), {
-  submitter: undefined,
-  syncToUrl: undefined,
-  syncToInitialValues: undefined,
-  open: undefined,
-  readonly: undefined,
-  grid: undefined,
-  disabled: undefined,
-  collapsed: undefined,
-  defaultCollapsed: undefined,
-  split: undefined,
-  collapse: undefined,
-  urlSync: undefined,
-  title: undefined,
-  trigger: undefined,
-  searchText: undefined,
-  resetText: undefined,
-  optionRender: undefined,
-  collapseRender: undefined,
-  collapseLabel: undefined,
-  footerRender: undefined,
-})
+const {
+  trigger = undefined,
+  open = undefined,
+  title = undefined,
+  grid = undefined,
+  readonly = undefined,
+  disabled = undefined,
+  urlSync = undefined,
+  syncToUrl = undefined,
+  syncToInitialValues = undefined,
+  submitter = undefined,
+  collapsed = undefined,
+  defaultCollapsed = undefined,
+  split = undefined,
+  searchText = undefined,
+  resetText = undefined,
+  optionRender = undefined,
+  collapseRender = undefined,
+  collapse = undefined,
+  collapseLabel = undefined,
+  footerRender = undefined,
+  ...props
+} = defineProps<SchemaLayoutProps<T>>()
+
 const slots = defineSlots<SchemaFormSlots<T>>()
 const { formRef, formApi } = useSchemaFormRef<T>()
 defineExpose(formApi)
 </script>
 
 <template>
-  <SchemaLayout ref="formRef" v-bind="{ ...$attrs, ...props }" layout-type="ModalForm">
+  <SchemaLayout
+    ref="formRef"
+    v-bind="{
+      ...$attrs,
+      ...props,
+      trigger,
+      open,
+      title,
+      grid,
+      readonly,
+      disabled,
+      urlSync,
+      syncToUrl,
+      syncToInitialValues,
+      submitter,
+      collapsed,
+      defaultCollapsed,
+      split,
+      searchText,
+      resetText,
+      optionRender,
+      collapseRender,
+      collapse,
+      collapseLabel,
+      footerRender,
+    }"
+    layout-type="ModalForm"
+  >
     <template v-for="(_, name) in slots" #[name]="slotProps">
       <slot :name="name" v-bind="slotProps ?? {}" />
     </template>

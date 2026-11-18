@@ -95,20 +95,96 @@ import {
 } from './table/utils'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<ProTableProps<T, P>>(), {
-  toolbar: undefined,
-  headerTitle: undefined,
-  toolBarRender: undefined,
-  tableAlertRender: undefined,
-  tableAlertOptionRender: undefined,
-  cardProps: undefined,
-  cardBordered: undefined,
-  ErrorBoundary: undefined,
-  search: () => ({}),
-  pagination: () => ({}),
-  options: () => ({}),
-})
-
+const {
+  prefixCls,
+  columns: columnsProp,
+  dataSource,
+  defaultDataSource,
+  request: requestProp,
+  params,
+  postData,
+  rowKey,
+  loading,
+  headerTitle = undefined,
+  tooltip,
+  form,
+  formRef,
+  onSubmit,
+  onReset,
+  onLoadingChange,
+  beforeSearchSubmit,
+  dateFormatter,
+  debounceTime,
+  toolBarRender = undefined,
+  optionsRender,
+  tableRender,
+  tableViewRender,
+  ErrorBoundary: ErrorBoundaryProp = undefined,
+  tableExtraRender,
+  searchFormRender,
+  tableAlertRender = undefined,
+  tableAlertOptionRender = undefined,
+  cardProps: cardPropsProp = undefined,
+  cardBordered = undefined,
+  tableClassName,
+  tableStyle,
+  classes,
+  styles: stylesProp,
+  search: searchProp = {},
+  localeText: localeTextProp,
+  pagination = {},
+  options: optionsProp = {},
+  toolbar: toolbarProp = undefined,
+  rowSelection,
+  polling,
+  revalidateOnFocus,
+  manualRequest,
+  columnsState: columnsStateProp,
+  editable: editableProp,
+  editableKeys: editableKeysProp,
+  scroll,
+  size: sizeProp,
+  bordered: borderedProp,
+  dropdownPrefixCls,
+  column: columnProp,
+  locale,
+  getPopupContainer,
+  sortDirections,
+  showSorterTooltip,
+  virtual,
+  rootClass,
+  tableLayout,
+  expandable,
+  indentSize,
+  rowClassName,
+  footer,
+  summary,
+  headerCell,
+  bodyCell,
+  caption,
+  id,
+  showHeader,
+  components,
+  onRow,
+  onHeaderRow,
+  direction: directionProp,
+  sticky,
+  rowHoverable,
+  tailor,
+  getContainerWidth,
+  measureRowRender,
+  expandedRowKeys,
+  defaultExpandedRowKeys,
+  expandedRowRender,
+  expandRowByClick,
+  expandIcon,
+  onExpand,
+  onExpandedRowsChange,
+  defaultExpandAllRows,
+  expandIconColumnIndex,
+  expandedRowClassName,
+  childrenColumnName,
+} = defineProps<ProTableProps<T, P>>()
 const emit = defineEmits<{
   'update:dataSource': [rows: T[]]
   'update:editableKeys': [keys: ProKey[]]
@@ -127,6 +203,275 @@ defineSlots<{
   'toolbar-actions'?: (props: { action: ProTableInstance<T>; selectedRows: T[] }) => VNodeChild
   [name: string]: ((props: any) => VNodeChild) | undefined
 }>()
+
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get prefixCls() {
+    return prefixCls
+  },
+  get columns() {
+    return columnsProp
+  },
+  get dataSource() {
+    return dataSource
+  },
+  get defaultDataSource() {
+    return defaultDataSource
+  },
+  get request() {
+    return requestProp
+  },
+  get params() {
+    return params
+  },
+  get postData() {
+    return postData
+  },
+  get rowKey() {
+    return rowKey
+  },
+  get loading() {
+    return loading
+  },
+  get headerTitle() {
+    return headerTitle
+  },
+  get tooltip() {
+    return tooltip
+  },
+  get form() {
+    return form
+  },
+  get formRef() {
+    return formRef
+  },
+  get onSubmit() {
+    return onSubmit
+  },
+  get onReset() {
+    return onReset
+  },
+  get onLoadingChange() {
+    return onLoadingChange
+  },
+  get beforeSearchSubmit() {
+    return beforeSearchSubmit
+  },
+  get dateFormatter() {
+    return dateFormatter
+  },
+  get debounceTime() {
+    return debounceTime
+  },
+  get toolBarRender() {
+    return toolBarRender
+  },
+  get optionsRender() {
+    return optionsRender
+  },
+  get tableRender() {
+    return tableRender
+  },
+  get tableViewRender() {
+    return tableViewRender
+  },
+  get ErrorBoundary() {
+    return ErrorBoundaryProp
+  },
+  get tableExtraRender() {
+    return tableExtraRender
+  },
+  get searchFormRender() {
+    return searchFormRender
+  },
+  get tableAlertRender() {
+    return tableAlertRender
+  },
+  get tableAlertOptionRender() {
+    return tableAlertOptionRender
+  },
+  get cardProps() {
+    return cardPropsProp
+  },
+  get cardBordered() {
+    return cardBordered
+  },
+  get tableClassName() {
+    return tableClassName
+  },
+  get tableStyle() {
+    return tableStyle
+  },
+  get classes() {
+    return classes
+  },
+  get styles() {
+    return stylesProp
+  },
+  get search() {
+    return searchProp
+  },
+  get localeText() {
+    return localeTextProp
+  },
+  get pagination() {
+    return pagination
+  },
+  get options() {
+    return optionsProp
+  },
+  get toolbar() {
+    return toolbarProp
+  },
+  get rowSelection() {
+    return rowSelection
+  },
+  get polling() {
+    return polling
+  },
+  get revalidateOnFocus() {
+    return revalidateOnFocus
+  },
+  get manualRequest() {
+    return manualRequest
+  },
+  get columnsState() {
+    return columnsStateProp
+  },
+  get editable() {
+    return editableProp
+  },
+  get editableKeys() {
+    return editableKeysProp
+  },
+  get scroll() {
+    return scroll
+  },
+  get size() {
+    return sizeProp
+  },
+  get bordered() {
+    return borderedProp
+  },
+  get dropdownPrefixCls() {
+    return dropdownPrefixCls
+  },
+  get column() {
+    return columnProp
+  },
+  get locale() {
+    return locale
+  },
+  get getPopupContainer() {
+    return getPopupContainer
+  },
+  get sortDirections() {
+    return sortDirections
+  },
+  get showSorterTooltip() {
+    return showSorterTooltip
+  },
+  get virtual() {
+    return virtual
+  },
+  get rootClass() {
+    return rootClass
+  },
+  get tableLayout() {
+    return tableLayout
+  },
+  get expandable() {
+    return expandable
+  },
+  get indentSize() {
+    return indentSize
+  },
+  get rowClassName() {
+    return rowClassName
+  },
+  get footer() {
+    return footer
+  },
+  get summary() {
+    return summary
+  },
+  get headerCell() {
+    return headerCell
+  },
+  get bodyCell() {
+    return bodyCell
+  },
+  get caption() {
+    return caption
+  },
+  get id() {
+    return id
+  },
+  get showHeader() {
+    return showHeader
+  },
+  get components() {
+    return components
+  },
+  get onRow() {
+    return onRow
+  },
+  get onHeaderRow() {
+    return onHeaderRow
+  },
+  get direction() {
+    return directionProp
+  },
+  get sticky() {
+    return sticky
+  },
+  get rowHoverable() {
+    return rowHoverable
+  },
+  get tailor() {
+    return tailor
+  },
+  get getContainerWidth() {
+    return getContainerWidth
+  },
+  get measureRowRender() {
+    return measureRowRender
+  },
+  get expandedRowKeys() {
+    return expandedRowKeys
+  },
+  get defaultExpandedRowKeys() {
+    return defaultExpandedRowKeys
+  },
+  get expandedRowRender() {
+    return expandedRowRender
+  },
+  get expandRowByClick() {
+    return expandRowByClick
+  },
+  get expandIcon() {
+    return expandIcon
+  },
+  get onExpand() {
+    return onExpand
+  },
+  get onExpandedRowsChange() {
+    return onExpandedRowsChange
+  },
+  get defaultExpandAllRows() {
+    return defaultExpandAllRows
+  },
+  get expandIconColumnIndex() {
+    return expandIconColumnIndex
+  },
+  get expandedRowClassName() {
+    return expandedRowClassName
+  },
+  get childrenColumnName() {
+    return childrenColumnName
+  },
+}
+
 const NativeTable = Table<T>
 const attrs = useAttrs()
 const instance = getCurrentInstance()
@@ -147,7 +492,7 @@ const DEFAULT_LOCALE_TEXT: ProTableLocaleText = {
   columnDrag: '拖动排序',
 }
 
-const prefix = useProPrefix('table', () => props.prefixCls)
+const prefix = useProPrefix('table', () => prefixCls)
 const intl = useIntl()
 const { nativeConfig, direction } = useProConfig()
 const slots = useSlots()
@@ -224,13 +569,12 @@ const tableBindings = computed(() => {
   )
 })
 const tableCardProps = computed(() => {
-  const bordered =
-    typeof props.cardBordered === 'object' ? props.cardBordered.table : props.cardBordered
-  return props.cardProps === false
+  const bordered = typeof cardBordered === 'object' ? cardBordered.table : cardBordered
+  return cardPropsProp === false
     ? { ghost: true, variant: 'borderless' as const }
     : {
-        variant: props.cardProps?.bordered ? ('outlined' as const) : ('borderless' as const),
-        ...props.cardProps,
+        variant: cardPropsProp?.bordered ? ('outlined' as const) : ('borderless' as const),
+        ...cardPropsProp,
         ...(bordered === undefined
           ? {}
           : { bordered, variant: bordered ? ('outlined' as const) : ('borderless' as const) }),
@@ -254,12 +598,12 @@ function findPart(dom: VNodeChild, part: string): VNodeChild {
   }
 }
 function renderOptions(dom: VNodeChild): VNodeChild {
-  return props.optionsRender ? props.optionsRender(props, Array.isArray(dom) ? dom : [dom]) : dom
+  return optionsRender ? optionsRender(props, Array.isArray(dom) ? dom : [dom]) : dom
 }
 
 function renderTableRoot(dom: VNodeChild): VNodeChild {
-  return props.tableRender
-    ? props.tableRender(props, dom, {
+  return tableRender
+    ? tableRender(props, dom, {
         toolbar: findPart(dom, 'toolbar'),
         alert: findPart(dom, 'alert'),
         table: findPart(dom, 'table'),
@@ -285,33 +629,33 @@ const action = {
 
 provide(proTableViewKey, { renderCell: renderViewCell })
 const rootElement = ref<HTMLElement>()
-const tableData = shallowRef<T[]>([...(props.dataSource ?? props.defaultDataSource ?? [])])
+const tableData = shallowRef<T[]>([...(dataSource ?? defaultDataSource ?? [])])
 const internalLoading = ref(false)
 const requestTotal = ref<number>()
 const toolbarKeyword = ref('')
 const submittedKeyword = ref('')
 const internalSearchCollapsed = ref(
-  typeof props.search === 'object' ? (props.search.defaultCollapsed ?? true) : true,
+  typeof searchProp === 'object' ? (searchProp.defaultCollapsed ?? true) : true,
 )
 const activeSort = ref<ProSort>({})
 const activeFilter = ref<ProFilter>({})
-const editableKeys = ref<ProKey[]>([...(props.editableKeys ?? [])])
+const editableKeys = ref<ProKey[]>([...(editableKeysProp ?? [])])
 const internalSelectedKeys = ref<ProKey[]>([])
 const selectedKeys = computed<ProKey[]>(() =>
-  props.rowSelection && Array.isArray(props.rowSelection.selectedRowKeys)
-    ? props.rowSelection.selectedRowKeys
+  rowSelection && Array.isArray(rowSelection.selectedRowKeys)
+    ? rowSelection.selectedRowKeys
     : internalSelectedKeys.value,
 )
 const editingForm = ref<FormInstance>()
 watch(
-  [() => (props.editable ? props.editable.formRef : undefined), editingForm],
+  [() => (editableProp ? editableProp.formRef : undefined), editingForm],
   ([target, value], [previous]) => {
     if (previous && previous !== target) previous.value = undefined
-    if (target) target.value = props.editable ? value : undefined
+    if (target) target.value = editableProp ? value : undefined
   },
 )
 onBeforeUnmount(() => {
-  const target = props.editable && props.editable.formRef
+  const target = editableProp && editableProp.formRef
   if (target) target.value = undefined
 })
 function editorName(record: T, column: ProColumns<T>) {
@@ -328,7 +672,7 @@ function editorItemProps(record: T, column: ProColumns<T>) {
     : column.formItemProps
 }
 function editText(action: 'save' | 'cancel' | 'delete', fallback: string): VNodeChild {
-  const config = props.editable
+  const config = editableProp
   return config && config[`${action}Text`] != null
     ? config[`${action}Text`]
     : intl.value.getMessage(`editableTable.action.${action}`, fallback)
@@ -338,14 +682,14 @@ const densityOpen = ref(false)
 const draggedColumnKey = ref<string>()
 const fallbackFullscreen = ref(false)
 const density = ref<'small' | 'middle' | 'large'>(
-  props.size ??
+  sizeProp ??
     (nativeConfig.value.componentSize === 'small'
       ? 'small'
       : nativeConfig.value.componentSize === 'large'
         ? 'large'
         : 'middle'),
 )
-const columnsState = ref<Record<string, ProColumnsState>>(loadColumnsState(props.columnsState))
+const columnsState = ref<Record<string, ProColumnsState>>(loadColumnsState(columnsStateProp))
 const remoteColumnOptions = shallowRef(new Map<string, ProFieldOption[]>())
 const loadingOptionKeys = shallowRef(new Set<string>())
 const mounted = ref(false)
@@ -377,7 +721,7 @@ const localeText = computed<ProTableLocaleText>(() => ({
     'tableToolBar.densitySmall',
     DEFAULT_LOCALE_TEXT.densityCompact,
   ),
-  ...props.localeText,
+  ...localeTextProp,
 }))
 
 function renderSearchCollapse(collapsed: boolean) {
@@ -387,9 +731,9 @@ function renderSearchCollapse(collapsed: boolean) {
 const rootStyle = useThemeVars()
 
 const toolbarSearch = computed(() => {
-  if (props.toolbar === false) return false
-  const toolbar = typeof props.toolbar === 'object' ? props.toolbar : undefined
-  return toolbar?.search ?? (typeof props.options === 'object' ? props.options.search : false)
+  if (toolbarProp === false) return false
+  const toolbar = typeof toolbarProp === 'object' ? toolbarProp : undefined
+  return toolbar?.search ?? (typeof optionsProp === 'object' ? optionsProp.search : false)
 })
 const toolbarSearchConfig = computed(() =>
   typeof toolbarSearch.value === 'object' ? toolbarSearch.value : {},
@@ -405,19 +749,19 @@ const toolbarSearchParams = computed(() =>
 )
 
 const initialCurrent = () => {
-  if (props.pagination === false || props.pagination?.type === 'cursor') return 1
-  return props.pagination?.current ?? props.pagination?.defaultCurrent ?? 1
+  if (pagination === false || pagination?.type === 'cursor') return 1
+  return pagination?.current ?? pagination?.defaultCurrent ?? 1
 }
 
 const initialPageSize = () => {
-  if (props.pagination === false) return 10
-  return props.pagination?.pageSize ?? props.pagination?.defaultPageSize ?? 10
+  if (pagination === false) return 10
+  return pagination?.pageSize ?? pagination?.defaultPageSize ?? 10
 }
 
 const current = ref(initialCurrent())
 const pageSize = ref(initialPageSize())
 const cursorPagination = computed(() =>
-  Boolean(props.request && props.pagination && props.pagination.type === 'cursor'),
+  Boolean(requestProp && pagination && pagination.type === 'cursor'),
 )
 const nextToken = ref<string>()
 let cursorHistory: Array<string | undefined> = [undefined]
@@ -434,15 +778,15 @@ function canGoToPage(page: number) {
 }
 
 const effectiveRowKey = computed<string | ((record: T) => ProKey)>(() =>
-  typeof props.rowKey === 'function' ? props.rowKey : String(props.rowKey ?? 'id'),
+  typeof rowKey === 'function' ? rowKey : String(rowKey ?? 'id'),
 )
 
 const effectiveColumns = computed<ProColumns<T>[]>(() => {
-  const source = [...props.columns]
+  const source = [...columnsProp]
   const hasOptionColumn = flattenColumns(source).some(
     (column) => column.valueType === 'option' && !column.hideInTable,
   )
-  if (props.editable && !hasOptionColumn) {
+  if (editableProp && !hasOptionColumn) {
     source.push({
       key: '__pro_actions',
       title: intl.value.getMessage('table.operation', '操作'),
@@ -483,7 +827,7 @@ const searchFormColumns = computed<ProColumns<T>[]>(() =>
   }),
 )
 const settingsConfig = computed(() =>
-  props.options && typeof props.options.setting === 'object' ? props.options.setting : {},
+  optionsProp && typeof optionsProp.setting === 'object' ? optionsProp.setting : {},
 )
 const fixedOptions = computed(() => [
   { value: 'none', label: intl.value.getMessage('tableToolBar.noFixed', '不固定') },
@@ -500,7 +844,7 @@ watch(
   { deep: true, immediate: true },
 )
 
-const searchConfig = computed(() => (typeof props.search === 'object' ? props.search : {}))
+const searchConfig = computed(() => (typeof searchProp === 'object' ? searchProp : {}))
 const searchCollapsed = computed(() =>
   searchConfig.value.collapsed === undefined
     ? internalSearchCollapsed.value
@@ -509,23 +853,23 @@ const searchCollapsed = computed(() =>
 
 const processedData = computed(() => {
   const source = [...tableData.value]
-  return props.postData ? props.postData(source) : source
+  return postData ? postData(source) : source
 })
 
 const locallyQueriedData = computed(() =>
-  props.request
+  requestProp
     ? processedData.value
     : applyLocalQuery(
         processedData.value,
         effectiveColumns.value,
-        props.search === false ? {} : submittedSearch.value,
+        searchProp === false ? {} : submittedSearch.value,
         activeSort.value,
         activeFilter.value,
       ),
 )
 
 const keywordQueriedData = computed(() => {
-  if (props.request || !toolbarSearch.value || !submittedKeyword.value)
+  if (requestProp || !toolbarSearch.value || !submittedKeyword.value)
     return locallyQueriedData.value
   const keyword = submittedKeyword.value.toLocaleLowerCase()
   return locallyQueriedData.value.filter((record) =>
@@ -541,32 +885,32 @@ const keywordQueriedData = computed(() => {
 const total = computed(() =>
   cursorPagination.value
     ? current.value * pageSize.value + (nextToken.value ? 1 : 0)
-    : props.request
+    : requestProp
       ? (requestTotal.value ??
-        (props.pagination === false ? undefined : props.pagination?.total) ??
+        (pagination === false ? undefined : pagination?.total) ??
         keywordQueriedData.value.length)
-      : props.pagination === false
+      : pagination === false
         ? keywordQueriedData.value.length
-        : (props.pagination?.total ?? keywordQueriedData.value.length),
+        : (pagination?.total ?? keywordQueriedData.value.length),
 )
 
 const displayedData = computed(() => {
-  if (props.pagination === false || props.request) return keywordQueriedData.value
+  if (pagination === false || requestProp) return keywordQueriedData.value
   const start = Math.max(0, (current.value - 1) * pageSize.value)
   return keywordQueriedData.value.slice(start, start + pageSize.value)
 })
 
 const effectiveLoading = computed(() =>
-  typeof props.loading === 'object'
-    ? { ...props.loading, spinning: props.loading.spinning ?? internalLoading.value }
-    : Boolean(props.loading) || internalLoading.value,
+  typeof loading === 'object'
+    ? { ...loading, spinning: loading.spinning ?? internalLoading.value }
+    : Boolean(loading) || internalLoading.value,
 )
 watch(
   () =>
     typeof effectiveLoading.value === 'object'
       ? Boolean(effectiveLoading.value.spinning)
       : effectiveLoading.value,
-  (value) => props.onLoadingChange?.(value),
+  (value) => onLoadingChange?.(value),
 )
 const paginationInfo = computed<ProTablePagination>(() => ({
   ...(cursorPagination.value ? { type: 'cursor' as const, nextToken: nextToken.value } : {}),
@@ -579,8 +923,8 @@ const renderPaginationTotal: NonNullable<ProTablePagination['showTotal']> = (tot
   `${intl.value.getMessage('pagination.total.range', '第')} ${range[0]}-${range[1]} ${intl.value.getMessage('pagination.total.total', '条/总共')} ${total} ${intl.value.getMessage('pagination.total.item', '条')}`
 
 const nativePaginationProps = computed(() => {
-  if (!props.pagination) return {}
-  const { type: _type, nextToken: _nextToken, onChange: _onChange, ...rest } = props.pagination
+  if (!pagination) return {}
+  const { type: _type, nextToken: _nextToken, onChange: _onChange, ...rest } = pagination
   if (!cursorPagination.value) return { showTotal: renderPaginationTotal, ...rest }
   const itemRender: NonNullable<ProTablePagination['itemRender']> = (page, itemType, element) =>
     itemType === 'prev' || itemType === 'next'
@@ -595,11 +939,11 @@ const nativePaginationProps = computed(() => {
   }
 })
 const paginationOptions = computed(() => {
-  if (props.pagination === false) return undefined
+  if (pagination === false) return undefined
   return {
-    size: props.pagination?.size ?? 'small',
-    showSizeChanger: cursorPagination.value ? false : (props.pagination?.showSizeChanger ?? true),
-    pageSizeOptions: props.pagination?.pageSizeOptions ?? [10, 20, 50, 100],
+    size: pagination?.size ?? 'small',
+    showSizeChanger: cursorPagination.value ? false : (pagination?.showSizeChanger ?? true),
+    pageSizeOptions: pagination?.pageSizeOptions ?? [10, 20, 50, 100],
   }
 })
 
@@ -607,7 +951,7 @@ const editable = useEditableTable<T>({
   rows: tableData,
   columns: () => effectiveColumns.value,
   rowKey: () => effectiveRowKey.value,
-  editable: () => props.editable,
+  editable: () => editableProp,
   editableKeys,
   getMessage: (key, fallback) => intl.value.getMessage(key, fallback),
   async validateRecord(key, record) {
@@ -732,8 +1076,8 @@ watch(densityOpen, (open) => {
 })
 
 const rowSelectionConfig = computed<import('./types').ProTableRowSelection<T> | undefined>(() => {
-  if (props.rowSelection === false || props.rowSelection === undefined) return undefined
-  const source = props.rowSelection
+  if (rowSelection === false || rowSelection === undefined) return undefined
+  const source = rowSelection
   const controlledKeys = Array.isArray(source.selectedRowKeys)
     ? (source.selectedRowKeys as ProKey[])
     : selectedKeys.value
@@ -752,17 +1096,17 @@ const rowSelectionConfig = computed<import('./types').ProTableRowSelection<T> | 
 
 const showToolbar = computed(
   () =>
-    props.toolbar !== false &&
-    props.toolBarRender !== false &&
-    (props.toolbar !== undefined ||
-      props.headerTitle !== undefined ||
-      typeof props.toolBarRender === 'function' ||
-      props.options !== false ||
+    toolbarProp !== false &&
+    toolBarRender !== false &&
+    (toolbarProp !== undefined ||
+      headerTitle !== undefined ||
+      typeof toolBarRender === 'function' ||
+      optionsProp !== false ||
       Boolean(slots['toolbar-title'] || slots['toolbar-actions'])),
 )
 
 function tableCardStyles(context: { props: ProCardProps }) {
-  const cardProps = props.cardProps === false ? undefined : props.cardProps
+  const cardProps = cardPropsProp === false ? undefined : cardPropsProp
   const styles =
     typeof cardProps?.styles === 'function' ? cardProps.styles(context) : cardProps?.styles
   const body = mergeStyle(cardProps?.bodyStyle, styles?.body)
@@ -781,9 +1125,7 @@ function tableCardStyles(context: { props: ProCardProps }) {
 }
 
 const toolbarTitle = computed(() =>
-  props.toolbar && typeof props.toolbar === 'object'
-    ? (props.toolbar.title ?? props.headerTitle)
-    : props.headerTitle,
+  toolbarProp && typeof toolbarProp === 'object' ? (toolbarProp.title ?? headerTitle) : headerTitle,
 )
 
 const showToolbarTitle = computed(
@@ -791,11 +1133,9 @@ const showToolbarTitle = computed(
 )
 
 const toolbarActions = computed(() => {
-  if (props.toolBarRender) return props.toolBarRender(action, selectedRows.value)
-  if (!props.toolbar || typeof props.toolbar !== 'object') return undefined
-  return typeof props.toolbar.actions === 'function'
-    ? props.toolbar.actions()
-    : props.toolbar.actions
+  if (toolBarRender) return toolBarRender(action, selectedRows.value)
+  if (!toolbarProp || typeof toolbarProp !== 'object') return undefined
+  return typeof toolbarProp.actions === 'function' ? toolbarProp.actions() : toolbarProp.actions
 })
 
 const fullscreenClass = computed(() => ({
@@ -814,24 +1154,24 @@ watch(toolbarSearch, (search) => {
 })
 
 watch(
-  () => props.size,
+  () => sizeProp,
   (size) => {
     density.value = size ?? 'middle'
   },
 )
 
 watch(
-  () => props.dataSource,
+  () => dataSource,
   (value) => {
     if (value === undefined) return
     tableData.value = [...value]
-    editable.syncKeys(props.editableKeys ?? editableKeys.value)
+    editable.syncKeys(editableKeysProp ?? editableKeys.value)
   },
   { deep: true },
 )
 
 watch(
-  () => props.editableKeys,
+  () => editableKeysProp,
   (keys) => {
     editable.syncKeys(keys ?? [])
   },
@@ -839,7 +1179,7 @@ watch(
 )
 
 watch(
-  () => props.columnsState?.value,
+  () => columnsStateProp?.value,
   (value) => {
     if (value) columnsState.value = cloneState(value)
   },
@@ -849,12 +1189,12 @@ watch(
 watch(
   () =>
     [
-      props.pagination === false ? false : props.pagination?.type,
-      props.pagination === false ? undefined : props.pagination?.current,
-      props.pagination === false ? undefined : props.pagination?.pageSize,
+      pagination === false ? false : pagination?.type,
+      pagination === false ? undefined : pagination?.current,
+      pagination === false ? undefined : pagination?.pageSize,
     ] as const,
   ([type, controlledCurrent, controlledSize], [previousType]) => {
-    if (props.pagination === false) return
+    if (pagination === false) return
     const nextPageSize = controlledSize ?? pageSize.value
     const typeChanged = type !== previousType
     const sizeChanged = nextPageSize !== pageSize.value
@@ -867,20 +1207,20 @@ watch(
     if (typeChanged || (sizeChanged && cursorPagination.value)) resetCursor()
     current.value = typeChanged ? 1 : targetCurrent
     pageSize.value = nextPageSize
-    if (mounted.value && props.request) void refresh()
+    if (mounted.value && requestProp) void refresh()
   },
 )
 
 watch(
-  () => props.columns,
+  () => columnsProp,
   () => void loadColumnOptions(),
   { deep: true, immediate: true },
 )
 
 watch(
-  () => props.params,
+  () => params,
   () => {
-    if (!mounted.value || !props.request) return
+    if (!mounted.value || !requestProp) return
     resetCursor()
     current.value = 1
     void refresh()
@@ -889,26 +1229,26 @@ watch(
 )
 
 watch(
-  () => props.polling,
+  () => polling,
   () => configurePolling(),
 )
 
 watch(total, (nextTotal) => {
-  if (props.pagination === false || props.request) return
+  if (pagination === false || requestProp) return
   const lastPage = Math.max(1, Math.ceil(nextTotal / pageSize.value))
   if (current.value > lastPage) current.value = lastPage
 })
 
 async function refresh(): Promise<void> {
-  if (!props.request) return
+  if (!requestProp) return
   if (pollingTimer) clearTimeout(pollingTimer)
   const sequence = ++requestSequence
   internalLoading.value = true
   const queryParams = {
-    ...(props.search === false ? {} : searchRequestParams.value),
+    ...(searchProp === false ? {} : searchRequestParams.value),
     ...toolbarSearchParams.value,
-    ...(props.params ?? ({} as P)),
-    ...(props.pagination === false
+    ...(params ?? ({} as P)),
+    ...(pagination === false
       ? {}
       : cursorPagination.value
         ? {
@@ -920,7 +1260,7 @@ async function refresh(): Promise<void> {
         : { current: current.value, pageSize: pageSize.value }),
   } as P & { current?: number; pageSize?: number }
   try {
-    const result = await props.request(
+    const result = await requestProp(
       queryParams,
       { ...activeSort.value },
       { ...activeFilter.value },
@@ -931,7 +1271,7 @@ async function refresh(): Promise<void> {
       return
     }
     tableData.value = [...result.data]
-    editable.syncKeys(props.editableKeys ?? editableKeys.value)
+    editable.syncKeys(editableKeysProp ?? editableKeys.value)
     if (cursorPagination.value) {
       nextToken.value = result.nextToken
       cursorHistory[current.value] = result.nextToken
@@ -939,9 +1279,7 @@ async function refresh(): Promise<void> {
     }
     requestTotal.value = result.total
     const loadedTotal =
-      result.total ??
-      (props.pagination === false ? undefined : props.pagination?.total) ??
-      result.data.length
+      result.total ?? (pagination === false ? undefined : pagination?.total) ?? result.data.length
     emit('update:dataSource', [...result.data])
     emit('load', [...result.data], loadedTotal)
   } catch (error) {
@@ -977,7 +1315,7 @@ async function reset(): Promise<void> {
   activeFilter.value = {}
   current.value = cursorPagination.value ? 1 : initialCurrent()
   pageSize.value = initialPageSize()
-  props.onReset?.()
+  onReset?.()
   await refresh()
 }
 
@@ -998,9 +1336,7 @@ function clearSelected(): void {
   internalSelectedKeys.value = []
   selectedRows.value = []
   const onChange =
-    props.rowSelection && typeof props.rowSelection === 'object'
-      ? props.rowSelection.onChange
-      : undefined
+    rowSelection && typeof rowSelection === 'object' ? rowSelection.onChange : undefined
   if (typeof onChange === 'function') onChange([], [], { type: 'none' })
   emit('selectionChange', [], [])
 }
@@ -1122,14 +1458,14 @@ function findRowByIndexOrKey(rows: T[], indexOrKey: number | ProKey): T | undefi
 }
 
 function formatSearchDates(values: Record<string, unknown>): Record<string, unknown> {
-  if (props.dateFormatter === false) return values
+  if (dateFormatter === false) return values
   const walk = (value: unknown, type = ''): unknown => {
     if (Array.isArray(value)) return value.map((item) => walk(item, type))
     if (value && typeof value === 'object') {
       if ('format' in value && typeof value.format === 'function')
-        return typeof props.dateFormatter === 'function'
-          ? props.dateFormatter(value, type)
-          : props.dateFormatter === 'number' && 'valueOf' in value
+        return typeof dateFormatter === 'function'
+          ? dateFormatter(value, type)
+          : dateFormatter === 'number' && 'valueOf' in value
             ? value.valueOf()
             : value.format(
                 type.includes('Time')
@@ -1139,7 +1475,7 @@ function formatSearchDates(values: Record<string, unknown>): Record<string, unkn
                     : 'YYYY-MM-DD',
               )
       if (value instanceof Date)
-        return props.dateFormatter === 'number' ? value.getTime() : value.toISOString()
+        return dateFormatter === 'number' ? value.getTime() : value.toISOString()
       return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item, type)]))
     }
     return value
@@ -1150,8 +1486,7 @@ function formatSearchDates(values: Record<string, unknown>): Record<string, unkn
       walk(
         value,
         String(
-          flattenColumns(props.columns).find((column) => columnKey(column) === key)?.valueType ??
-            '',
+          flattenColumns(columnsProp).find((column) => columnKey(column) === key)?.valueType ?? '',
         ),
       ),
     ]),
@@ -1161,7 +1496,7 @@ function initialSearchValues(): Record<string, unknown> {
   return Object.fromEntries(
     searchableColumns.value.map((column) => [
       columnKey(column),
-      column.initialValue ?? getValue(props.form?.initialValues ?? {}, column.dataIndex),
+      column.initialValue ?? getValue(form?.initialValues ?? {}, column.dataIndex),
     ]),
   )
 }
@@ -1173,19 +1508,19 @@ function commitSearch(values: Record<string, unknown>, submit = false): boolean 
   try {
     const formatted = buildSearchParams(effectiveColumns.value, formatSearchDates(values))
     const page =
-      props.pagination === false
+      pagination === false
         ? {}
         : { ...(cursorPagination.value ? {} : { current: 1 }), pageSize: pageSize.value }
     const prepared =
-      props.search === false
+      searchProp === false
         ? {}
-        : props.beforeSearchSubmit
-          ? props.beforeSearchSubmit({ ...formatted, ...page } as P)
+        : beforeSearchSubmit
+          ? beforeSearchSubmit({ ...formatted, ...page } as P)
           : formatted
     const { current: _current, pageSize: _pageSize, nextToken: _nextToken, ...query } = prepared
     submittedSearch.value = values
     searchRequestParams.value = query
-    if (submit) props.onSubmit?.(formatted as P)
+    if (submit) onSubmit?.(formatted as P)
     return true
   } catch (error) {
     emit('requestError', error)
@@ -1207,14 +1542,14 @@ function submitSearch(values: Record<string, unknown>): void {
   debounceTimer = setTimeout(() => {
     debounceTimer = undefined
     void refresh()
-  }, props.debounceTime ?? 10)
+  }, debounceTime ?? 10)
 }
 function resetSearch(): void {
   if (resettingAction) return
   clearSearchDebounce()
   if (!commitSearch(initialSearchValues())) return
   resetCursor()
-  props.onReset?.()
+  onReset?.()
   clearToolbarSearch()
   current.value = 1
   emitTableChange()
@@ -1235,7 +1570,7 @@ async function submitToolbarSearch(value: string): Promise<void> {
     toolbarKeyword.value = value
     submittedKeyword.value = value
     resetCursor()
-    if (typeof props.toolbar === 'object') props.toolbar.onSearch?.(value)
+    if (typeof toolbarProp === 'object') toolbarProp.onSearch?.(value)
     current.value = 1
     emitTableChange()
     await refresh()
@@ -1257,7 +1592,7 @@ function onPageChange(page: number, size: number): void {
   const sizeChanged = size !== pageSize.value
   if (sizeChanged && cursorPagination.value) resetCursor()
   else if (!canGoToPage(page)) return
-  if (props.pagination) props.pagination.onChange?.(page, size)
+  if (pagination) pagination.onChange?.(page, size)
   pageSize.value = size
   current.value = sizeChanged ? 1 : page
   emitTableChange()
@@ -1380,7 +1715,7 @@ function getDisplayedRecord(record: T): T {
 
 function getCellValue(record: T, column: ProColumns<T>, index: number): unknown {
   if (['index', 'indexBorder'].includes(typeOf(column, record, index))) {
-    return (props.pagination === false ? 0 : (current.value - 1) * pageSize.value) + index + 1
+    return (pagination === false ? 0 : (current.value - 1) * pageSize.value) + index + 1
   }
   const displayed = getDisplayedRecord(record)
   const value = getValue(displayed, column.dataIndex)
@@ -1462,7 +1797,7 @@ function removeRow(record: T): void {
 }
 
 function customActions(record: T): VNodeChild | undefined {
-  if (!props.editable || !props.editable.actionRender) return undefined
+  if (!editableProp || !editableProp.actionRender) return undefined
   const key = getRecordKey(record)
   if (key === undefined) return undefined
   const displayed = getDisplayedRecord(record)
@@ -1474,7 +1809,7 @@ function customActions(record: T): VNodeChild | undefined {
     record: displayed,
     editing: editable.isEditing(key),
   }
-  return props.editable.actionRender(displayed, actions, {
+  return editableProp.actionRender(displayed, actions, {
     save: h(Button, { type: 'link', onClick: actions.save }, () => editText('save', '保存')),
     cancel: h(Button, { type: 'link', onClick: actions.cancel }, () => editText('cancel', '取消')),
     delete: h(Button, { type: 'link', danger: true, onClick: actions.remove }, () =>
@@ -1484,7 +1819,7 @@ function customActions(record: T): VNodeChild | undefined {
 }
 
 function hasCustomActions(): boolean {
-  return Boolean(props.editable && props.editable.actionRender)
+  return Boolean(editableProp && editableProp.actionRender)
 }
 
 function fieldOptions(column: ProColumns<T>, record?: T): ProFieldOption[] {
@@ -1520,7 +1855,7 @@ function isOptionLoading(column: ProColumns<T>): boolean {
 
 async function loadColumnOptions(): Promise<void> {
   const sequence = ++optionRequestSequence
-  const requestColumns = flattenColumns(props.columns).filter(
+  const requestColumns = flattenColumns(columnsProp).filter(
     (column): column is ProColumns<T> & Required<Pick<ProColumns<T>, 'request'>> =>
       typeof column.request === 'function',
   )
@@ -1573,7 +1908,7 @@ function updateColumnsState(key: string, value: Partial<ProColumnsState>): void 
 
 function commitColumnsState(state: Record<string, ProColumnsState>): void {
   columnsState.value = state
-  persistColumnsState(columnsState.value, props.columnsState)
+  persistColumnsState(columnsState.value, columnsStateProp)
 }
 
 function updateAllColumnVisibility(checked: boolean): void {
@@ -1583,7 +1918,7 @@ function updateAllColumnVisibility(checked: boolean): void {
 }
 
 function resetColumnsState(): void {
-  commitColumnsState(cloneState(props.columnsState?.defaultValue ?? {}))
+  commitColumnsState(cloneState(columnsStateProp?.defaultValue ?? {}))
 }
 
 function moveSettingsColumn(sourceKey: string, targetKey: string): void {
@@ -1635,8 +1970,8 @@ function getToolbarPopupContainer(): HTMLElement {
 }
 
 function showOption(option: 'density' | 'fullScreen' | 'reload' | 'setting'): boolean {
-  if (props.options === false) return false
-  return Boolean(props.options?.[option] ?? option !== 'fullScreen')
+  if (optionsProp === false) return false
+  return Boolean(optionsProp?.[option] ?? option !== 'fullScreen')
 }
 
 function optionText(option: 'density' | 'fullScreen' | 'reload' | 'setting'): string {
@@ -1646,7 +1981,7 @@ function optionText(option: 'density' | 'fullScreen' | 'reload' | 'setting'): st
   return localeText.value.setting
 }
 function activateOption(option: 'fullScreen' | 'reload', event: MouseEvent) {
-  const callback = props.options && props.options[option]
+  const callback = optionsProp && optionsProp[option]
   if (typeof callback === 'function') callback(event, action)
   else if (option === 'reload') void reload()
   else void fullScreen()
@@ -1655,10 +1990,8 @@ function activateOption(option: 'fullScreen' | 'reload', event: MouseEvent) {
 function configurePolling(): void {
   if (pollingTimer) clearTimeout(pollingTimer)
   pollingTimer = undefined
-  const interval =
-    typeof props.polling === 'function' ? props.polling(tableData.value) : props.polling
-  if (!mounted.value || !props.request || internalLoading.value || !interval || interval <= 0)
-    return
+  const interval = typeof polling === 'function' ? polling(tableData.value) : polling
+  if (!mounted.value || !requestProp || internalLoading.value || !interval || interval <= 0) return
   pollingTimer = setTimeout(
     () => {
       if (typeof document === 'undefined' || !document.hidden) void refresh()
@@ -1669,7 +2002,7 @@ function configurePolling(): void {
 }
 
 function onWindowFocus(): void {
-  if (props.revalidateOnFocus && props.request) void refresh()
+  if (revalidateOnFocus && requestProp) void refresh()
 }
 
 function onFullscreenChange(): void {
@@ -1715,7 +2048,7 @@ onMounted(() => {
   window.addEventListener('focus', onWindowFocus)
   document.addEventListener('fullscreenchange', onFullscreenChange)
   configurePolling()
-  if (initializedSearch && props.request && !props.manualRequest) void refresh()
+  if (initializedSearch && requestProp && !manualRequest) void refresh()
 })
 
 onBeforeUnmount(() => {
@@ -1735,16 +2068,14 @@ const alertContext = computed(() => ({
   onCleanSelected: clearSelected,
 }))
 const alertContent = computed(() =>
-  typeof props.tableAlertRender === 'function'
-    ? props.tableAlertRender(alertContext.value)
-    : undefined,
+  typeof tableAlertRender === 'function' ? tableAlertRender(alertContext.value) : undefined,
 )
 const editingModel = computed(() =>
   Object.fromEntries([...editable.drafts.value].map(([key, record]) => [String(key), record])),
 )
 function renderTableView(dom: VNodeChild): VNodeChild {
-  return props.tableViewRender
-    ? props.tableViewRender(
+  return tableViewRender
+    ? tableViewRender(
         {
           ...props,
           columns: effectiveColumns.value,
@@ -1767,7 +2098,7 @@ function renderViewCell(record: T, column: ProColumns<T>, index: number): VNodeC
       column,
       editable: isRowEditing(record),
     })
-  if (typeOf(column, record, index) === 'option' && props.editable) {
+  if (typeOf(column, record, index) === 'option' && editableProp) {
     if (hasCustomActions()) return customActions(record)
     if (isRowEditing(record))
       return h(Space, { size: 'small' }, () => [
@@ -1848,15 +2179,13 @@ defineExpose<
     :class="[prefix, fullscreenClass, attrs.class]"
     :style="[rootStyle, attrs.style as CSSProperties]"
   >
-    <RenderView
-      :render="props.searchFormRender ? (dom) => props.searchFormRender!(props, dom) : undefined"
-    >
+    <RenderView :render="searchFormRender ? (dom) => searchFormRender!(props, dom) : undefined">
       <ProCard
-        v-if="props.search !== false && searchableColumns.length"
+        v-if="searchProp !== false && searchableColumns.length"
         :class="`${prefix}-search`"
         data-pro-table-search
         :variant="
-          (typeof props.cardBordered === 'object' ? props.cardBordered.search : props.cardBordered)
+          (typeof cardBordered === 'object' ? cardBordered.search : cardBordered)
             ? 'outlined'
             : 'borderless'
         "
@@ -1874,17 +2203,17 @@ defineExpose<
             resetText: searchConfig.resetText ?? localeText.reset,
             collapseRender: searchConfig.collapseRender ?? renderSearchCollapse,
           }"
-          :form="props.form"
-          :form-ref="props.formRef"
+          :form="form"
+          :form-ref="formRef"
           @submit="submitSearch"
           @reset="resetSearch"
           @collapse="toggleSearchCollapsed"
         />
       </ProCard>
     </RenderView>
-    <RenderNode v-if="props.tableExtraRender" :content="props.tableExtraRender(props, tableData)" />
+    <RenderNode v-if="tableExtraRender" :content="tableExtraRender(props, tableData)" />
     <component
-      :is="props.ErrorBoundary === false ? RenderView : (props.ErrorBoundary ?? ErrorBoundary)"
+      :is="ErrorBoundaryProp === false ? RenderView : (ErrorBoundaryProp ?? ErrorBoundary)"
     >
       <ProCard
         v-bind="tableCardProps"
@@ -1898,9 +2227,9 @@ defineExpose<
             data-pro-part="toolbar"
             :class="`${prefix}-list-toolbar`"
             data-pro-table-list-toolbar
-            v-bind="typeof props.toolbar === 'object' ? props.toolbar : {}"
+            v-bind="typeof toolbarProp === 'object' ? toolbarProp : {}"
             :title="toolbarTitle"
-            :tooltip="props.tooltip"
+            :tooltip="tooltip"
             :search="false"
           >
             <template #title>
@@ -2158,8 +2487,8 @@ defineExpose<
           <div
             v-if="
               rowSelectionConfig &&
-              (selectedKeys.length || (props.rowSelection && props.rowSelection.alwaysShowAlert)) &&
-              props.tableAlertRender !== false &&
+              (selectedKeys.length || (rowSelection && rowSelection.alwaysShowAlert)) &&
+              tableAlertRender !== false &&
               alertContent !== false
             "
             data-pro-part="alert"
@@ -2169,18 +2498,15 @@ defineExpose<
             <div :class="`${prefix}-alert-container`">
               <div :class="`${prefix}-alert-info`" data-pro-table-alert-info>
                 <div :class="`${prefix}-alert-info-content`">
-                  <RenderNode v-if="props.tableAlertRender" :content="alertContent" /><span v-else
+                  <RenderNode v-if="tableAlertRender" :content="alertContent" /><span v-else
                     >{{ intl.getMessage('alert.selected', '已选择') }} {{ selectedKeys.length }}
                     {{ intl.getMessage('alert.item', '项') }}</span
                   >
                 </div>
-                <div
-                  v-if="props.tableAlertOptionRender !== false"
-                  :class="`${prefix}-alert-info-option`"
-                >
+                <div v-if="tableAlertOptionRender !== false" :class="`${prefix}-alert-info-option`">
                   <RenderNode
-                    v-if="props.tableAlertOptionRender"
-                    :content="props.tableAlertOptionRender(alertContext)"
+                    v-if="tableAlertOptionRender"
+                    :content="tableAlertOptionRender(alertContext)"
                   /><Button v-else type="link" @click="clearSelected">{{
                     intl.getMessage('alert.clear', '取消选择')
                   }}</Button>
@@ -2190,29 +2516,29 @@ defineExpose<
           </div>
           <slot name="before-table" />
           <component
-            :is="props.editable ? Form : 'div'"
+            :is="editableProp ? Form : 'div'"
             ref="editingForm"
-            v-bind="props.editable ? props.editable.formProps : {}"
+            v-bind="editableProp ? editableProp.formProps : {}"
             :model="editingModel"
             @submit.prevent
           >
-            <RenderView :render="props.tableViewRender ? renderTableView : undefined">
+            <RenderView :render="tableViewRender ? renderTableView : undefined">
               <NativeTable
                 data-pro-part="table"
                 v-bind="tableBindings"
-                :class="props.tableClassName"
-                :style="props.tableStyle"
-                :classes="props.classes"
-                :styles="props.styles"
+                :class="tableClassName"
+                :style="tableStyle"
+                :classes="classes"
+                :styles="stylesProp"
                 :columns="tableColumns"
                 :data-source="displayedData"
                 :row-key="effectiveRowKey"
                 :loading="effectiveLoading"
                 :pagination="false"
                 :row-selection="rowSelectionConfig"
-                :scroll="props.scroll"
+                :scroll="scroll"
                 :size="density"
-                :bordered="props.bordered"
+                :bordered="borderedProp"
                 @change="handleTableChange"
               >
                 <template #bodyCell="{ column, record, index }">
@@ -2229,7 +2555,7 @@ defineExpose<
 
                     <template
                       v-else-if="
-                        props.editable &&
+                        editableProp &&
                         typeOf(resolveOriginalColumn(column)!, record, index) === 'option'
                       "
                     >
@@ -2261,7 +2587,7 @@ defineExpose<
                           ><template #title
                             ><RenderNode
                               :content="
-                                (props.editable && props.editable.deletePopconfirmMessage) ||
+                                (editableProp && editableProp.deletePopconfirmMessage) ||
                                 intl.getMessage('deleteThisLine', '确认删除此行？')
                               "
                           /></template>
@@ -2332,7 +2658,7 @@ defineExpose<
           <slot name="after-table" />
 
           <div
-            v-if="props.pagination !== false"
+            v-if="pagination !== false"
             :class="`${prefix}-pagination`"
             data-pro-table-pagination
           >

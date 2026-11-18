@@ -169,6 +169,33 @@ describe('all 42 built-in field modes', () => {
 })
 
 describe('field edge contracts', () => {
+  it('ignores raw records in action content and preserves nested action nodes', async () => {
+    const edit = vi.fn()
+    const remove = vi.fn()
+    const wrapper = mount(ProField, {
+      props: { valueType: 'option', text: { id: 1, name: 'Ada' } },
+    })
+    expect(wrapper.text()).toBe('')
+
+    await wrapper.setProps({
+      text: [
+        h('button', { onClick: edit }, 'Edit'),
+        { id: 1 },
+        [h('button', { onClick: remove }, 'Remove'), ' Details'],
+      ],
+    })
+    expect(wrapper.findAll('button').map((button) => button.text())).toEqual(['Edit', 'Remove'])
+    expect(wrapper.text()).toContain('Details')
+    await wrapper.get('button:first-child').trigger('click')
+    await wrapper.findAll('button')[1]!.trigger('click')
+    expect(edit).toHaveBeenCalledOnce()
+    expect(remove).toHaveBeenCalledOnce()
+
+    await wrapper.setProps({ text: { id: 2 } })
+    expect(wrapper.findAll('button')).toHaveLength(0)
+    expect(() => wrapper.unmount()).not.toThrow()
+  })
+
   it('loads read labels, reacts to params, and refreshes without an edit request duplicate', async () => {
     const request = vi.fn(async (params?: Record<string, unknown>) => [
       { label: `Label ${typeof params?.id === 'number' ? params.id : ''}`, value: 'a' },

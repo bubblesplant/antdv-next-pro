@@ -13,7 +13,13 @@ import type { ProFieldOption } from './ValueTypeControl'
 
 defineOptions({ name: 'AntdvNextProValueTypeControl', inheritAttrs: false })
 
-const props = defineProps({
+const {
+  column: columnProp,
+  value,
+  options,
+  loading,
+  fieldProps,
+} = defineProps({
   column: {
     type: Object as PropType<object>,
     required: true,
@@ -39,33 +45,33 @@ const config = useProConfig()
 const registeredType = computed(() => Boolean(config.valueTypeMap.value[resolveFieldType()]))
 
 function resolveColumn(): ProColumns<Record<string, unknown>> {
-  return props.column as ProColumns<Record<string, unknown>>
+  return columnProp as ProColumns<Record<string, unknown>>
 }
 
 function resolveFieldType(): ProFormControlType {
   const valueType = resolveColumn().valueType
   if (valueType !== undefined) return resolveColumnValueType(valueType, {}, 0).type
-  return props.options.length > 0 || resolveColumn().valueEnum !== undefined ? 'select' : 'text'
+  return options.length > 0 || resolveColumn().valueEnum !== undefined ? 'select' : 'text'
 }
 
 function resolveControlProps(): Record<string, unknown> {
   const column = resolveColumn()
   const result: Record<string, unknown> = {
     fieldType: resolveFieldType(),
-    modelValue: props.value,
-    fieldProps: props.fieldProps,
-    loading: props.loading,
+    modelValue: value,
+    fieldProps,
+    loading,
   }
 
   const hasResolvedOptions =
-    props.options.length > 0 ||
+    options.length > 0 ||
     column.request !== undefined ||
     column.valueEnum !== undefined ||
-    Array.isArray(props.fieldProps.options) ||
-    Array.isArray(props.fieldProps.treeData)
+    Array.isArray(fieldProps.options) ||
+    Array.isArray(fieldProps.treeData)
 
   if (hasExplicitProp(instance?.vnode.props, 'options') && hasResolvedOptions) {
-    result.options = props.options
+    result.options = options
   } else if (column.valueEnum !== undefined) {
     result.valueEnum = column.valueEnum
   }
@@ -80,9 +86,9 @@ function resolveControlProps(): Record<string, unknown> {
     v-bind="$attrs"
     :value-type="resolveColumnValueType(resolveColumn().valueType, {}, 0)"
     mode="edit"
-    :model-value="props.value"
-    :field-props="props.fieldProps"
-    :options="props.options"
+    :model-value="value"
+    :field-props="fieldProps"
+    :options="options"
     @update:model-value="emit('update:value', $event)"
   />
   <FieldControl

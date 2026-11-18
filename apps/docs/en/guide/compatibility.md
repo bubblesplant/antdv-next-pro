@@ -141,6 +141,12 @@ ProForm composes child fields; BetaSchemaForm/SchemaForm consume schemas. Group,
 | EditableProTable | ProTable methods + `getRowData`, `getRowsData`, `setRowData`                                                                                    |
 | SchemaForm       | `validate`, `reset`, `getFieldsValue`, `setFieldsValue`, `submit`, `open`, `close`, `next`, `prev`                                              |
 
+## Vue rendering compatibility
+
+The minimum supported Vue version is **3.5.0**. Components use `<script setup>` with reactive props destructuring and inline defaults. When compiling the source directly, use a matching Vue SFC compiler version of 3.5.0 or later.
+
+Public render callbacks and Antdv direct-slot contracts retain the necessary VNode boundaries for form validation, context, and refs. This source migration prepares for future Vapor work; Vapor compilation is not enabled and Vapor compatibility is not claimed.
+
 ## Project release convention
 
 Changesets and GitHub Actions are project conventions, not React APIs. Describe npm-facing changes with `pnpm changeset`. Successful CI on `main` maintains the version PR; npm publishing only runs when `NPM_TOKEN` exists, with provenance enabled.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ name: string; size?: number }>()
+const { name, size = 16 } = defineProps<{ name: string; size?: number }>()
 
 const paths: Record<string, string> = {
   search: 'm21 21-4.5-4.5M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0',
@@ -20,8 +20,8 @@ const paths: Record<string, string> = {
 
 <template>
   <svg
-    :width="size ?? 16"
-    :height="size ?? 16"
+    :width="size"
+    :height="size"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"

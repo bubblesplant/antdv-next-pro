@@ -1,4 +1,4 @@
-import type { App, Component, Plugin } from 'vue'
+import type { App, Component, FunctionalComponent, Plugin } from 'vue'
 
 import EditableProTable from './EditableProTable.vue'
 import AdaptiveProTable from './adaptive-pro-table/AdaptiveProTable'
@@ -76,7 +76,11 @@ const components = [
   ...Object.entries(sharedComponents).filter(([name]) => name !== 'LightWrapper'),
   ['LightWrapper', LightWrapper],
   ...Object.entries(fieldAtoms).filter(
-    ([, component]) => typeof component === 'object' && component !== null && 'setup' in component,
+    ([name, component]) =>
+      name !== 'FieldStatus' &&
+      (typeof component === 'function'
+        ? /^[A-Z]/.test(name)
+        : typeof component === 'object' && component !== null && 'setup' in component),
   ),
   ...proFormFieldComponents,
 ] as const
@@ -87,8 +91,11 @@ export const AntdvNextPro: Plugin = {
       // Vue's global registry erases generic SFC props; public named exports retain their types.
       const runtimeComponent = component as Component
       app.component(publicName, runtimeComponent)
-      if (runtimeComponent.name && runtimeComponent.name !== publicName)
-        app.component(runtimeComponent.name, runtimeComponent)
+      const runtimeName =
+        typeof runtimeComponent === 'function'
+          ? (runtimeComponent as FunctionalComponent).displayName
+          : runtimeComponent.name
+      if (runtimeName && runtimeName !== publicName) app.component(runtimeName, runtimeComponent)
     }
     // Preserve the original template aliases even when a layout delegates to a composition form.
     for (const [name, component] of Object.entries({

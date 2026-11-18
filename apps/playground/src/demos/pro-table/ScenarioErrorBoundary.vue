@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onErrorCaptured, ref, watch } from 'vue'
 
-const props = defineProps<{
+const { resetKey, variant } = defineProps<{
   resetKey: number
   variant: 'custom' | 'default'
 }>()
@@ -14,7 +14,7 @@ const failed = ref(false)
 const errorMessage = ref('')
 
 watch(
-  () => props.resetKey,
+  () => resetKey,
   () => {
     failed.value = false
     errorMessage.value = ''

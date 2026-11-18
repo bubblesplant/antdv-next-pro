@@ -6,45 +6,107 @@ import { DownOutlined, QuestionCircleOutlined } from '@antdv-next/icons'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
 import RenderNode from '../table/RenderNode.vue'
 defineOptions({ inheritAttrs: false })
-const props = defineProps<ListToolBarProps>()
+const {
+  title,
+  actions,
+  search,
+  onSearch: onSearchProp,
+  subTitle,
+  tooltip,
+  tabs,
+  menu,
+  filter,
+  settings,
+  multipleLine,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<ListToolBarProps>()
 const emit = defineEmits<{ search: [value: string] }>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get title() {
+    return title
+  },
+  get actions() {
+    return actions
+  },
+  get search() {
+    return search
+  },
+  get onSearch() {
+    return onSearchProp
+  },
+  get subTitle() {
+    return subTitle
+  },
+  get tooltip() {
+    return tooltip
+  },
+  get tabs() {
+    return tabs
+  },
+  get menu() {
+    return menu
+  },
+  get filter() {
+    return filter
+  },
+  get settings() {
+    return settings
+  },
+  get multipleLine() {
+    return multipleLine
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const slots = useSlots()
 const { prefix, direction, intl, classes, styles, themeVars } = useAuxiliaryStyle(
   props,
   'table-list-toolbar',
 )
 const searchBindings = computed(() => {
-  const { onSearch, ...rest } = typeof props.search === 'object' ? props.search : {}
+  const { onSearch, ...rest } = typeof search === 'object' ? search : {}
   return { placeholder: intl.value.getMessage('tableForm.inputPlaceholder', '请输入'), ...rest }
 })
-const hasTitle = computed(() =>
-  Boolean(props.menu || props.title || props.subTitle || props.tooltip || slots.title),
-)
-const hasFilter = computed(() => Boolean(props.filter || slots.filter))
-const hasLeft = computed(() => hasTitle.value || Boolean(props.search))
+const hasTitle = computed(() => Boolean(menu || title || subTitle || tooltip || slots.title))
+const hasFilter = computed(() => Boolean(filter || slots.filter))
+const hasLeft = computed(() => hasTitle.value || Boolean(search))
 const hasRight = computed(() =>
   Boolean(
-    (hasTitle.value && props.search) ||
-    (!props.multipleLine && hasFilter.value) ||
-    props.actions ||
+    (hasTitle.value && search) ||
+    (!multipleLine && hasFilter.value) ||
+    actions ||
     slots.actions ||
-    props.settings?.length ||
+    settings?.length ||
     slots.settings,
   ),
 )
-const current = ref(props.menu?.defaultActiveKey)
-const menuItems = computed(() => props.menu?.items ?? [])
+const current = ref(menu?.defaultActiveKey)
+const menuItems = computed(() => menu?.items ?? [])
 const menuLabel = computed(
   () =>
-    menuItems.value.find((item) => item.key === (props.menu?.activeKey ?? current.value))?.label ??
+    menuItems.value.find((item) => item.key === (menu?.activeKey ?? current.value))?.label ??
     menuItems.value[0]?.label,
 )
 function selectMenu(key: string) {
   current.value = key
-  props.menu?.onChange?.(key)
+  menu?.onChange?.(key)
 }
 function submitSearch(value: string) {
-  const cfg = typeof props.search === 'object' ? props.search : undefined
+  const cfg = typeof search === 'object' ? search : undefined
   Promise.resolve(cfg?.onSearch?.(value)).then((result) => {
     if (result !== false) {
       emit('search', value)

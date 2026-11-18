@@ -14,9 +14,22 @@ import { resolveRowKey } from './utils'
 import { useTableRef } from './useTableRef'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<RowEditorTableProps<T, P>>(), {
-  editable: () => ({ type: 'single' }),
-})
+const {
+  dataSource,
+  defaultDataSource,
+  onRowEditStart,
+  onRowEditEnd,
+  columns,
+  value,
+  defaultValue,
+  rowKey,
+  editable = { type: 'single' },
+  editableKeys,
+  recordCreatorProps,
+  onRow: onRowProp,
+  ...restProps
+} = defineProps<RowEditorTableProps<T, P>>()
+
 const emit = defineEmits<{
   'update:editableKeys': [keys: ProKey[]]
   'update:dataSource': [rows: T[]]
@@ -26,7 +39,21 @@ const instance = getCurrentInstance()
 const timers = new Map<ProKey, ReturnType<typeof setTimeout>>()
 const editing = new Set<ProKey>()
 const bindings = computed(() => {
-  Object.values(props)
+  Object.values({
+    ...restProps,
+    dataSource,
+    defaultDataSource,
+    onRowEditStart,
+    onRowEditEnd,
+    columns,
+    value,
+    defaultValue,
+    rowKey,
+    editable,
+    editableKeys,
+    recordCreatorProps,
+    onRow: onRowProp,
+  })
   return Object.fromEntries(
     Object.entries(instance?.vnode.props ?? {}).filter(
       ([raw]) =>
@@ -54,7 +81,7 @@ onBeforeUnmount(() => {
 function start(key: ProKey) {
   const record = table.value?.getRowData(key)
   if (!record || !table.value?.startEditable(key)) return false
-  if (!editing.has(key)) props.onRowEditStart?.(key, record)
+  if (!editing.has(key)) onRowEditStart?.(key, record)
   editing.add(key)
   return true
 }
@@ -63,7 +90,7 @@ function finish(key: ProKey) {
   clear(key)
   editing.delete(key)
   const record = table.value?.getRowData(key)
-  if (record) props.onRowEditEnd?.(key, record)
+  if (record) onRowEditEnd?.(key, record)
 }
 async function save(key: ProKey) {
   clear(key)
@@ -72,8 +99,8 @@ async function save(key: ProKey) {
   return result
 }
 function onRow(record: T, index?: number) {
-  const original = props.onRow?.(record, index) ?? {}
-  const key = resolveRowKey(record, props.rowKey)
+  const original = onRowProp?.(record, index) ?? {}
+  const key = resolveRowKey(record, rowKey)
   return {
     ...original,
     onDblclick: (event: MouseEvent) => {
@@ -123,12 +150,12 @@ defineExpose<ProTableInstance<T>>({
     ref="table"
     @update:editable-keys="syncEditing"
     v-bind="{ ...bindings, ...$attrs }"
-    :value="props.value ?? props.dataSource"
-    :default-value="props.defaultValue ?? props.defaultDataSource"
+    :value="value ?? dataSource"
+    :default-value="defaultValue ?? defaultDataSource"
     @update:value="emit('update:dataSource', $event)"
-    :columns="props.columns"
-    :editable="props.editable ?? { type: 'single' }"
-    :record-creator-props="props.recordCreatorProps ?? false"
+    :columns="columns"
+    :editable="editable ?? { type: 'single' }"
+    :record-creator-props="recordCreatorProps ?? false"
     :on-row="onRow"
     ><template v-for="(_, name) in $slots" #[name]="scope"
       ><slot :name="name" v-bind="scope ?? {}" /></template

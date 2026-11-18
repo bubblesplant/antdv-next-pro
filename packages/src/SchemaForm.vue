@@ -51,22 +51,56 @@ type RuntimeSchemaSlots = Record<
 >
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<SchemaFormProps<T>>(), {
-  submitter: () => ({}),
-  syncToUrl: undefined,
-  syncToInitialValues: true,
-  title: undefined,
-  searchText: undefined,
-  resetText: undefined,
-  optionRender: undefined,
-  collapseRender: undefined,
-  collapseLabel: undefined,
-  footerRender: undefined,
-  collapsed: undefined,
-  defaultCollapsed: undefined,
-  disabled: undefined,
-  collapse: undefined,
-})
+const {
+  columns,
+  modelValue: modelValueProp,
+  initialValues,
+  request,
+  params,
+  layoutType: layoutTypeProp,
+  open: openProp,
+  current: currentProp,
+  title = undefined,
+  width,
+  labelCol,
+  wrapperCol,
+  grid,
+  readonly,
+  disabled = undefined,
+  layout,
+  formProps,
+  onFinish,
+  onValuesChange,
+  urlSync,
+  syncToUrl = undefined,
+  syncToInitialValues = true,
+  dateFormatter,
+  submitter = {},
+  submitTimeout,
+  modalProps,
+  drawerProps,
+  prefixCls,
+  classes,
+  classNames,
+  styles,
+  collapsed = undefined,
+  defaultCollapsed = undefined,
+  defaultColsNumber,
+  span,
+  labelWidth,
+  split,
+  searchText = undefined,
+  resetText = undefined,
+  optionRender = undefined,
+  collapseRender = undefined,
+  collapse = undefined,
+  collapseLabel = undefined,
+  placement,
+  footerRender = undefined,
+  stepsProps,
+  formRef,
+  style,
+} = defineProps<SchemaFormProps<T>>()
 const emit = defineEmits<{
   'update:modelValue': [values: Partial<T>]
   'update:open': [open: boolean]
@@ -86,19 +120,166 @@ const emit = defineEmits<{
   collapse: [collapsed: boolean]
 }>()
 const slots = defineSlots<SchemaFormSlots<T>>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get columns() {
+    return columns
+  },
+  get modelValue() {
+    return modelValueProp
+  },
+  get initialValues() {
+    return initialValues
+  },
+  get request() {
+    return request
+  },
+  get params() {
+    return params
+  },
+  get layoutType() {
+    return layoutTypeProp
+  },
+  get open() {
+    return openProp
+  },
+  get current() {
+    return currentProp
+  },
+  get title() {
+    return title
+  },
+  get width() {
+    return width
+  },
+  get labelCol() {
+    return labelCol
+  },
+  get wrapperCol() {
+    return wrapperCol
+  },
+  get grid() {
+    return grid
+  },
+  get readonly() {
+    return readonly
+  },
+  get disabled() {
+    return disabled
+  },
+  get layout() {
+    return layout
+  },
+  get formProps() {
+    return formProps
+  },
+  get onFinish() {
+    return onFinish
+  },
+  get onValuesChange() {
+    return onValuesChange
+  },
+  get urlSync() {
+    return urlSync
+  },
+  get syncToUrl() {
+    return syncToUrl
+  },
+  get syncToInitialValues() {
+    return syncToInitialValues
+  },
+  get dateFormatter() {
+    return dateFormatter
+  },
+  get submitter() {
+    return submitter
+  },
+  get submitTimeout() {
+    return submitTimeout
+  },
+  get modalProps() {
+    return modalProps
+  },
+  get drawerProps() {
+    return drawerProps
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classes
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return styles
+  },
+  get collapsed() {
+    return collapsed
+  },
+  get defaultCollapsed() {
+    return defaultCollapsed
+  },
+  get defaultColsNumber() {
+    return defaultColsNumber
+  },
+  get span() {
+    return span
+  },
+  get labelWidth() {
+    return labelWidth
+  },
+  get split() {
+    return split
+  },
+  get searchText() {
+    return searchText
+  },
+  get resetText() {
+    return resetText
+  },
+  get optionRender() {
+    return optionRender
+  },
+  get collapseRender() {
+    return collapseRender
+  },
+  get collapse() {
+    return collapse
+  },
+  get collapseLabel() {
+    return collapseLabel
+  },
+  get placement() {
+    return placement
+  },
+  get footerRender() {
+    return footerRender
+  },
+  get stepsProps() {
+    return stepsProps
+  },
+  get formRef() {
+    return formRef
+  },
+  get style() {
+    return style
+  },
+}
 const attrs = useAttrs()
 const { prefix: defaultPrefix } = useFormPrefix('', () => undefined)
 const { prefix, direction, t, config } = useFormPrefix(
   'form',
   () =>
-    props.prefixCls ??
-    `${defaultPrefix.value}-${props.layoutType === 'QueryFilter' ? 'query-filter' : props.layoutType === 'LightFilter' ? 'form-light-filter' : props.layoutType === 'StepsForm' || props.layoutType === 'StepForm' ? 'steps-form' : 'form'}`,
+    prefixCls ??
+    `${defaultPrefix.value}-${layoutTypeProp === 'QueryFilter' ? 'query-filter' : layoutTypeProp === 'LightFilter' ? 'form-light-filter' : layoutTypeProp === 'StepsForm' || layoutTypeProp === 'StepForm' ? 'steps-form' : 'form'}`,
 )
 const rootStyle = useThemeVars()
 const semantic = useSemanticStyles(props, {
-  classes: () => props.classes,
-  classNames: () => props.classNames,
-  styles: () => props.styles,
+  classes: () => classes,
+  classNames: () => classNames,
+  styles: () => styles,
 })
 const rootAttrs = computed(() => ({
   ...attrs,
@@ -106,7 +287,7 @@ const rootAttrs = computed(() => ({
   style: [
     rootStyle.value,
     { direction: direction.value },
-    props.style,
+    style,
     attrs.style,
     semantic.styles.value.root,
   ],
@@ -116,9 +297,9 @@ const formState = reactive<FormRecord>({})
 const initialSnapshot = ref<FormRecord>({})
 const requestLoading = ref(false)
 const submitting = ref(false)
-const closeLock = useOverlaySubmitLock(() => props.submitTimeout)
-const internalOpen = ref(props.open ?? false)
-const internalCurrent = ref(props.current ?? 0)
+const closeLock = useOverlaySubmitLock(() => submitTimeout)
+const internalOpen = ref(openProp ?? false)
+const internalCurrent = ref(currentProp ?? 0)
 const initialized = ref(false)
 let requestSequence = 0
 let urlWriteQueued = false
@@ -133,50 +314,48 @@ watch(
   },
   { flush: 'sync' },
 )
-const effectiveUrlSync = computed(() =>
-  props.syncToUrl === undefined ? props.urlSync : Boolean(props.syncToUrl),
-)
+const effectiveUrlSync = computed(() => (syncToUrl === undefined ? urlSync : Boolean(syncToUrl)))
 const bodyOptions = computed(() => ({
-  formProps: { ...props.formProps, layout: props.layout, disabled: props.disabled },
+  formProps: { ...formProps, layout, disabled },
   prefixCls: prefix.value,
   classes: semantic.classes.value,
   styles: semantic.styles.value,
-  collapsed: props.collapsed,
-  defaultCollapsed: props.defaultCollapsed,
-  defaultColsNumber: props.defaultColsNumber,
-  span: props.span,
-  labelWidth: props.labelWidth,
-  split: props.split,
-  optionRender: props.optionRender,
-  collapseRender: props.collapseRender,
-  searchText: props.searchText,
-  resetText: props.resetText,
-  collapse: props.collapse,
-  collapseLabel: props.collapseLabel,
-  placement: props.placement,
-  footerRender: props.footerRender,
-  stepsProps: props.stepsProps,
+  collapsed,
+  defaultCollapsed,
+  defaultColsNumber,
+  span,
+  labelWidth,
+  split,
+  optionRender,
+  collapseRender,
+  searchText,
+  resetText,
+  collapse,
+  collapseLabel,
+  placement,
+  footerRender,
+  stepsProps,
   finish: submit,
 }))
 
-const layoutType = computed<SchemaFormLayoutType>(() => props.layoutType ?? 'Form')
-const bodyColumns = computed(() => props.columns as unknown as SchemaFormColumn<FormRecord>[])
+const layoutType = computed<SchemaFormLayoutType>(() => layoutTypeProp ?? 'Form')
+const bodyColumns = computed(() => columns as unknown as SchemaFormColumn<FormRecord>[])
 const schemaSlots = slots as unknown as RuntimeSchemaSlots
 const slotValues = computed(() => formState as unknown as Partial<T>)
-const fieldNames = computed(() => schemaFieldNames(props.columns))
-const steps = computed(() => buildSchemaSteps(props.columns))
+const fieldNames = computed(() => schemaFieldNames(columns))
+const steps = computed(() => buildSchemaSteps(columns))
 const isDialog = computed(
   () => layoutType.value === 'ModalForm' || layoutType.value === 'DrawerForm',
 )
 const dialogTitle = computed(
   () =>
-    (props.title ??
+    (title ??
       (layoutType.value === 'ModalForm'
-        ? props.modalProps?.title
-        : props.drawerProps?.title)) as ModalProps['title'],
+        ? modalProps?.title
+        : drawerProps?.title)) as ModalProps['title'],
 )
 const overlayFooter = provideOverlayFormFooter(
-  computed(() => isDialog.value && props.submitter !== false && !slots.footer),
+  computed(() => isDialog.value && submitter !== false && !slots.footer),
 )
 function setFooterTarget(element: unknown): void {
   overlayFooter.target.value = element instanceof HTMLElement ? element : undefined
@@ -185,10 +364,10 @@ const dialogFooter = computed(() =>
   slots.footer || overlayFooter.enabled.value ? undefined : null,
 )
 const dialogSubmitter = computed(() => {
-  if (slots.footer || props.submitter === false) return false
-  const source = props.submitter ?? {}
+  if (slots.footer || submitter === false) return false
+  const source = submitter ?? {}
   const sourceReset = source.resetButtonProps
-  const okText = props.modalProps?.okText ?? config.value.locale?.Modal?.okText
+  const okText = modalProps?.okText ?? config.value.locale?.Modal?.okText
   return {
     ...source,
     searchConfig: {
@@ -213,51 +392,47 @@ const dialogSubmitter = computed(() => {
               if (sourceReset?.onClick) sourceReset.onClick(event)
               else {
                 closeForm()
-                if (layoutType.value === 'ModalForm') props.modalProps?.onCancel?.(event)
-                else props.drawerProps?.onClose?.(event)
+                if (layoutType.value === 'ModalForm') modalProps?.onCancel?.(event)
+                else drawerProps?.onClose?.(event)
               }
             },
           },
   }
 })
 const modalOptions = computed(() => ({
-  ...props.modalProps,
+  ...modalProps,
   onCancel: undefined,
   afterClose: () => {
-    if (
-      !internalOpen.value &&
-      (props.modalProps?.destroyOnHidden ?? props.modalProps?.destroyOnClose)
-    )
-      reset()
-    props.modalProps?.afterClose?.()
+    if (!internalOpen.value && (modalProps?.destroyOnHidden ?? modalProps?.destroyOnClose)) reset()
+    modalProps?.afterClose?.()
   },
 }))
 const drawerOptions = computed(() => ({
-  ...props.drawerProps,
+  ...drawerProps,
   onClose: undefined,
   afterOpenChange: (next: boolean) => {
     if (
       !next &&
       !internalOpen.value &&
-      (props.drawerProps?.destroyOnHidden ?? props.drawerProps?.destroyOnClose)
+      (drawerProps?.destroyOnHidden ?? drawerProps?.destroyOnClose)
     )
       reset()
-    props.drawerProps?.afterOpenChange?.(next)
+    drawerProps?.afterOpenChange?.(next)
   },
 }))
 function cancelModal(event: MouseEvent | KeyboardEvent): void {
   if (closeLock.locked.value) return
-  props.modalProps?.onCancel?.(event)
+  modalProps?.onCancel?.(event)
   closeForm()
 }
 function closeDrawer(event: MouseEvent | KeyboardEvent): void {
   if (closeLock.locked.value) return
-  props.drawerProps?.onClose?.(event)
+  drawerProps?.onClose?.(event)
   closeForm()
 }
 
 watch(
-  () => props.open,
+  () => openProp,
   (open) => {
     if (open !== undefined) internalOpen.value = open
   },
@@ -265,17 +440,17 @@ watch(
 )
 
 watch(
-  () => props.current,
+  () => currentProp,
   (current) => {
     if (current !== undefined) internalCurrent.value = normalizeCurrent(current)
   },
 )
 
 watch(
-  () => props.modelValue,
+  () => modelValueProp,
   (modelValue) => {
     if (!initialized.value || modelValue === undefined) return
-    const converted = convertInboundValues(props.columns, modelValue)
+    const converted = convertInboundValues(columns, modelValue)
     if (!recordsEqual(formState, converted)) replaceRecord(formState, converted)
   },
   { deep: true },
@@ -284,9 +459,9 @@ watch(
 watch(
   () =>
     [
-      props.request,
-      cloneValue(props.params),
-      cloneValue(props.initialValues),
+      request,
+      cloneValue(params),
+      cloneValue(initialValues),
       cloneValue(effectiveUrlSync.value),
     ] as const,
   (next, previous) => {
@@ -303,9 +478,9 @@ watch(
 )
 
 watch(
-  () => props.columns,
+  () => columns,
   () => {
-    const converted = convertInboundValues(props.columns, formState)
+    const converted = convertInboundValues(columns, formState)
     if (!recordsEqual(formState, converted)) replaceRecord(formState, converted)
   },
   { deep: true },
@@ -313,22 +488,22 @@ watch(
 
 async function initialize(): Promise<void> {
   const sequence = ++requestSequence
-  requestLoading.value = Boolean(props.request)
+  requestLoading.value = Boolean(request)
 
   try {
     let requested: Partial<T> = {}
-    if (props.request) requested = await props.request(props.params)
+    if (request) requested = await request(params)
     if (sequence !== requestSequence) return
 
     const fromUrl = readUrlValues(effectiveUrlSync.value, fieldNames.value)
     const hydrated =
-      props.syncToInitialValues === false
+      syncToInitialValues === false
         ? {}
-        : typeof props.syncToUrl === 'function'
-          ? props.syncToUrl(fromUrl, 'get')
+        : typeof syncToUrl === 'function'
+          ? syncToUrl(fromUrl, 'get')
           : fromUrl
-    const merged = mergeValues(props.initialValues, requested, hydrated, props.modelValue)
-    const converted = convertInboundValues(props.columns, merged)
+    const merged = mergeValues(initialValues, requested, hydrated, modelValueProp)
+    const converted = convertInboundValues(columns, merged)
     replaceRecord(formState, converted)
     initialSnapshot.value = cloneValue(converted)
     initialized.value = true
@@ -337,10 +512,7 @@ async function initialize(): Promise<void> {
     emit('requestError', error)
     emit('error', error)
 
-    const fallback = convertInboundValues(
-      props.columns,
-      mergeValues(props.initialValues, props.modelValue),
-    )
+    const fallback = convertInboundValues(columns, mergeValues(initialValues, modelValueProp))
     replaceRecord(formState, fallback)
     initialSnapshot.value = cloneValue(fallback)
     initialized.value = true
@@ -358,7 +530,7 @@ function handleFieldChange(path: Array<string | number>, value: unknown): void {
   const changed: FormRecord = {}
   setValue(changed, path, cloneValue(value))
   emit('valuesChange', changed as Partial<T>, snapshot)
-  props.onValuesChange?.(changed as Partial<T>, snapshot)
+  onValuesChange?.(changed as Partial<T>, snapshot)
   scheduleUrlWrite()
 }
 
@@ -370,7 +542,7 @@ function handleModelChange(values: FormRecord): void {
   emit('update:modelValue', snapshot)
   emit('change', snapshot)
   emit('valuesChange', changed as Partial<T>, snapshot)
-  props.onValuesChange?.(changed as Partial<T>, snapshot)
+  onValuesChange?.(changed as Partial<T>, snapshot)
   scheduleUrlWrite()
 }
 
@@ -396,7 +568,7 @@ function getFieldsValue(): Partial<T> {
 }
 
 function setFieldsValue(values: Partial<T>): void {
-  const converted = convertInboundValues(props.columns, values)
+  const converted = convertInboundValues(columns, values)
   replaceRecord(formState, mergeValues(formState, converted))
   const snapshot = getFieldsValue()
   emit('update:modelValue', snapshot)
@@ -415,8 +587,8 @@ async function validate(names?: ProDataIndex[]): Promise<Partial<T>> {
 }
 
 function getFieldsFormatValue(): Partial<T> {
-  const values = formatSchemaValues(props.columns, formState, props.dateFormatter)
-  return buildSubmitValues(props.columns, values) as Partial<T>
+  const values = formatSchemaValues(columns, formState, dateFormatter)
+  return buildSubmitValues(columns, values) as Partial<T>
 }
 
 async function performSubmit(): Promise<Partial<T>> {
@@ -427,8 +599,8 @@ async function performSubmit(): Promise<Partial<T>> {
     const values = getFieldsFormatValue()
     emit('submit', values)
     if (isDialog.value) closeLock.start()
-    const result = await props.onFinish?.(values)
-    if (!props.onFinish) emit('finish', values)
+    const result = await onFinish?.(values)
+    if (!onFinish) emit('finish', values)
     if (alive && result === true && isDialog.value && openRevision === submittedRevision)
       closeForm()
     return values
@@ -530,9 +702,7 @@ function scheduleUrlWrite(): void {
     urlWriteQueued = false
     writeUrlValues(
       effectiveUrlSync.value,
-      typeof props.syncToUrl === 'function'
-        ? props.syncToUrl(cloneValue(formState), 'set')
-        : formState,
+      typeof syncToUrl === 'function' ? syncToUrl(cloneValue(formState), 'set') : formState,
       fieldNames.value,
     )
   })
@@ -541,7 +711,7 @@ function scheduleUrlWrite(): void {
 function hydrateFromUrl(): void {
   if (!effectiveUrlSync.value) return
   const fromUrl = readUrlValues(effectiveUrlSync.value, fieldNames.value)
-  const converted = convertInboundValues(props.columns, fromUrl)
+  const converted = convertInboundValues(columns, fromUrl)
   const reconciled = reconcileUrlValues(formState, converted, fieldNames.value)
   if (recordsEqual(formState, reconciled)) return
   replaceRecord(formState, reconciled)
@@ -590,12 +760,12 @@ const formApi: SchemaFormInstance<T> = {
   loading: submitting,
 }
 defineExpose<SchemaFormInstance<T>>(formApi)
-onMounted(() => assignRef(props.formRef, formApi))
+onMounted(() => assignRef(formRef, formApi))
 onBeforeUnmount(() => {
   alive = false
   openRevision++
   requestSequence++
-  assignRef(props.formRef, undefined)
+  assignRef(formRef, undefined)
 })
 </script>
 

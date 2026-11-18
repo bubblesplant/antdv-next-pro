@@ -9,7 +9,13 @@ import { computed, watch, onBeforeUnmount } from 'vue'
 import { QueryFilter, LightFilter } from '../schema-form/layouts'
 import { useSchemaFormRef } from '../schema-form/useSchemaFormRef'
 
-const props = defineProps<{
+const {
+  columns,
+  search,
+  form: formProp,
+  loading,
+  formRef,
+} = defineProps<{
   columns: ProColumns<T>[]
   search?: ProTableSearchConfig<T>
   form?: ProTableSearchForm<T>
@@ -23,17 +29,17 @@ const emit = defineEmits<{
 }>()
 const { formRef: form, formApi } = useSchemaFormRef<T>()
 const formBindings = computed(() => {
-  const { initialValues, submitter, onSubmit, onReset, classes, styles, ...rest } = props.form ?? {}
+  const { initialValues, submitter, onSubmit, onReset, classes, styles, ...rest } = formProp ?? {}
   return {
     ...rest,
-    classes: typeof classes === 'function' ? () => classes({ props: props.form ?? {} }) : classes,
-    styles: typeof styles === 'function' ? () => styles({ props: props.form ?? {} }) : styles,
+    classes: typeof classes === 'function' ? () => classes({ props: formProp ?? {} }) : classes,
+    styles: typeof styles === 'function' ? () => styles({ props: formProp ?? {} }) : styles,
     labelCol: rest.labelCol ? { ...rest.labelCol } : undefined,
     wrapperCol: rest.wrapperCol ? { ...rest.wrapperCol } : undefined,
   }
 })
 const formColumns = computed(() =>
-  props.columns
+  columns
     .filter((column) => !column.hideInSearch && column.search !== false)
     .map((column) => ({
       ...column,
@@ -44,28 +50,28 @@ const formColumns = computed(() =>
     })),
 )
 const optionRender = computed(() =>
-  props.search?.optionRender === false
+  search?.optionRender === false
     ? false
-    : props.search?.optionRender
+    : search?.optionRender
       ? (_query: unknown, _form: unknown, dom: import('vue').VNodeChild[]) =>
-          typeof props.search?.optionRender === 'function'
-            ? props.search.optionRender(props.search, form.value, dom)
+          typeof search?.optionRender === 'function'
+            ? search.optionRender(search, form.value, dom)
             : dom
       : undefined,
 )
 const submitter = computed(() => {
-  const source = props.form?.submitter
+  const source = formProp?.submitter
   if (source === false) return false
   return {
     ...source,
     submitButtonProps:
       source?.submitButtonProps === false
         ? (false as const)
-        : { loading: props.loading, ...source?.submitButtonProps },
+        : { loading, ...source?.submitButtonProps },
   }
 })
 watch(
-  () => props.formRef,
+  () => formRef,
   (value, previous) => {
     if (previous) previous.value = undefined
     if (value) value.value = formApi
@@ -73,7 +79,7 @@ watch(
   { immediate: true },
 )
 onBeforeUnmount(() => {
-  const target = props.formRef
+  const target = formRef
   if (target) target.value = undefined
 })
 async function finish(values: Record<string, unknown>) {
@@ -88,7 +94,7 @@ defineExpose(formApi)
     ref="form"
     :form-props="formBindings"
     :date-formatter="false"
-    :initial-values="props.form?.initialValues"
+    :initial-values="formProp?.initialValues"
     :submitter="submitter"
     :columns="formColumns"
     :default-collapsed="search?.defaultCollapsed ?? true"
