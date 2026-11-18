@@ -1,5 +1,17 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.6
+
+### Patch Changes
+
+- [#28](https://github.com/bubblesplant/antdv-next-pro/pull/28) [`2785e61`](https://github.com/bubblesplant/antdv-next-pro/commit/2785e61fa9c9b51a11816311984d9c3f53d17e56) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 修复 AdaptiveProTable 在自适应高度布局中的表体滚动，未指定 `scroll.y` 时默认使用 `auto`，并在内容溢出时启用滚动。
+
+  更新 Antdv Next、Vue 及开发测试工具链依赖。
+
+- [#28](https://github.com/bubblesplant/antdv-next-pro/pull/28) [`463da99`](https://github.com/bubblesplant/antdv-next-pro/commit/463da995e499e2ee8374d5f78d92f79f1303e9bc) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 对齐 ProComponents 的 `ProTable` 默认搜索布局：`QueryFilter` 随搜索区宽度切换 1–4 列及标签位置，修复窄容器下的操作按钮对齐问题和搜索卡片重复内边距。显式数字 `span` 仍固定列数，`LightFilter` 保持自然换行。
+
+- [#28](https://github.com/bubblesplant/antdv-next-pro/pull/28) [`f4fde74`](https://github.com/bubblesplant/antdv-next-pro/commit/f4fde7451a454dcc87419e1d326dad23c04683fd) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 代码格式化
+
 ## 0.3.5
 
 ### Patch Changes
