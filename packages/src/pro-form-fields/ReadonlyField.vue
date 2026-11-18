@@ -8,23 +8,26 @@ import { useProPrefix } from '../provider/context'
 
 defineOptions({ name: 'AntdvNextProReadonlyField', inheritAttrs: false })
 
-const props = withDefaults(
-  defineProps<{
-    value?: unknown
-    options?: ProFormFieldOption[]
-    type?: ProReadonlyValueType
-    emptyText?: VNodeChild
-    moneyPrefix?: VNodeChild | false
-    readonlyRender?: (value: unknown) => VNodeChild
-    fieldProps?: Record<string, unknown>
-    prefixCls?: string
-  }>(),
-  {
-    options: () => [],
-    emptyText: '-',
-  },
-)
-const prefix = useProPrefix('field', () => props.prefixCls)
+const {
+  value,
+  options = [],
+  type,
+  emptyText = '-',
+  moneyPrefix,
+  readonlyRender,
+  fieldProps,
+  prefixCls,
+} = defineProps<{
+  value?: unknown
+  options?: ProFormFieldOption[]
+  type?: ProReadonlyValueType
+  emptyText?: VNodeChild
+  moneyPrefix?: VNodeChild | false
+  readonlyRender?: (value: unknown) => VNodeChild
+  fieldProps?: Record<string, unknown>
+  prefixCls?: string
+}>()
+const prefix = useProPrefix('field', () => prefixCls)
 </script>
 
 <template>

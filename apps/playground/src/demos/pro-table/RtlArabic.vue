@@ -90,12 +90,8 @@ const tableBindings: ProTableProps<DemoRow, DemoQuery> = {
   <ConfigProvider :locale="providerLocale" direction="rtl"
     ><div class="scenario-demo mode-rtl-arabic" dir="rtl" data-scenario-mode="rtl-arabic">
       <div class="request-monitor">
-        <span
-          ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-        >
-        <span
-          ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-        >
+        <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+        <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
         <code :title="lastRequest || requestLabels.waiting">{{
           lastRequest || requestLabels.waiting
         }}</code>

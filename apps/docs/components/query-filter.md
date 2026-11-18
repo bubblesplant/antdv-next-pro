@@ -38,7 +38,9 @@ import '@bubblesjs/antdv-next-pro/style.css'
 
 `defaultCollapsed` 默认为 `true`，`v-model:collapsed` 可受控切换。字段超过首行容量时显示折叠按钮，展开向下、收起向上，默认箭头随状态旋转；收起会隐藏字段并保留值。
 
-`span` 使用 24 栅格，可传数字或断点对象，例如 `{ xs: 24, sm: 12, md: 8 }`。不设置时，根据容器宽度和 `defaultColsNumber` 调整列宽。
+未指定 `span` 和 `layout` 时，按查询区的**容器宽度**而非浏览器窗口宽度，使用 ProComponents 的默认布局：小于 `480px` 为一列，`480–575px` 为两列，标签都在输入框上方；`576–1199px` 为三列，`1200px` 起为四列，标签放在输入框旁。断点取自主题。
+
+`span` 使用 24 栅格。数字（如 `8`）固定栅格占位；断点对象（如 `{ xs: 24, md: 12, xl: 8 }`）会继承较窄断点上最近的配置。自定义跨度默认使用水平布局，可显式设置 `layout`。
 
 ## columns 与实例方法
 
@@ -74,12 +76,12 @@ import '@bubblesjs/antdv-next-pro/style.css'
 | `modelValue`        | `Partial<T>`                                                 | —              | `v-model` 当前查询条件                                                         |
 | `columns`           | `SchemaFormColumn<T>[]`                                      | —              | 传入时进入 Schema 模式；[列属性](./schema-form#columns)                        |
 | `onFinish`          | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —              | 可等待业务查询回调，使用 `:on-finish`                                          |
-| `layout`            | `FormProps['layout']`                                        | `'horizontal'` | [原生 Form 布局](https://www.antdv-next.com/components/form-cn)，可设 vertical |
+| `layout`            | `FormProps['layout']`                                        | 随容器宽度     | [原生 Form 布局](https://www.antdv-next.com/components/form-cn)，可设 vertical |
 | `collapsed`         | `boolean`                                                    | 非受控         | 受控折叠状态，支持 `v-model:collapsed`                                         |
 | `defaultCollapsed`  | `boolean`                                                    | `true`         | 非受控初始状态                                                                 |
-| `defaultColsNumber` | `number`                                                     | `3`            | 较宽容器的默认列数                                                             |
-| `span`              | `number \| Record<string, number>`                           | 响应容器宽度   | 24 栅格列宽；支持 `xs/sm/md/lg/xl` 断点                                        |
-| `labelWidth`        | `number \| 'auto'`                                           | `80`           | 标签宽度，数字单位 px                                                          |
+| `defaultColsNumber` | `number`                                                     | 随容器宽度     | 覆盖默认布局在较宽容器下的列数                                                 |
+| `span`              | `number \| Record<string, number>`                           | 响应容器宽度   | 24 栅格列宽；支持 `xs/sm/md/lg/xl/xxl` 断点                                    |
+| `labelWidth`        | `number \| 'auto'`                                           | `80`           | 水平布局的标签宽度，数字单位 px                                                |
 | `split`             | `boolean`                                                    | `false`        | 字段分隔样式                                                                   |
 | `searchText`        | `VNodeChild`                                                 | 国际化“查询”   | 优先于 submitter 内的提交文案                                                  |
 | `resetText`         | `VNodeChild`                                                 | 国际化“重置”   | 优先于 submitter 内的重置文案                                                  |

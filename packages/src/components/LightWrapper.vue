@@ -5,19 +5,62 @@ import FieldLabel from './FieldLabel.vue'
 import FilterDropdown from './FilterDropdown.vue'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<LightWrapperProps>(), {
-  open: undefined,
-  footerRender: undefined,
-  label: undefined,
-  value: undefined,
-})
+const {
+  label = undefined,
+  value: valueProp = undefined,
+  open = undefined,
+  disabled,
+  allowClear,
+  footerRender = undefined,
+  placement,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<LightWrapperProps>()
 const emit = defineEmits<{ 'update:open': [value: boolean]; clear: []; confirm: [] }>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get label() {
+    return label
+  },
+  get value() {
+    return valueProp
+  },
+  get open() {
+    return open
+  },
+  get disabled() {
+    return disabled
+  },
+  get allowClear() {
+    return allowClear
+  },
+  get footerRender() {
+    return footerRender
+  },
+  get placement() {
+    return placement
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { prefix, classes, styles, themeVars } = useAuxiliaryStyle(props, 'field-light-wrapper')
 const internal = ref(false)
-const opened = computed(() => props.open ?? internal.value)
+const opened = computed(() => open ?? internal.value)
 function setOpen(value: boolean) {
-  if (props.disabled && value) return
-  if (props.open === undefined) internal.value = value
+  if (disabled && value) return
+  if (open === undefined) internal.value = value
   emit('update:open', value)
 }
 </script>

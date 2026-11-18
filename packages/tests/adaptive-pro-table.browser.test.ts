@@ -260,7 +260,7 @@ describe('AdaptiveProTable', () => {
     ).toBeLessThanOrEqual(element('[data-pro-table]').getBoundingClientRect().bottom + 1)
   })
 
-  it('passes search and scroll through without adding defaults', async () => {
+  it('forwards search and reacts to scroll changes while keeping the automatic height default', async () => {
     wrapper = mount(AdaptiveProTable as Component, {
       attachTo: document.body,
       props: { columns, dataSource: [], search: { span: 12 } },
@@ -268,11 +268,20 @@ describe('AdaptiveProTable', () => {
     await settle()
     const table = wrapper.findComponent(ProTable)
     expect(table.props()).toHaveProperty('search', { span: 12 })
-    expect(table.props()).toHaveProperty('scroll', undefined)
+    expect(table.props()).toHaveProperty('scroll', { y: 'auto' })
 
     await wrapper.setProps({ search: { collapseRender: false }, scroll: { x: 1100 } })
     expect(table.props()).toHaveProperty('search', { collapseRender: false })
-    expect(table.props()).toHaveProperty('scroll', { x: 1100 })
+    expect(table.props()).toHaveProperty('scroll', { x: 1100, y: 'auto' })
+
+    await wrapper.setProps({ scroll: { x: 1200, y: 180 } })
+    expect(table.props()).toHaveProperty('scroll', { x: 1200, y: 180 })
+
+    await wrapper.setProps({ scroll: { y: 0 } })
+    expect(table.props()).toHaveProperty('scroll', { y: 0 })
+
+    await wrapper.setProps({ scroll: undefined })
+    expect(table.props()).toHaveProperty('scroll', { y: 'auto' })
   })
 
   it('preserves localized labels and custom collapse rendering', async () => {

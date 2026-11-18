@@ -102,12 +102,8 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
 <template>
   <div class="scenario-demo mode-no-search-table" data-scenario-mode="no-search-table">
     <div class="request-monitor">
-      <span
-        ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-      >
-      <span
-        ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-      >
+      <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+      <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
       <code :title="lastRequest || requestLabels.waiting">{{
         lastRequest || requestLabels.waiting
       }}</code>

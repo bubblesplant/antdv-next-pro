@@ -59,7 +59,66 @@ interface Props extends ProFormFieldProps<any, any, any, any> {
 
 defineOptions({ name: 'AntdvNextProFormField', inheritAttrs: false })
 
-const props = withDefaults(defineProps<Props>(), { preserve: undefined })
+const {
+  modelValue: modelValueProp,
+  name: nameProp,
+  label: labelProp,
+  rules: rulesProp,
+  fieldMode: fieldModeProp,
+  fieldProps: fieldPropsProp,
+  formItemProps: formItemPropsProp,
+  disabled: disabledProp,
+  readonly: readonlyProp,
+  emptyText: emptyTextProp,
+  readonlyRender: readonlyRenderProp,
+  width: widthProp,
+  ignoreFormItem: ignoreFormItemProp,
+  placeholder: placeholderProp,
+  prefixCls: prefixClsProp,
+  classes: classesProp,
+  classNames: classNamesProp,
+  styles: stylesProp,
+  convertValue: convertValueProp,
+  transform: transformProp,
+  preserve: preserveProp = undefined,
+  proFieldProps: proFieldPropsProp,
+  options: optionsProp,
+  valueEnum: valueEnumProp,
+  request: requestProp,
+  params: paramsProp,
+  debounceTime: debounceTimeProp,
+  proFieldKey: proFieldKeyProp,
+  cacheForSwr: cacheForSwrProp,
+  searchValue: searchValueProp,
+  valueType: valueTypeProp,
+  fieldType: fieldTypeProp,
+  loading: loadingProp,
+  precision: precisionProp,
+  min: minProp,
+  prefix: prefixProp,
+  locale: localeProp,
+  moneySymbol: moneySymbolProp,
+  customSymbol: customSymbolProp,
+  numberFormatOptions: numberFormatOptionsProp,
+  numberPopoverRender: numberPopoverRenderProp,
+  showTime: showTimeProp,
+  layout: layoutProp,
+  radioType: radioTypeProp,
+  onGetCaptcha: onGetCaptchaProp,
+  phoneName: phoneNameProp,
+  captchaTextRender: captchaTextRenderProp,
+  captchaProps: captchaPropsProp,
+  onTiming: onTimingProp,
+  countDown: countDownProp,
+  captchaText: captchaTextProp,
+  countDownText: countDownTextProp,
+  buttonProps: buttonPropsProp,
+  icon: iconProp,
+  title: titleProp,
+  description: descriptionProp,
+  max: maxProp,
+  imageProps: imagePropsProp,
+} = defineProps<Props>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown): void
   (event: 'change', ...args: unknown[]): void
@@ -67,6 +126,67 @@ const emit = defineEmits<{
   (event: 'requestError', error: unknown): void
   (event: 'captchaError', error: unknown): void
 }>()
+
+const semanticProps = computed<Props & Record<string, unknown>>(() => ({
+  modelValue: modelValueProp,
+  name: nameProp,
+  label: labelProp,
+  rules: rulesProp,
+  fieldMode: fieldModeProp,
+  fieldProps: fieldPropsProp,
+  formItemProps: formItemPropsProp,
+  disabled: disabledProp,
+  readonly: readonlyProp,
+  emptyText: emptyTextProp,
+  readonlyRender: readonlyRenderProp,
+  width: widthProp,
+  ignoreFormItem: ignoreFormItemProp,
+  placeholder: placeholderProp,
+  prefixCls: prefixClsProp,
+  classes: classesProp,
+  classNames: classNamesProp,
+  styles: stylesProp,
+  convertValue: convertValueProp,
+  transform: transformProp,
+  preserve: preserveProp,
+  proFieldProps: proFieldPropsProp,
+  options: optionsProp,
+  valueEnum: valueEnumProp,
+  request: requestProp,
+  params: paramsProp,
+  debounceTime: debounceTimeProp,
+  proFieldKey: proFieldKeyProp,
+  cacheForSwr: cacheForSwrProp,
+  searchValue: searchValueProp,
+  valueType: valueTypeProp,
+  fieldType: fieldTypeProp,
+  loading: loadingProp,
+  precision: precisionProp,
+  min: minProp,
+  prefix: prefixProp,
+  locale: localeProp,
+  moneySymbol: moneySymbolProp,
+  customSymbol: customSymbolProp,
+  numberFormatOptions: numberFormatOptionsProp,
+  numberPopoverRender: numberPopoverRenderProp,
+  showTime: showTimeProp,
+  layout: layoutProp,
+  radioType: radioTypeProp,
+  onGetCaptcha: onGetCaptchaProp,
+  phoneName: phoneNameProp,
+  captchaTextRender: captchaTextRenderProp,
+  captchaProps: captchaPropsProp,
+  onTiming: onTimingProp,
+  countDown: countDownProp,
+  captchaText: captchaTextProp,
+  countDownText: countDownTextProp,
+  buttonProps: buttonPropsProp,
+  icon: iconProp,
+  title: titleProp,
+  description: descriptionProp,
+  max: maxProp,
+  imageProps: imagePropsProp,
+}))
 
 interface FieldControlInstance {
   refresh?: () => Promise<void>
@@ -82,8 +202,8 @@ const instance = getCurrentInstance()
 const fieldRef = ref<FieldControlInstance>()
 const form = useProFormContext()
 const config = useProConfig()
-const namePath = useProFormNamePath(() => props.name)
-const valueType = computed(() => resolveProFieldValueType(props.valueType ?? props.fieldType))
+const namePath = useProFormNamePath(() => nameProp)
+const valueType = computed(() => resolveProFieldValueType(valueTypeProp ?? fieldTypeProp))
 const proFieldTypes = new Set([
   'progress',
   'avatar',
@@ -105,14 +225,14 @@ const controlComponent = computed(() =>
     ? ProField
     : FieldControl,
 )
-const { classes, styles } = useSemanticStyles(props, {
-  classes: () => props.classes,
-  classNames: () => props.classNames,
-  styles: () => props.styles,
+const { classes, styles } = useSemanticStyles(semanticProps, {
+  classes: () => classesProp,
+  classNames: () => classNamesProp,
+  styles: () => stylesProp,
 })
 const fieldValue = computed(() =>
   hasExplicitProp(rawProps(), 'modelValue')
-    ? props.modelValue
+    ? modelValueProp
     : namePath.value.length
       ? form?.getFieldValue(namePath.value)
       : undefined,
@@ -124,10 +244,10 @@ watch(
     const registeredPath = [...path]
     const unregister = form?.registerField({
       path: () => registeredPath,
-      convertValue: props.convertValue,
-      transform: props.transform,
+      convertValue: convertValueProp,
+      transform: transformProp,
       valueType: () => valueType.value.type,
-      preserve: props.preserve,
+      preserve: preserveProp,
     })
     if (unregister) onCleanup(unregister)
   },
@@ -183,7 +303,7 @@ function rawProps(): Record<string, unknown> | null | undefined {
 }
 
 function resolveFieldMode(): 'form-item' | 'field' {
-  return props.ignoreFormItem ? 'field' : (props.fieldMode ?? 'form-item')
+  return ignoreFormItemProp ? 'field' : (fieldModeProp ?? 'form-item')
 }
 
 const formItemAttrNames = new Set([
@@ -210,17 +330,17 @@ const formItemAttrNames = new Set([
 
 function resolveFormItemProps(): Record<string, unknown> {
   const result = mergeProps(
-    (props.formItemProps ?? {}) as Record<string, unknown>,
+    (formItemPropsProp ?? {}) as Record<string, unknown>,
     Object.fromEntries(Object.entries(attrs).filter(([key]) => formItemAttrNames.has(key))),
   ) as Record<string, unknown>
 
   for (const name of ['name', 'label', 'rules'] as const) {
-    if (hasExplicitProp(rawProps(), name)) result[name] = props[name]
+    if (hasExplicitProp(rawProps(), name)) result[name] = semanticProps.value[name]
   }
   if (namePath.value.length) result.name = namePath.value
   result.class = [result.class, classes.value.root]
   const widths = { xs: 104, sm: 216, md: 328, lg: 440, xl: 552 }
-  const width = typeof props.width === 'string' ? widths[props.width] : props.width
+  const width = typeof widthProp === 'string' ? widths[widthProp] : widthProp
   result.style = [
     result.style,
     width === undefined ? undefined : { width: `${width}px`, maxWidth: '100%' },
@@ -231,12 +351,12 @@ function resolveFormItemProps(): Record<string, unknown> {
 
 function resolveControlProps(): Record<string, unknown> {
   const result: Record<string, unknown> = {}
-  if (props.fieldType !== undefined) result.fieldType = props.fieldType
-  if (props.valueType !== undefined) result.valueType = valueType.value.type
+  if (fieldTypeProp !== undefined) result.fieldType = fieldTypeProp
+  if (valueTypeProp !== undefined) result.valueType = valueType.value.type
 
   for (const name of controlPropNames) {
     if (!hasExplicitProp(rawProps(), name)) continue
-    const value = props[name]
+    const value = semanticProps.value[name]
     result[name] =
       name === 'fieldProps' || name === 'buttonProps'
         ? ((value ?? {}) as Record<string, unknown>)
@@ -251,17 +371,17 @@ function resolveControlProps(): Record<string, unknown> {
   if (
     form &&
     !hasExplicitProp(rawProps(), 'disabled') &&
-    !Object.hasOwn(props.fieldProps ?? {}, 'disabled')
+    !Object.hasOwn(fieldPropsProp ?? {}, 'disabled')
   )
     result.disabled = form.disabled.value
   if (
     form &&
     !hasExplicitProp(rawProps(), 'readonly') &&
-    !Object.hasOwn(props.fieldProps ?? {}, 'readonly')
+    !Object.hasOwn(fieldPropsProp ?? {}, 'readonly')
   )
     result.readonly = form.readonly.value
   const { type: _type, ...typeConfig } = valueType.value
-  result.fieldProps = mergeProps(controlAttrs, typeConfig, props.fieldProps ?? {})
+  result.fieldProps = mergeProps(controlAttrs, typeConfig, fieldPropsProp ?? {})
   for (const key of [
     'locale',
     'moneySymbol',
@@ -269,15 +389,15 @@ function resolveControlProps(): Record<string, unknown> {
     'numberFormatOptions',
     'numberPopoverRender',
   ] as const) {
-    if (hasExplicitProp(rawProps(), key) && !Object.hasOwn(props.fieldProps ?? {}, key))
-      (result.fieldProps as Record<string, unknown>)[key] = props[key]
+    if (hasExplicitProp(rawProps(), key) && !Object.hasOwn(fieldPropsProp ?? {}, key))
+      (result.fieldProps as Record<string, unknown>)[key] = semanticProps.value[key]
   }
-  if (props.proFieldProps?.mode === 'read' || props.proFieldProps?.readonly === true)
+  if (proFieldPropsProp?.mode === 'read' || proFieldPropsProp?.readonly === true)
     result.readonly = true
   if (controlComponent.value === ProField) {
     const { root: _rootClass, ...controlClasses } = classes.value
     const { root: _rootStyle, ...controlStyles } = styles.value
-    Object.assign(result, { classes: controlClasses, styles: controlStyles }, props.proFieldProps, {
+    Object.assign(result, { classes: controlClasses, styles: controlStyles }, proFieldPropsProp, {
       valueType: valueType.value,
       mode: result.readonly ? 'read' : 'edit',
     })
@@ -289,7 +409,7 @@ function resolveControlProps(): Record<string, unknown> {
   if (resolveFieldMode() === 'field') {
     result.class = [attrs.class, classes.value.root]
     const widths = { xs: 104, sm: 216, md: 328, lg: 440, xl: 552 }
-    const width = typeof props.width === 'string' ? widths[props.width] : props.width
+    const width = typeof widthProp === 'string' ? widths[widthProp] : widthProp
     result.style = [
       attrs.style,
       width === undefined ? undefined : { width: `${width}px`, maxWidth: '100%' },

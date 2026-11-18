@@ -22,6 +22,8 @@
 
 ## 安装
 
+最低支持 **Vue 3.5.0**。组件源码使用 `<script setup>` 和响应式 props 解构；直接引入源码时，Vue SFC 编译器也需为 3.5.0 或更高版本，并与运行时版本保持一致。详见 [快速开始](./apps/docs/guide/getting-started.md)。
+
 ```bash
 pnpm add @bubblesjs/antdv-next-pro antdv-next vue
 ```

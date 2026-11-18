@@ -75,7 +75,49 @@ interface Props {
 
 defineOptions({ name: 'AntdvNextProFieldControl', inheritAttrs: false })
 
-const props = defineProps<Props>()
+const {
+  fieldType: fieldTypeProp,
+  valueType: valueTypeProp,
+  modelValue: modelValueProp,
+  fieldProps: fieldPropsProp,
+  options: optionsProp,
+  valueEnum: valueEnumProp,
+  request: requestProp,
+  params: paramsProp,
+  disabled: disabledProp,
+  readonly: readonlyProp,
+  emptyText: emptyTextProp,
+  readonlyRender: readonlyRenderProp,
+  loading: loadingProp,
+  precision: precisionProp,
+  min: minProp,
+  prefix: prefixProp,
+  showTime: showTimeProp,
+  layout: layoutProp,
+  radioType: radioTypeProp,
+  onGetCaptcha: onGetCaptchaProp,
+  countDown: countDownProp,
+  captchaText: captchaTextProp,
+  countDownText: countDownTextProp,
+  buttonProps: buttonPropsProp,
+  prefixCls: prefixClsProp,
+  debounceTime: debounceTimeProp,
+  proFieldKey: proFieldKeyProp,
+  cacheForSwr: cacheForSwrProp,
+  searchValue: searchValueProp,
+  phoneName: phoneNameProp,
+  captchaTextRender: captchaTextRenderProp,
+  captchaProps: captchaPropsProp,
+  onTiming: onTimingProp,
+  icon: iconProp,
+  title: titleProp,
+  description: descriptionProp,
+  max: maxProp,
+  imageProps: imagePropsProp,
+  classes: classesProp,
+  classNames: classNamesProp,
+  styles: stylesProp,
+} = defineProps<Props>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown): void
   (event: 'change', ...args: unknown[]): void
@@ -84,19 +126,63 @@ const emit = defineEmits<{
   (event: 'captchaError', error: unknown): void
 }>()
 
+const semanticProps = computed<Props & Record<string, unknown>>(() => ({
+  fieldType: fieldTypeProp,
+  valueType: valueTypeProp,
+  modelValue: modelValueProp,
+  fieldProps: fieldPropsProp,
+  options: optionsProp,
+  valueEnum: valueEnumProp,
+  request: requestProp,
+  params: paramsProp,
+  disabled: disabledProp,
+  readonly: readonlyProp,
+  emptyText: emptyTextProp,
+  readonlyRender: readonlyRenderProp,
+  loading: loadingProp,
+  precision: precisionProp,
+  min: minProp,
+  prefix: prefixProp,
+  showTime: showTimeProp,
+  layout: layoutProp,
+  radioType: radioTypeProp,
+  onGetCaptcha: onGetCaptchaProp,
+  countDown: countDownProp,
+  captchaText: captchaTextProp,
+  countDownText: countDownTextProp,
+  buttonProps: buttonPropsProp,
+  prefixCls: prefixClsProp,
+  debounceTime: debounceTimeProp,
+  proFieldKey: proFieldKeyProp,
+  cacheForSwr: cacheForSwrProp,
+  searchValue: searchValueProp,
+  phoneName: phoneNameProp,
+  captchaTextRender: captchaTextRenderProp,
+  captchaProps: captchaPropsProp,
+  onTiming: onTimingProp,
+  icon: iconProp,
+  title: titleProp,
+  description: descriptionProp,
+  max: maxProp,
+  imageProps: imagePropsProp,
+  classes: classesProp,
+  classNames: classNamesProp,
+  styles: stylesProp,
+}))
+
 dayjs.extend(customParseFormat)
 
 const attrs = useAttrs()
 const slots = useSlots()
 const instance = getCurrentInstance()
-const { classes, styles } = useSemanticStyles(props, {
-  classes: () => props.classes,
-  classNames: () => props.classNames,
-  styles: () => props.styles,
+const { classes, styles } = useSemanticStyles(semanticProps, {
+  classes: () => classesProp,
+  classNames: () => classNamesProp,
+  styles: () => stylesProp,
 })
 const intl = useIntl()
 const config = useProConfig()
-const prefixCls = useProPrefix('field', () => props.prefixCls)
+const prefixCls = useProPrefix('field', () => prefixClsProp)
 const form = useProFormContext()
 const formItemStatus = useFormItemInputContext()
 const controlRef = ref<{ focus?: () => void }>()
@@ -107,16 +193,16 @@ const previewOpen = ref(false)
 const nativeUploadPrefix = computed(() => config.nativeConfig.value.getPrefixCls('upload'))
 let countdownTimer: ReturnType<typeof setInterval> | undefined
 
-const sourceOptions = computed(() => props.options)
+const sourceOptions = computed(() => optionsProp)
 const sourceFieldOptions = computed(() => {
-  const fieldProps = props.fieldProps ?? {}
+  const fieldProps = fieldPropsProp ?? {}
   const fieldType = resolveFieldType()
   const value = fieldType === 'treeSelect' ? fieldProps.treeData : fieldProps.options
   return Array.isArray(value) ? value : undefined
 })
-const sourceValueEnum = computed(() => props.valueEnum)
-const sourceRequest = computed(() => props.request)
-const sourceParams = computed(() => props.params)
+const sourceValueEnum = computed(() => valueEnumProp)
+const sourceRequest = computed(() => requestProp)
+const sourceParams = computed(() => paramsProp)
 
 const optionState = useFieldOptions({
   options: sourceOptions,
@@ -124,19 +210,17 @@ const optionState = useFieldOptions({
   valueEnum: sourceValueEnum,
   request: sourceRequest,
   params: sourceParams,
-  keyWords: computed(
-    () => props.searchValue ?? (props.fieldProps?.searchValue as string | undefined),
-  ),
+  keyWords: computed(() => searchValueProp ?? (fieldPropsProp?.searchValue as string | undefined)),
   debounceTime: computed(
-    () => props.debounceTime ?? (props.fieldProps?.debounceTime as number | undefined) ?? 0,
+    () => debounceTimeProp ?? (fieldPropsProp?.debounceTime as number | undefined) ?? 0,
   ),
-  proFieldKey: computed(() => props.proFieldKey),
-  cacheForSwr: computed(() => props.cacheForSwr),
+  proFieldKey: computed(() => proFieldKeyProp),
+  cacheForSwr: computed(() => cacheForSwrProp),
   onRequestError: (error) => emit('requestError', error),
 })
 
 function resolveFieldType(): ProFormControlType {
-  return props.fieldType ?? props.valueType ?? 'text'
+  return fieldTypeProp ?? valueTypeProp ?? 'text'
 }
 
 function rawProps(): Record<string, unknown> | null | undefined {
@@ -148,17 +232,17 @@ function isExplicit(name: string): boolean {
 }
 
 function resolveSemanticProp(name: keyof Props, fallback?: unknown): unknown {
-  const fieldProps = props.fieldProps ?? {}
+  const fieldProps = fieldPropsProp ?? {}
   if (Object.hasOwn(fieldProps, name)) return fieldProps[name]
-  if (isExplicit(name)) return props[name]
+  if (isExplicit(name)) return semanticProps.value[name]
   return fallback
 }
 
 function resolveReadonly(): boolean {
-  const fieldProps = props.fieldProps ?? {}
+  const fieldProps = fieldPropsProp ?? {}
   if (Object.hasOwn(fieldProps, 'readonly') || Object.hasOwn(fieldProps, 'readOnly'))
     return fieldProps.readonly === true || fieldProps.readOnly === true
-  if (isExplicit('readonly')) return props.readonly === true
+  if (isExplicit('readonly')) return readonlyProp === true
   return fieldProps.readonly === true || fieldProps.readOnly === true
 }
 
@@ -167,31 +251,31 @@ function resolveDisabled(): boolean {
 }
 
 function hasOptionSource(): boolean {
-  const fieldProps = props.fieldProps ?? {}
+  const fieldProps = fieldPropsProp ?? {}
   return (
-    props.options !== undefined ||
-    props.valueEnum !== undefined ||
-    props.request !== undefined ||
+    optionsProp !== undefined ||
+    valueEnumProp !== undefined ||
+    requestProp !== undefined ||
     Array.isArray(fieldProps.options) ||
     Array.isArray(fieldProps.treeData)
   )
 }
 
 function resolveOptions(): ProFormFieldOption[] {
-  if (props.request) return optionState.options.value
-  const fieldProps = props.fieldProps ?? {}
+  if (requestProp) return optionState.options.value
+  const fieldProps = fieldPropsProp ?? {}
   const fieldOptions =
     resolveFieldType() === 'treeSelect' ? fieldProps.treeData : fieldProps.options
   return resolveLocalFieldOptions({
-    options: props.options,
+    options: optionsProp,
     fieldOptions: Array.isArray(fieldOptions) ? fieldOptions : undefined,
-    valueEnum: props.valueEnum,
+    valueEnum: valueEnumProp,
   })
 }
 
 function resolveLoading(): boolean {
-  if (isExplicit('loading')) return props.loading === true
-  const fieldProps = props.fieldProps ?? {}
+  if (isExplicit('loading')) return loadingProp === true
+  const fieldProps = fieldPropsProp ?? {}
   if (Object.hasOwn(fieldProps, 'loading')) return fieldProps.loading === true
   return optionState.loading.value
 }
@@ -203,7 +287,7 @@ function resolveControlComponent() {
 function resolveControlProps(): Record<string, unknown> {
   const fieldType = resolveFieldType()
   const descriptor = resolveFieldDescriptor(fieldType, hasOptionSource())
-  const fieldProps = omitManagedProps(props.fieldProps ?? {}, fieldType)
+  const fieldProps = omitManagedProps(fieldPropsProp ?? {}, fieldType)
   const rootAttrs = omitManagedProps(attrs, fieldType)
   const merged = mergeProps(rootAttrs, fieldProps) as Record<string, unknown>
   merged.style = [merged.style, styles.value.control]
@@ -237,7 +321,7 @@ function resolveControlProps(): Record<string, unknown> {
     applyOptionalDefault(merged, 'precision', resolveSemanticProp('precision'))
     applyOptionalDefault(merged, 'min', resolveSemanticProp('min', 0))
   } else if (fieldType === 'money') {
-    const moneyProps = props.fieldProps ?? {}
+    const moneyProps = fieldPropsProp ?? {}
     const locale = resolveMoneyLocale(
       typeof moneyProps.locale === 'string' ? moneyProps.locale : intl.value.locale,
     )
@@ -296,12 +380,12 @@ function resolveControlProps(): Record<string, unknown> {
   if (descriptor.optionProp === 'treeData') merged.treeData = resolveTreeData(resolveOptions())
   if (fieldType === 'segmented' && !Array.isArray(merged.options)) merged.options = []
   if (fieldType === 'select' || fieldType === 'treeSelect') merged.loading = resolveLoading()
-  if (props.request && ['select', 'treeSelect', 'cascader'].includes(fieldType)) {
+  if (requestProp && ['select', 'treeSelect', 'cascader'].includes(fieldType)) {
     merged.showSearch ??= true
     merged.filterOption = false
     merged.onSearch = (value: string) => {
       optionState.search(value)
-      callHandler(props.fieldProps?.onSearch, [value])
+      callHandler(fieldPropsProp?.onSearch, [value])
       callHandler(attrs.onSearch, [value])
     }
   }
@@ -314,7 +398,7 @@ function resolveControlProps(): Record<string, unknown> {
         : undefined,
     ]
   }
-  let value = descriptor.valueProp === 'fileList' ? (props.modelValue ?? []) : props.modelValue
+  let value = descriptor.valueProp === 'fileList' ? (modelValueProp ?? []) : modelValueProp
   if (/^(?:date|time|fromNow)/.test(fieldType) && !merged.valueFormat && value != null) {
     const parse = (item: unknown) => {
       if (item == null || item === '') return null
@@ -342,7 +426,7 @@ function resolveControlProps(): Record<string, unknown> {
   merged[`onUpdate:${descriptor.valueProp}`] = handleModelUpdate
   merged.onChange = handleChange
   if (descriptor.valueProp === 'fileList') {
-    if (props.max !== undefined) merged.maxCount ??= props.max
+    if (maxProp !== undefined) merged.maxCount ??= maxProp
     if (fieldType === 'uploadButton') {
       merged.listType ??= 'picture'
       merged.onPreview ??= handleUploadPreview
@@ -370,7 +454,7 @@ function resolveEmptyText(): VNodeChild {
 
 function resolveReadonlyAttrs(): Record<string, unknown> {
   return mergeProps(
-    omitManagedProps(props.fieldProps ?? {}, resolveFieldType()),
+    omitManagedProps(fieldPropsProp ?? {}, resolveFieldType()),
     omitManagedProps({ ...attrs }, resolveFieldType()),
   ) as Record<string, unknown>
 }
@@ -382,7 +466,7 @@ function resolveCaptchaInputProps(): Record<string, unknown> {
 }
 
 function resolveCaptchaButtonProps(): Record<string, unknown> {
-  const buttonProps = { ...(props.buttonProps ?? {}), ...(props.captchaProps ?? {}) }
+  const buttonProps = { ...(buttonPropsProp ?? {}), ...(captchaPropsProp ?? {}) }
   delete buttonProps.onClick
   return {
     ...buttonProps,
@@ -397,11 +481,11 @@ function resolveCaptchaButtonProps(): Record<string, unknown> {
 }
 
 function resolveCaptchaButtonText(): VNodeChild {
-  if (props.captchaTextRender)
-    return props.captchaTextRender(remainingSeconds.value > 0, remainingSeconds.value)
+  if (captchaTextRenderProp)
+    return captchaTextRenderProp(remainingSeconds.value > 0, remainingSeconds.value)
   if (remainingSeconds.value > 0) {
     return (
-      props.countDownText?.(remainingSeconds.value) ??
+      countDownTextProp?.(remainingSeconds.value) ??
       intl.value
         .getMessage('captcha.retryAfter', '{count} 秒后重新获取')
         .replace('{count}', String(remainingSeconds.value))
@@ -418,8 +502,8 @@ function resolveCheckboxLayout(): 'horizontal' | 'vertical' {
 }
 
 function showUploadTrigger(): boolean {
-  const max = (props.fieldProps?.maxCount as number | undefined) ?? props.max
-  return max === undefined || !Array.isArray(props.modelValue) || props.modelValue.length < max
+  const max = (fieldPropsProp?.maxCount as number | undefined) ?? maxProp
+  return max === undefined || !Array.isArray(modelValueProp) || modelValueProp.length < max
 }
 
 async function handleUploadPreview(file: UploadFile): Promise<void> {
@@ -444,7 +528,7 @@ const previewConfig = computed(() => ({
   afterOpenChange: (open: boolean) => {
     if (!open) previewImage.value = ''
   },
-  ...(typeof props.imageProps?.preview === 'object' ? props.imageProps.preview : {}),
+  ...(typeof imagePropsProp?.preview === 'object' ? imagePropsProp.preview : {}),
 }))
 
 function resolveNonDefaultSlotNames(): string[] {
@@ -453,27 +537,27 @@ function resolveNonDefaultSlotNames(): string[] {
 
 function handleModelUpdate(value: unknown): void {
   const descriptor = resolveFieldDescriptor(resolveFieldType(), hasOptionSource())
-  callHandler(props.fieldProps?.[`onUpdate:${descriptor.valueProp}`], [value])
+  callHandler(fieldPropsProp?.[`onUpdate:${descriptor.valueProp}`], [value])
   callHandler(attrs[`onUpdate:${descriptor.valueProp}`], [value])
   emit('update:modelValue', value)
 }
 
 function handleChange(...args: unknown[]): void {
-  callHandler(props.fieldProps?.onChange, args)
+  callHandler(fieldPropsProp?.onChange, args)
   emit('change', ...args)
 }
 
 function handleDrop(event: unknown): void {
-  callHandler(props.fieldProps?.onDrop, [event])
+  callHandler(fieldPropsProp?.onDrop, [event])
   emit('drop', event)
 }
 
 function handleBeforeUpload(...args: unknown[]): unknown {
-  const handlers = [props.fieldProps?.beforeUpload, attrs.beforeUpload].filter(Boolean)
+  const handlers = [fieldPropsProp?.beforeUpload, attrs.beforeUpload].filter(Boolean)
   const results = handlers.flatMap((handler) => callHandlerWithResults(handler, args))
   const hasTransport = Boolean(
-    (props.fieldProps ?? {}).action ||
-    (props.fieldProps ?? {}).customRequest ||
+    (fieldPropsProp ?? {}).action ||
+    (fieldPropsProp ?? {}).customRequest ||
     attrs.action ||
     attrs.customRequest,
   )
@@ -497,14 +581,14 @@ async function getCaptcha(event?: unknown): Promise<void> {
   }
 
   captchaLoading.value = true
-  callHandler(props.buttonProps?.onClick, [event])
-  if (props.captchaProps?.onClick !== props.buttonProps?.onClick)
-    callHandler(props.captchaProps?.onClick, [event])
+  callHandler(buttonPropsProp?.onClick, [event])
+  if (captchaPropsProp?.onClick !== buttonPropsProp?.onClick)
+    callHandler(captchaPropsProp?.onClick, [event])
   try {
-    if (props.phoneName !== undefined) await form?.validateFields([props.phoneName])
+    if (phoneNameProp !== undefined) await form?.validateFields([phoneNameProp])
     const phone =
-      props.phoneName === undefined ? '' : String(form?.getFieldValue(props.phoneName) ?? '')
-    const result = await props.onGetCaptcha?.(phone)
+      phoneNameProp === undefined ? '' : String(form?.getFieldValue(phoneNameProp) ?? '')
+    const result = await onGetCaptchaProp?.(phone)
     if (result === false) {
       emit('captchaError', false)
       return
@@ -519,12 +603,12 @@ async function getCaptcha(event?: unknown): Promise<void> {
 
 function startCountdown(): void {
   resetCountdown()
-  remainingSeconds.value = Math.max(0, Math.floor(props.countDown ?? 60))
-  props.onTiming?.(remainingSeconds.value)
+  remainingSeconds.value = Math.max(0, Math.floor(countDownProp ?? 60))
+  onTimingProp?.(remainingSeconds.value)
   if (remainingSeconds.value === 0) return
   countdownTimer = setInterval(() => {
     remainingSeconds.value = Math.max(remainingSeconds.value - 1, 0)
-    props.onTiming?.(remainingSeconds.value)
+    onTimingProp?.(remainingSeconds.value)
     if (remainingSeconds.value === 0) clearCountdownTimer()
   }, 1000)
 }

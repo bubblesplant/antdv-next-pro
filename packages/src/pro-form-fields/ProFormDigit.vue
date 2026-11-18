@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormDigitProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormDigit', inheritAttrs: false })
-const props = defineProps<ProFormDigitProps>()
+const { ...props } = defineProps<ProFormDigitProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormDigitProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

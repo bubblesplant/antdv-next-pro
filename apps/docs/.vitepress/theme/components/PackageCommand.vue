@@ -140,8 +140,7 @@ onBeforeUnmount(() => {
       :tabindex="activeIndex === index ? 0 : -1"
     >
       <code class="package-command__code"
-        ><span>{{ manager.name }}</span
-        >{{ manager.command.slice(manager.name.length) }}</code
+        ><span>{{ manager.name }}</span>{{ manager.command.slice(manager.name.length) }}</code
       >
       <button
         class="package-command__copy"

@@ -116,7 +116,7 @@ const reload = async (action: ProTableInstance<Project>) => {
       row-key="id"
       :pagination="false"
       :row-selection="{}"
-      :search="{ collapsed, span: 8, labelWidth: 'auto' }"
+      :search="{ collapsed, labelWidth: 'auto' }"
       :options="{ reload: true, setting: true }"
       @search-collapse="collapsed = $event"
       @request-error="lastAction = '请求失败，现有数据已保留'"

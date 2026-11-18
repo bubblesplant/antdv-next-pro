@@ -64,25 +64,39 @@ interface BodyProps {
   finish?: () => Promise<unknown>
 }
 
-const props = withDefaults(defineProps<BodyProps>(), {
-  grid: false,
-  readonly: false,
-  current: 0,
-  loading: false,
-  submitting: false,
-  schemaSlots: () => ({}),
-  classes: () => ({}),
-  styles: () => ({}),
-  collapsed: undefined,
-  defaultCollapsed: undefined,
-  collapse: undefined,
-  searchText: undefined,
-  resetText: undefined,
-  optionRender: undefined,
-  collapseRender: undefined,
-  collapseLabel: undefined,
-  footerRender: undefined,
-})
+const {
+  columns: columnsProp,
+  model,
+  layoutType,
+  labelCol,
+  wrapperCol,
+  grid = false,
+  readonly = false,
+  submitter,
+  current: currentProp = 0,
+  loading = false,
+  submitting = false,
+  schemaSlots = {},
+  formProps,
+  prefixCls,
+  classes = {},
+  styles = {},
+  collapsed = undefined,
+  defaultCollapsed = undefined,
+  defaultColsNumber,
+  span,
+  labelWidth,
+  split,
+  searchText = undefined,
+  resetText = undefined,
+  optionRender = undefined,
+  collapseRender = undefined,
+  collapse = undefined,
+  collapseLabel = undefined,
+  placement,
+  footerRender = undefined,
+  finish,
+} = defineProps<BodyProps>()
 const emit = defineEmits<{
   fieldChange: [path: Array<string | number>, value: unknown]
   modelChange: [values: FormRecord]
@@ -97,31 +111,25 @@ const emit = defineEmits<{
 const formRef = shallowRef<ProFormInstance>()
 const stepForms = shallowRef<ProFormInstance[]>([])
 const rootStyle = useThemeVars()
-const { prefix, t } = useFormPrefix('form', () => props.prefixCls)
-const isStepLayout = computed(
-  () => props.layoutType === 'StepForm' || props.layoutType === 'StepsForm',
-)
-const steps = computed(() => buildSchemaSteps(props.columns))
+const { prefix, t } = useFormPrefix('form', () => prefixCls)
+const isStepLayout = computed(() => layoutType === 'StepForm' || layoutType === 'StepsForm')
+const steps = computed(() => buildSchemaSteps(columnsProp))
 const normalizedCurrent = computed(() =>
-  Math.max(0, Math.min(props.current, Math.max(steps.value.length - 1, 0))),
+  Math.max(0, Math.min(currentProp, Math.max(steps.value.length - 1, 0))),
 )
 const activeColumns = computed(() =>
-  isStepLayout.value ? (steps.value[normalizedCurrent.value]?.columns ?? []) : props.columns,
+  isStepLayout.value ? (steps.value[normalizedCurrent.value]?.columns ?? []) : columnsProp,
 )
 const hasPrevious = computed(() => isStepLayout.value && normalizedCurrent.value > 0)
 const hasNext = computed(
   () => isStepLayout.value && normalizedCurrent.value < steps.value.length - 1,
 )
-const showSubmitter = computed(() => props.submitter !== false && !props.readonly)
-const filterComponent = computed(() =>
-  props.layoutType === 'QueryFilter' ? QueryFilter : LightFilter,
-)
-const isFilter = computed(
-  () => props.layoutType === 'QueryFilter' || props.layoutType === 'LightFilter',
-)
+const showSubmitter = computed(() => submitter !== false && !readonly)
+const filterComponent = computed(() => (layoutType === 'QueryFilter' ? QueryFilter : LightFilter))
+const isFilter = computed(() => layoutType === 'QueryFilter' || layoutType === 'LightFilter')
 const formSubmitter = computed<false | SubmitterProps>(() => {
-  if (props.submitter === false || props.readonly) return false
-  const source = props.submitter ?? {}
+  if (submitter === false || readonly) return false
+  const source = submitter ?? {}
   return {
     ...source,
     submitButtonProps:
@@ -129,54 +137,54 @@ const formSubmitter = computed<false | SubmitterProps>(() => {
         ? false
         : {
             ...source.submitButtonProps,
-            loading: props.submitting || source.submitButtonProps?.loading,
+            loading: submitting || source.submitButtonProps?.loading,
           },
   }
 })
 const formClasses = computed(() => {
-  const source = props.formProps?.classes
+  const source = formProps?.classes
   return {
-    ...(typeof source === 'function' ? source({ props: props.formProps ?? {} }) : source),
-    ...(props.classes.form !== undefined && { form: props.classes.form }),
-    ...(props.classes.submitter !== undefined && { submitter: props.classes.submitter }),
+    ...(typeof source === 'function' ? source({ props: formProps ?? {} }) : source),
+    ...(classes.form !== undefined && { form: classes.form }),
+    ...(classes.submitter !== undefined && { submitter: classes.submitter }),
   }
 })
 const formStyles = computed(() => {
-  const source = props.formProps?.styles
+  const source = formProps?.styles
   return {
-    ...(typeof source === 'function' ? source({ props: props.formProps ?? {} }) : source),
-    ...(props.styles.form !== undefined && { form: props.styles.form }),
-    ...(props.styles.submitter !== undefined && { submitter: props.styles.submitter }),
+    ...(typeof source === 'function' ? source({ props: formProps ?? {} }) : source),
+    ...(styles.form !== undefined && { form: styles.form }),
+    ...(styles.submitter !== undefined && { submitter: styles.submitter }),
   }
 })
 const filterProps = computed(() => ({
-  ...props.formProps,
-  prefixCls: props.prefixCls,
-  modelValue: props.model,
-  readonly: props.readonly,
-  labelCol: props.labelCol,
-  wrapperCol: props.wrapperCol,
+  ...formProps,
+  prefixCls,
+  modelValue: model,
+  readonly,
+  labelCol,
+  wrapperCol,
   submitter: formSubmitter.value,
-  classes: props.classes,
-  styles: props.styles,
-  collapsed: props.collapsed,
-  defaultCollapsed: props.defaultCollapsed,
-  defaultColsNumber: props.defaultColsNumber,
-  span: props.span,
-  labelWidth: props.labelWidth,
-  split: props.split,
-  searchText: props.searchText,
-  resetText: props.resetText,
-  optionRender: props.optionRender,
-  collapseRender: props.collapseRender,
-  collapse: props.collapse,
-  collapseLabel: props.collapseLabel,
-  placement: props.placement,
-  footerRender: props.footerRender,
+  classes,
+  styles,
+  collapsed,
+  defaultCollapsed,
+  defaultColsNumber,
+  span,
+  labelWidth,
+  split,
+  searchText,
+  resetText,
+  optionRender,
+  collapseRender,
+  collapse,
+  collapseLabel,
+  placement,
+  footerRender,
   onFinish: finishForm,
 }))
 const submitterConfig = computed(() =>
-  props.submitter && typeof props.submitter === 'object' ? props.submitter : {},
+  submitter && typeof submitter === 'object' ? submitter : {},
 )
 const submitText = computed(
   () =>
@@ -188,13 +196,13 @@ const stepItems = computed(() =>
   steps.value.map((step, index) => ({
     key: String(index),
     title: h(Fragment, null, [
-      props.schemaSlots['step-title']?.({
+      schemaSlots['step-title']?.({
         title: step.title,
         index,
         current: normalizedCurrent.value,
         step,
         steps: steps.value,
-        values: props.model,
+        values: model,
       }) ??
         step.title ??
         String(index + 1),
@@ -223,17 +231,17 @@ function handleFieldChange(path: Array<string | number>, value: unknown): void {
   emit('fieldChange', path, value)
 }
 async function finishForm(): Promise<void> {
-  if (props.finish) await props.finish()
+  if (finish) await finish()
   else emit('submit')
 }
 function renderFields(columns = activeColumns.value): VNodeChild {
   return h(SchemaFormFields, {
     columns,
-    model: props.model,
-    readonly: props.readonly,
-    grid: props.grid,
-    layoutType: props.layoutType,
-    schemaSlots: props.schemaSlots,
+    model,
+    readonly,
+    grid,
+    layoutType,
+    schemaSlots,
     onFieldChange: handleFieldChange,
   })
 }
@@ -244,7 +252,7 @@ function stepSlotProps(index: number) {
     step,
     steps: steps.value,
     columns: step?.columns ?? [],
-    values: props.model,
+    values: model,
     content: () => renderFields(step?.columns ?? []),
   }
 }
@@ -256,10 +264,10 @@ const stepActionSlotProps = computed(() => ({
   current: normalizedCurrent.value,
   step: steps.value[normalizedCurrent.value],
   steps: steps.value,
-  values: props.model,
+  values: model,
   hasPrevious: hasPrevious.value,
   hasNext: hasNext.value,
-  submitting: props.submitting,
+  submitting,
   next: () => emit('next'),
   prev: () => emit('prev'),
   submit: () => void finishForm(),
@@ -274,7 +282,7 @@ function renderStepActions(): VNodeChild {
         Button,
         {
           ...config.resetButtonProps,
-          disabled: props.submitting || Boolean(config.resetButtonProps?.disabled),
+          disabled: submitting || Boolean(config.resetButtonProps?.disabled),
           onClick: (event: MouseEvent) => {
             if (config.resetButtonProps) config.resetButtonProps.onClick?.(event)
             emit('prev')
@@ -288,7 +296,7 @@ function renderStepActions(): VNodeChild {
         {
           type: 'primary',
           ...config.submitButtonProps,
-          loading: props.submitting,
+          loading: submitting,
           onClick: (event: MouseEvent) => {
             if (config.submitButtonProps) config.submitButtonProps.onClick?.(event)
             if (hasNext.value) emit('next')

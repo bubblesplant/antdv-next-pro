@@ -3,7 +3,7 @@ import type { VNodeChild } from 'vue'
 import VNodeContent from '../shared/VNodeContent'
 
 defineOptions({ name: 'AntdvNextProRenderNode' })
-defineProps<{ content?: VNodeChild }>()
+const { content } = defineProps<{ content?: VNodeChild }>()
 </script>
 
 <template>

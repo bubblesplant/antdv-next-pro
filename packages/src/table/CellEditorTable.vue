@@ -15,9 +15,21 @@ import { resolveColumnValueType } from './valueType'
 import { useTableRef } from './useTableRef'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<CellEditorTableProps<T, P>>(), {
-  editable: () => ({ type: 'single' }),
-})
+const {
+  dataSource,
+  defaultDataSource,
+  onRowEditStart,
+  onRowEditEnd,
+  columns: columnsProp,
+  value,
+  defaultValue,
+  rowKey,
+  editable = { type: 'single' },
+  editableKeys,
+  recordCreatorProps,
+  ...restProps
+} = defineProps<CellEditorTableProps<T, P>>()
+
 const emit = defineEmits<{
   'update:editableKeys': [keys: ProKey[]]
   'update:dataSource': [rows: T[]]
@@ -29,7 +41,20 @@ let timer: ReturnType<typeof setTimeout> | undefined
 let switching = false
 const identifiers = new WeakMap<ProColumns<T>, string>()
 const bindings = computed(() => {
-  Object.values(props)
+  Object.values({
+    ...restProps,
+    dataSource,
+    defaultDataSource,
+    onRowEditStart,
+    onRowEditEnd,
+    columns: columnsProp,
+    value,
+    defaultValue,
+    rowKey,
+    editable,
+    editableKeys,
+    recordCreatorProps,
+  })
   return Object.fromEntries(
     Object.entries(instance?.vnode.props ?? {}).filter(
       ([raw]) =>
@@ -65,7 +90,7 @@ function finish(key: ProKey) {
   clear()
   active.value = undefined
   const record = table.value?.getRowData(key)
-  if (record) props.onRowEditEnd?.(key, record)
+  if (record) onRowEditEnd?.(key, record)
 }
 async function save(key: ProKey) {
   const result = (await table.value?.saveEditable(key)) ?? false
@@ -75,7 +100,7 @@ async function save(key: ProKey) {
 function start(key: ProKey, column?: ProColumns<T>, identifier?: string) {
   const record = table.value?.getRowData(key)
   if (!record) return false
-  const target = column ?? flattenColumns(props.columns).find((item) => permitted(item, record, 0))
+  const target = column ?? flattenColumns(columnsProp).find((item) => permitted(item, record, 0))
   if (!target) return false
   const previous = active.value
   active.value = { key, column: identifier ?? identifiers.get(target) ?? columnKey(target) }
@@ -84,7 +109,7 @@ function start(key: ProKey, column?: ProColumns<T>, identifier?: string) {
     return false
   }
   if (previous?.key !== key || previous.column !== active.value.column)
-    props.onRowEditStart?.(key, record)
+    onRowEditStart?.(key, record)
   return true
 }
 async function activate(
@@ -94,7 +119,7 @@ async function activate(
   identifier: string,
   cell: HTMLElement,
 ) {
-  const key = resolveRowKey(record, props.rowKey)
+  const key = resolveRowKey(record, rowKey)
   if (key === undefined || !permitted(column, record, index) || switching) return
   if (active.value?.key === key && active.value.column === identifier) return
   clear()
@@ -113,8 +138,7 @@ function decorate(source: ProColumns<T>[], path = ''): ProColumns<T>[] {
     const identifier = `${path}${columnIndex}:${columnKey(column)}`
     identifiers.set(column, identifier)
     const duplicate =
-      flattenColumns(props.columns).filter((item) => columnKey(item) === columnKey(column)).length >
-      1
+      flattenColumns(columnsProp).filter((item) => columnKey(item) === columnKey(column)).length > 1
     return {
       ...column,
       key: column.key ?? (duplicate ? identifier : undefined),
@@ -122,11 +146,11 @@ function decorate(source: ProColumns<T>[], path = ''): ProColumns<T>[] {
       columns: column.columns ? decorate(column.columns, `${identifier}/`) : undefined,
       editable: (record, index) =>
         permitted(column, record, index) &&
-        active.value?.key === resolveRowKey(record, props.rowKey) &&
+        active.value?.key === resolveRowKey(record, rowKey) &&
         active.value?.column === identifier,
       onCell: (record, index = 0) => {
         const original = column.onCell?.(record, index) ?? {}
-        const key = resolveRowKey(record, props.rowKey)
+        const key = resolveRowKey(record, rowKey)
         const isActive = () => active.value?.key === key && active.value?.column === identifier
         return {
           ...original,
@@ -161,7 +185,7 @@ function syncEditing(keys: ProKey[]) {
   if (active.value && !keys.includes(active.value.key)) finish(active.value.key)
   emit('update:editableKeys', keys)
 }
-const columns = computed(() => decorate(props.columns))
+const columns = computed(() => decorate(columnsProp))
 const action = useTableRef(table)
 defineExpose<ProTableInstance<T>>({
   ...action,
@@ -178,12 +202,12 @@ defineExpose<ProTableInstance<T>>({
     ref="table"
     @update:editable-keys="syncEditing"
     v-bind="{ ...bindings, ...$attrs }"
-    :value="props.value ?? props.dataSource"
-    :default-value="props.defaultValue ?? props.defaultDataSource"
+    :value="value ?? dataSource"
+    :default-value="defaultValue ?? defaultDataSource"
     @update:value="emit('update:dataSource', $event)"
     :columns="columns"
-    :editable="props.editable ?? { type: 'single' }"
-    :record-creator-props="props.recordCreatorProps ?? false"
+    :editable="editable ?? { type: 'single' }"
+    :record-creator-props="recordCreatorProps ?? false"
     ><template v-for="(_, name) in $slots" #[name]="scope"
       ><slot :name="name" v-bind="scope ?? {}" /></template
   ></EditableProTable>

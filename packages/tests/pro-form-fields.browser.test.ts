@@ -1,5 +1,7 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { ConfigProvider, theme, type UploadFile, type UploadProps } from 'antdv-next'
+import type { VueWrapper } from '@vue/test-utils'
+import type { UploadFile, UploadProps } from 'antdv-next'
+import { flushPromises, mount } from '@vue/test-utils'
+import { ConfigProvider, theme } from 'antdv-next'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, ref } from 'vue'
 
@@ -137,6 +139,8 @@ describe('ProFormFields browser theming and upload paths', () => {
       { attachTo: document.body },
     )
     const target = wrapper.get('.ant-upload-drag .ant-upload-btn').element
+    // Let mount-time listeners settle before a synthetic event bubbles through them.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     target.dispatchEvent(
       new DragEvent('drop', {
         bubbles: true,

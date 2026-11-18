@@ -6,7 +6,7 @@ import ScenarioErrorBoundary from '../demos/pro-table/ScenarioErrorBoundary.vue'
 import { exampleComponents, examples, type PlaygroundExample, type SourceFile } from '../examples'
 import { copyText, downloadSources } from '../utils/sourceFiles'
 
-const props = defineProps<{ example: PlaygroundExample }>()
+const { example } = defineProps<{ example: PlaygroundExample }>()
 const activeTab = ref<'preview' | 'code'>('preview')
 const revision = ref(0)
 const sources = ref<SourceFile[]>([])
@@ -21,14 +21,14 @@ let sourceRequest: Promise<void> | undefined
 let disposed = false
 
 const componentMeta = computed(() =>
-  exampleComponents.find((item) => item.id === props.example.componentId)!,
+  exampleComponents.find((item) => item.id === example.componentId)!,
 )
 const currentSource = computed(() => sources.value[sourceIndex.value])
-const currentIndex = computed(() => examples.findIndex((item) => item.path === props.example.path))
+const currentIndex = computed(() => examples.findIndex((item) => item.path === example.path))
 const previous = computed(() => examples[currentIndex.value - 1])
 const next = computed(() => examples[currentIndex.value + 1])
 const componentFirstPath = computed(
-  () => examples.find((item) => item.componentId === props.example.componentId)?.path ?? '/',
+  () => examples.find((item) => item.componentId === example.componentId)?.path ?? '/',
 )
 
 function notify(message: string) {
@@ -51,7 +51,7 @@ async function loadSources() {
   sourceError.value = ''
   sourceRequest = (async () => {
     try {
-      const files = await props.example.sources()
+      const files = await example.sources()
       if (!disposed) sources.value = files
     } catch {
       if (!disposed) sourceError.value = '示例代码加载失败，请重试。'
@@ -97,10 +97,7 @@ async function copyLink() {
 async function downloadExample() {
   await loadSources()
   if (sources.value.length)
-    downloadSources(
-      sources.value,
-      `${props.example.componentId}-${props.example.path.split('/').at(-1)}`,
-    )
+    downloadSources(sources.value, `${example.componentId}-${example.path.split('/').at(-1)}`)
   else notify(sourceError.value || '代码正在加载，请稍后重试。')
 }
 
@@ -266,9 +263,7 @@ onBeforeUnmount(() => {
           </li>
         </ul>
         <details v-if="events.length" class="event-log">
-          <summary>
-            交互记录 <span>{{ events.length }}</span>
-          </summary>
+          <summary>交互记录 <span>{{ events.length }}</span></summary>
           <ol>
             <li v-for="(event, index) in events" :key="index">{{ event }}</li>
           </ol>

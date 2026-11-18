@@ -109,6 +109,7 @@ describe('ProFormFields public surface', () => {
     for (const [name, component] of publicFields) {
       expect(app.component(name), name).toBe(component)
     }
+    expect(app.component('component')).toBeUndefined()
   })
 })
 

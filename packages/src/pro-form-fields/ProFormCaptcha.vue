@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormCaptchaInstance, ProFormCaptchaProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormCaptcha', inheritAttrs: false })
-const props = defineProps<ProFormCaptchaProps>()
+const { ...props } = defineProps<ProFormCaptchaProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormCaptchaProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

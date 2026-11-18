@@ -89,7 +89,7 @@ function switchSearchMode(next: typeof searchMode.value) {
   announce(`搜索栏切换为 ${next === 'query' ? 'QueryFilter' : 'LightFilter'}，查询条件已重置`)
 }
 const searchConfig = computed<ProTableProps<DemoRow, DemoQuery>['search']>(() => {
-  return { filterType: searchMode.value, labelWidth: 'auto', span: 8, defaultCollapsed: false }
+  return { filterType: searchMode.value, labelWidth: 'auto', defaultCollapsed: false }
 })
 const tableRenderKey = computed(() => {
   return `search-bar-type-switch-${searchMode.value}`
@@ -119,12 +119,8 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
     data-scenario-mode="search-bar-type-switch"
   >
     <div class="request-monitor">
-      <span
-        ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-      >
-      <span
-        ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-      >
+      <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+      <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
       <code :title="lastRequest || requestLabels.waiting">{{
         lastRequest || requestLabels.waiting
       }}</code>

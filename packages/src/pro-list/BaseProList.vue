@@ -12,11 +12,12 @@ import { computed, getCurrentInstance, ref } from 'vue'
 import ProList from './ProList.vue'
 import { useTableRef } from '../table/useTableRef'
 defineOptions({ inheritAttrs: false })
-const props = defineProps<BaseProListProps<T, P>>()
+const { toolBarRender, cardProps, search, ...restProps } = defineProps<BaseProListProps<T, P>>()
+
 const target = ref<ProTableInstance<T>>()
 const instance = getCurrentInstance()
 const bindings = computed(() => {
-  Object.values(props)
+  Object.values({ ...restProps, toolBarRender, cardProps, search })
   return Object.fromEntries(
     Object.entries(instance?.vnode.props ?? {}).filter(([key]) => key !== 'ref'),
   )
@@ -27,9 +28,9 @@ defineExpose<ProTableInstance<T>>(useTableRef(target))
   <!-- @vue-generic {T,P} --><ProList
     ref="target"
     v-bind="{ ...bindings, ...$attrs }"
-    :card-props="props.cardProps ?? false"
-    :search="props.search ?? false"
-    :tool-bar-render="props.toolBarRender ?? false"
+    :card-props="cardProps ?? false"
+    :search="search ?? false"
+    :tool-bar-render="toolBarRender ?? false"
     ><template v-for="(_, name) in $slots" #[name]="scope"
       ><slot :name="name" v-bind="scope ?? {}" /></template
   ></ProList>

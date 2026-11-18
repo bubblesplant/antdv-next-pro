@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormRadioGroupProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormRadioGroup', inheritAttrs: false })
-const props = defineProps<ProFormRadioGroupProps>()
+const { ...props } = defineProps<ProFormRadioGroupProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormRadioGroupProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

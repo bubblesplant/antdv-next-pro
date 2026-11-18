@@ -25,37 +25,65 @@ import { getValue, normalizePath } from './utils'
 
 defineOptions({ name: 'AntdvNextProSchemaFormField', inheritAttrs: false })
 
-const props = withDefaults(defineProps<FieldProps>(), {
-  prefix: () => [],
-  readonly: false,
-  grid: false,
-  layoutType: 'Form',
-  schemaSlots: () => ({}),
-})
+const {
+  column: columnProp,
+  model,
+  prefix = [],
+  readonly: readonlyProp = false,
+  grid = false,
+  layoutType: layoutTypeProp = 'Form',
+  schemaSlots = {},
+  onValueChange,
+} = defineProps<FieldProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get column() {
+    return columnProp
+  },
+  get model() {
+    return model
+  },
+  get prefix() {
+    return prefix
+  },
+  get readonly() {
+    return readonlyProp
+  },
+  get grid() {
+    return grid
+  },
+  get layoutType() {
+    return layoutTypeProp
+  },
+  get schemaSlots() {
+    return schemaSlots
+  },
+  get onValueChange() {
+    return onValueChange
+  },
+}
 
 const ADivider = Divider as Component
 const nativeForm = useFormInstance()
 const { t } = useFormPrefix('form', () => undefined)
-const valueType = computed(() => resolveColumnValueType(props.column.valueType, props.model, 0))
+const valueType = computed(() => resolveColumnValueType(columnProp.valueType, model, 0))
 
 function renderFormItem(context: ProRenderContext<FormRecord>): VNodeChild {
-  return props.column.formItemRender
-    ? props.column.formItemRender(props.column, context, nativeForm)
-    : props.column.renderFormItem?.(props.column, context)
+  return columnProp.formItemRender
+    ? columnProp.formItemRender(columnProp, context, nativeForm)
+    : columnProp.renderFormItem?.(columnProp, context)
 }
 
 function resolvePath(): Array<string | number> {
-  return [...props.prefix, ...normalizePath(props.column.dataIndex)]
+  return [...prefix, ...normalizePath(columnProp.dataIndex)]
 }
 
 function resolveDependencyValues(): unknown[] | undefined {
-  return props.column.dependencies?.map((dependency) =>
-    getValue(props.model, normalizePath(dependency)),
-  )
+  return columnProp.dependencies?.map((dependency) => getValue(model, normalizePath(dependency)))
 }
 
 function createUpdate(currentPath: Array<string | number>): (next: unknown) => void {
-  return (next) => props.onValueChange(currentPath, next)
+  return (next) => onValueChange(currentPath, next)
 }
 
 function createRenderContext(
@@ -63,10 +91,10 @@ function createRenderContext(
   update: (next: unknown) => void,
 ): ProRenderContext<FormRecord> {
   return {
-    record: props.model,
+    record: model,
     index: 0,
-    column: props.column as ProColumns<FormRecord>,
-    editable: !props.readonly && !props.column.readonly,
+    column: columnProp as ProColumns<FormRecord>,
+    editable: !readonlyProp && !columnProp.readonly,
     dependencies,
     update,
   }
@@ -74,9 +102,9 @@ function createRenderContext(
 
 function resolveFormListState(): FormListState {
   const currentPath = resolvePath()
-  const current = getValue(props.model, currentPath)
+  const current = getValue(model, currentPath)
   const rows = Array.isArray(current) ? current : []
-  const fieldProps = resolveObjectProps(props.column.fieldProps, props.model)
+  const fieldProps = resolveObjectProps(columnProp.fieldProps, model)
   return {
     rows,
     fieldProps,
@@ -84,7 +112,7 @@ function resolveFormListState(): FormListState {
       fieldProps.creatorButtonText ?? t('editableTable.action.add', '添加一行数据'),
     ),
     path: currentPath,
-    title: props.column.title ? resolveTitle(props.column) : undefined,
+    title: columnProp.title ? resolveTitle(columnProp) : undefined,
   }
 }
 
@@ -98,7 +126,7 @@ function resolveCompositeRenderState(): CompositeState {
   return {
     content,
     hasContent,
-    title: !hasContent && props.column.title ? resolveTitle(props.column) : undefined,
+    title: !hasContent && columnProp.title ? resolveTitle(columnProp) : undefined,
   }
 }
 
@@ -109,17 +137,17 @@ function resolveDefaultControlState(
   const { type, ...configuration } = valueType.value
   const fieldProps = {
     ...configuration,
-    ...resolveObjectProps(props.column.fieldProps, props.model),
+    ...resolveObjectProps(columnProp.fieldProps, model),
   }
   const valueEnum =
-    typeof props.column.valueEnum === 'function' ? props.column.valueEnum() : props.column.valueEnum
-  const readonly = props.readonly || props.column.readonly === true
+    typeof columnProp.valueEnum === 'function' ? columnProp.valueEnum() : columnProp.valueEnum
+  const readonly = readonlyProp || columnProp.readonly === true
   const disabled = Boolean(fieldProps.disabled)
 
-  if (props.column.component) {
+  if (columnProp.component) {
     return {
       disabled: false,
-      component: props.column.component,
+      component: columnProp.component,
       componentProps: {
         ...fieldProps,
         value: currentValue,
@@ -140,12 +168,12 @@ function resolveDefaultControlState(
     'onUpdate:modelValue': update,
   }
   if (valueEnum !== undefined) componentProps.valueEnum = valueEnum
-  if (props.column.request) {
-    componentProps.request = props.column.request
-    if (props.column.params !== undefined) componentProps.params = props.column.params
+  if (columnProp.request) {
+    componentProps.request = columnProp.request
+    if (columnProp.params !== undefined) componentProps.params = columnProp.params
   }
-  if (props.column.onFieldRequestError) {
-    componentProps.onRequestError = props.column.onFieldRequestError
+  if (columnProp.onFieldRequestError) {
+    componentProps.onRequestError = columnProp.onFieldRequestError
   }
 
   return { disabled: false, component: FieldControl, componentProps }
@@ -156,16 +184,16 @@ function resolveFieldRenderState(): FormItemState {
   const dependencies = resolveDependencyValues()
   const update = createUpdate(currentPath)
   const context = createRenderContext(dependencies, update)
-  const currentValue = getValue(props.model, currentPath)
+  const currentValue = getValue(model, currentPath)
   const currentFieldName = currentPath.join('.')
   const fieldSlot =
-    props.schemaSlots[`field-${currentFieldName}`] ??
-    props.schemaSlots[currentFieldName] ??
-    props.schemaSlots[String(props.column.key ?? '')]
+    schemaSlots[`field-${currentFieldName}`] ??
+    schemaSlots[currentFieldName] ??
+    schemaSlots[String(columnProp.key ?? '')]
   const fieldSlotContent = fieldSlot?.({
     value: currentValue,
-    record: props.model,
-    column: props.column,
+    record: model,
+    column: columnProp,
     dependencies,
     update,
   })
@@ -177,10 +205,9 @@ function resolveFieldRenderState(): FormItemState {
     content === undefined || content === null
       ? resolveDefaultControlState(currentValue, update)
       : undefined
-  const resolvedFormItemProps = resolveObjectProps(props.column.formItemProps, props.model)
-  const labelSlot = props.schemaSlots[`label-${currentFieldName}`]
-  const label =
-    labelSlot?.({ column: props.column, record: props.model }) ?? resolveTitle(props.column)
+  const resolvedFormItemProps = resolveObjectProps(columnProp.formItemProps, model)
+  const labelSlot = schemaSlots[`label-${currentFieldName}`]
+  const label = labelSlot?.({ column: columnProp, record: model }) ?? resolveTitle(columnProp)
   return {
     content,
     defaultControl,
@@ -189,8 +216,8 @@ function resolveFieldRenderState(): FormItemState {
       ...resolvedFormItemProps,
       name: currentPath,
       label,
-      tooltip: props.column.tooltip,
-      extra: props.column.extra,
+      tooltip: columnProp.tooltip,
+      extra: columnProp.extra,
     },
   }
 }
@@ -233,7 +260,7 @@ function isHidden(column: SchemaFormColumn<FormRecord>, layoutType: SchemaFormLa
 </script>
 
 <template>
-  <template v-if="!isHidden(column, layoutType)">
+  <template v-if="!isHidden(columnProp, layoutTypeProp)">
     <DirectSlotRenderer
       v-if="valueType.type === 'divider'"
       :component="ADivider"

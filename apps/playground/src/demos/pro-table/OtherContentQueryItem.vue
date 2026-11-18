@@ -119,12 +119,8 @@ function resetContentQuery() {
 <template>
   <div class="scenario-demo mode-content-query-item" data-scenario-mode="content-query-item">
     <div class="request-monitor">
-      <span
-        ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-      >
-      <span
-        ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-      >
+      <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+      <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
       <code :title="lastRequest || requestLabels.waiting">{{
         lastRequest || requestLabels.waiting
       }}</code>
@@ -150,8 +146,7 @@ function resetContentQuery() {
           :class="{ active: contentPriority === item.value }"
           @click="contentPriority = item.value as DemoQuery['priority']"
         >
-          <i>{{ item.icon }}</i
-          >{{ item.label }}
+          <i>{{ item.icon }}</i>{{ item.label }}
         </button>
       </div>
       <span class="button-row content-query-actions"

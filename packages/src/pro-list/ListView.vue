@@ -14,13 +14,26 @@ import { proTableViewKey, type ProTableViewContext } from '../table/viewContext'
 import RenderNode from '../table/RenderNode.vue'
 import RenderView from '../components/RenderView.vue'
 
-const props = withDefaults(defineProps<ProListViewProps<T>>(), {
-  itemTitleRender: undefined,
-  itemHeaderRender: undefined,
-  split: undefined,
-})
+const {
+  columns: columnsProp,
+  dataSource,
+  rowKey,
+  rowSelection,
+  expandable,
+  grid,
+  itemCardProps,
+  split = undefined,
+  itemTitleRender = undefined,
+  itemHeaderRender = undefined,
+  onItem,
+  onRow,
+  prefixCls,
+  action,
+  classes,
+  styles,
+} = defineProps<ProListViewProps<T>>()
 const slots = useSlots()
-const prefix = useProPrefix('list', () => props.prefixCls)
+const prefix = useProPrefix('list', () => prefixCls)
 const { direction, token } = useProConfig()
 const themeVars = useThemeVars()
 const tokenStyles = computed<CSSProperties>(() => ({
@@ -35,31 +48,29 @@ const tokenStyles = computed<CSSProperties>(() => ({
 }))
 const tableView = inject<ProTableViewContext<T>>(proTableViewKey)
 const selected = ref<import('../types').ProKey[]>(
-  props.rowSelection ? (props.rowSelection.defaultSelectedRowKeys ?? []) : [],
+  rowSelection ? (rowSelection.defaultSelectedRowKeys ?? []) : [],
 )
-const expanded = ref<import('../types').ProKey[]>([
-  ...(props.expandable?.defaultExpandedRowKeys ?? []),
-])
-const columns = computed<ProListColumn<T>[]>(() => props.columns ?? [])
+const expanded = ref<import('../types').ProKey[]>([...(expandable?.defaultExpandedRowKeys ?? [])])
+const columns = computed<ProListColumn<T>[]>(() => columnsProp ?? [])
 const selectedKeys = computed(() =>
-  props.rowSelection && Array.isArray(props.rowSelection.selectedRowKeys)
-    ? props.rowSelection.selectedRowKeys
+  rowSelection && Array.isArray(rowSelection.selectedRowKeys)
+    ? rowSelection.selectedRowKeys
     : selected.value,
 )
-const expandedKeys = computed(() => props.expandable?.expandedRowKeys ?? expanded.value)
+const expandedKeys = computed(() => expandable?.expandedRowKeys ?? expanded.value)
 const gridStyles = computed<CSSProperties>(() => {
   const result: Record<string, string | number> = {
-    '--pro-list-gap': `${props.grid?.gutter ?? 16}px`,
+    '--pro-list-gap': `${grid?.gutter ?? 16}px`,
   }
-  let count = props.grid?.column ?? 1
+  let count = grid?.column ?? 1
   for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const) {
-    count = props.grid?.[size] ?? count
+    count = grid?.[size] ?? count
     result[`--pro-list-${size}`] = count
   }
   return result
 })
 function keyOf(record: T, index: number) {
-  return resolveRowKey(record, props.rowKey) ?? index
+  return resolveRowKey(record, rowKey) ?? index
 }
 function meta(slot: string) {
   return columns.value.find(
@@ -74,8 +85,8 @@ function renderSlot(record: T, index: number, slot: string): VNodeChild {
   if (!column) return undefined
   if (tableView) return tableView.renderCell(record, column, index)
   const text =
-    column.renderText && props.action
-      ? column.renderText(value(record, slot), record, index, props.action)
+    column.renderText && action
+      ? column.renderText(value(record, slot), record, index, action)
       : value(record, slot)
   const dom = h(ProField, {
     text,
@@ -86,30 +97,24 @@ function renderSlot(record: T, index: number, slot: string): VNodeChild {
     copyable: column.copyable,
     ellipsis: column.ellipsis,
   })
-  return column.render && props.action
-    ? column.render(dom, record, index, props.action, column)
-    : dom
+  return column.render && action ? column.render(dom, record, index, action, column) : dom
 }
 function select(record: T, index: number, checked: boolean, event: Event) {
   const key = keyOf(record, index)
   selected.value =
-    props.rowSelection && props.rowSelection.type === 'radio'
+    rowSelection && rowSelection.type === 'radio'
       ? [key]
       : checked
         ? [...new Set([...selectedKeys.value, key])]
         : selectedKeys.value.filter((item) => item !== key)
-  const rows = props.dataSource?.filter((item, i) => selected.value.includes(keyOf(item, i))) ?? []
-  if (props.rowSelection) {
-    props.rowSelection.onSelect?.(record, checked, rows, event)
-    props.rowSelection.onChange?.(selected.value, rows, { type: 'single' })
+  const rows = dataSource?.filter((item, i) => selected.value.includes(keyOf(item, i))) ?? []
+  if (rowSelection) {
+    rowSelection.onSelect?.(record, checked, rows, event)
+    rowSelection.onChange?.(selected.value, rows, { type: 'single' })
   }
   // Native checkbox clicks mutate the input before an unchanged controlled prop can patch it.
   void nextTick(() => {
-    if (
-      props.rowSelection &&
-      props.rowSelection.selectedRowKeys &&
-      event?.target instanceof HTMLInputElement
-    )
+    if (rowSelection && rowSelection.selectedRowKeys && event?.target instanceof HTMLInputElement)
       event.target.checked = selectedKeys.value.includes(key)
   })
 }
@@ -119,14 +124,14 @@ function toggle(record: T, index: number) {
   expanded.value = open
     ? [...expandedKeys.value, key]
     : expandedKeys.value.filter((item) => item !== key)
-  props.expandable?.onExpand?.(open, record)
-  props.expandable?.onExpandedRowsChange?.(expanded.value)
+  expandable?.onExpand?.(open, record)
+  expandable?.onExpandedRowsChange?.(expanded.value)
 }
 function rowBindings(record: T, index: number) {
   return mergeProps(
-    { ...props.onRow?.(record, index) },
-    { ...props.onItem?.(record, index) },
-    props.expandable?.expandRowByClick ? { onClick: () => toggle(record, index) } : {},
+    { ...onRow?.(record, index) },
+    { ...onItem?.(record, index) },
+    expandable?.expandRowByClick ? { onClick: () => toggle(record, index) } : {},
   )
 }
 function customRender(render: ProListViewProps<T>['itemTitleRender'], record: T, index: number) {
@@ -134,8 +139,8 @@ function customRender(render: ProListViewProps<T>['itemTitleRender'], record: T,
 }
 function needExpanded(record: T, index: number) {
   return (
-    !props.expandable ||
-    !Object.keys(props.expandable).length ||
+    !expandable ||
+    !Object.keys(expandable).length ||
     expandedKeys.value.includes(keyOf(record, index))
   )
 }
@@ -161,17 +166,17 @@ function renderGridCard(record: T, index: number): VNodeChild {
   const footer = meta('actions')?.cardActionProps === 'actions'
   const title = slots.title?.({ record, index }) ?? renderSlot(record, index, 'title')
   const titleDom =
-    typeof props.itemTitleRender === 'function'
-      ? props.itemTitleRender(record, index, title)
-      : props.itemTitleRender === false
+    typeof itemTitleRender === 'function'
+      ? itemTitleRender(record, index, title)
+      : itemTitleRender === false
         ? undefined
         : title
-  const selection = props.rowSelection
+  const selection = rowSelection
     ? h('input', {
-        type: props.rowSelection.type === 'radio' ? 'radio' : 'checkbox',
+        type: rowSelection.type === 'radio' ? 'radio' : 'checkbox',
         checked: selectedKeys.value.includes(keyOf(record, index)),
         'aria-label': String(value(record, 'title') ?? keyOf(record, index)),
-        disabled: props.rowSelection.getCheckboxProps?.(record)?.disabled,
+        disabled: rowSelection.getCheckboxProps?.(record)?.disabled,
         onClick: (event: Event) => event.stopPropagation(),
         onChange: (event: Event) =>
           select(record, index, (event.target as HTMLInputElement).checked, event),
@@ -181,12 +186,8 @@ function renderGridCard(record: T, index: number): VNodeChild {
     ? h(
         'div',
         {
-          class: [
-            `${prefix.value}-item-action`,
-            `${prefix.value}-row-actions`,
-            props.classes?.actions,
-          ],
-          style: props.styles?.actions,
+          class: [`${prefix.value}-item-action`, `${prefix.value}-row-actions`, classes?.actions],
+          style: styles?.actions,
           'data-pro-list-row-actions': '',
           onClick: (event: Event) => event.stopPropagation(),
         },
@@ -196,8 +197,8 @@ function renderGridCard(record: T, index: number): VNodeChild {
   const header = h(
     'div',
     {
-      class: [`${prefix.value}-row-header-container`, props.classes?.header],
-      style: props.styles?.header,
+      class: [`${prefix.value}-row-header-container`, classes?.header],
+      style: styles?.header,
       'data-pro-list-row-header': '',
     },
     [
@@ -206,12 +207,8 @@ function renderGridCard(record: T, index: number): VNodeChild {
       h(
         'span',
         {
-          class: [
-            `${prefix.value}-item-meta-title`,
-            `${prefix.value}-row-title`,
-            props.classes?.title,
-          ],
-          style: props.styles?.title,
+          class: [`${prefix.value}-item-meta-title`, `${prefix.value}-row-title`, classes?.title],
+          style: styles?.title,
           'data-pro-list-row-title': '',
         },
         [titleDom],
@@ -220,8 +217,8 @@ function renderGridCard(record: T, index: number): VNodeChild {
         ? h(
             'span',
             {
-              class: [`${prefix.value}-row-sub-title`, props.classes?.subTitle],
-              style: props.styles?.subTitle,
+              class: [`${prefix.value}-row-sub-title`, classes?.subTitle],
+              style: styles?.subTitle,
               'data-pro-list-row-sub-title': '',
             },
             [slots.subTitle?.({ record, index }) ?? renderSlot(record, index, 'subTitle')],
@@ -230,16 +227,14 @@ function renderGridCard(record: T, index: number): VNodeChild {
     ],
   )
   const headerDom =
-    typeof props.itemHeaderRender === 'function'
-      ? props.itemHeaderRender(record, index, header)
-      : header
+    typeof itemHeaderRender === 'function' ? itemHeaderRender(record, index, header) : header
   const extraDom =
     meta('extra') || slots.extra
       ? h(
           'div',
           {
-            class: [`${prefix.value}-row-extra`, props.classes?.extra],
-            style: props.styles?.extra,
+            class: [`${prefix.value}-row-extra`, classes?.extra],
+            style: styles?.extra,
             'data-pro-list-row-extra': '',
           },
           [slots.extra?.({ record, index }) ?? renderSlot(record, index, 'extra')],
@@ -253,9 +248,9 @@ function renderGridCard(record: T, index: number): VNodeChild {
             class: [
               `${prefix.value}-item-meta-description`,
               `${prefix.value}-row-description`,
-              props.classes?.description,
+              classes?.description,
             ],
-            style: props.styles?.description,
+            style: styles?.description,
             'data-pro-list-row-description': '',
           },
           [slots.description?.({ record, index }) ?? renderSlot(record, index, 'description')],
@@ -266,8 +261,8 @@ function renderGridCard(record: T, index: number): VNodeChild {
       ? h(
           'div',
           {
-            class: [`${prefix.value}-row-content`, props.classes?.content],
-            style: props.styles?.content,
+            class: [`${prefix.value}-row-content`, classes?.content],
+            style: styles?.content,
           },
           [slots.content?.({ record, index }) ?? renderSlot(record, index, 'content')],
         )
@@ -275,14 +270,14 @@ function renderGridCard(record: T, index: number): VNodeChild {
   return h(
     ProCard,
     {
-      ...props.itemCardProps,
+      ...itemCardProps,
       class: `${prefix.value}-row-card`,
-      checked: props.rowSelection
+      checked: rowSelection
         ? selectedKeys.value.includes(keyOf(record, index))
-        : props.itemCardProps?.checked,
+        : itemCardProps?.checked,
     },
     {
-      ...(props.itemHeaderRender !== false ? { title: () => headerDom } : {}),
+      ...(itemHeaderRender !== false ? { title: () => headerDom } : {}),
       ...(extraDom || (actions && !footer)
         ? { extra: () => [extraDom, footer ? undefined : actionDom] }
         : {}),

@@ -6,8 +6,10 @@
 
 - Node.js 24.x (the repository engine range is `>=24 <25`)
 - pnpm 12.4.1
-- Vue 3.5+
+- Vue **3.5.0 or later** (minimum supported version: `3.5.0`; Vue 3.4 and earlier are unsupported)
 - `antdv-next` `^1.5.2`
+
+Component sources target Vue 3.5 and use `<script setup>` with reactive props destructuring and inline defaults in `const { ... } = defineProps<...>()`. When consuming source files directly, use Vue SFC compiler 3.5.0 or later and keep it aligned with the Vue runtime. Vapor compilation is not enabled.
 
 ## Install
 

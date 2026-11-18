@@ -128,6 +128,19 @@ export interface LightFilterProps<T extends FormRecord = FormRecord> extends Pro
     | ((props: { confirm: () => void; clear: () => void }, doms: VNodeChild[]) => VNodeChild)
 }
 
+export interface ProFormLightWrapperProps {
+  name?: ProDataIndex
+  label?: VNodeChild
+  disabled?: boolean
+  placement?: PopoverProps['placement']
+  fieldNames?: ProDataIndex[]
+  footerRender?: LightFilterProps['footerRender']
+  open?: boolean
+  'onUpdate:open'?: (open: boolean) => void
+  onConfirm?: (value: unknown) => void
+  onClear?: () => void
+}
+
 export interface StepsFormProps<T extends FormRecord = FormRecord> {
   current?: number
   onFinish?: ProFormFinish<T>

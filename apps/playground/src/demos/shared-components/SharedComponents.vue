@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, defineComponent, h, ref } from 'vue'
+import { computed, ref } from 'vue'
+import CrashContent from './CrashContent.vue'
 import { Button, Form, Input, Space } from 'antdv-next'
 import {
   DropdownFooter,
@@ -29,19 +30,6 @@ const error = computed(() =>
   showError.value && name.value.trim().length < 2 ? '请至少输入两个字符' : undefined,
 )
 const crash = ref(false)
-const CrashContent = defineComponent({
-  props: { fail: Boolean },
-  setup(props) {
-    return () => {
-      if (props.fail) throw new Error('这是用于演示恢复流程的错误。')
-      return h(
-        'p',
-        { 'data-demo-boundary-content': '' },
-        '内容正常，点击“触发错误”查看自定义降级界面。',
-      )
-    }
-  },
-})
 const searchColumns: ProColumns[] = [
   { title: '项目名称', dataIndex: 'name' },
   {

@@ -6,7 +6,10 @@ import DirectSlotRenderer from '../shared/DirectSlotRenderer'
 import VNodeContent from '../shared/VNodeContent'
 
 defineOptions({ inheritAttrs: false })
-defineProps<{ state: FormItemState; rootAttrs?: Record<string, unknown> }>()
+const { state, rootAttrs } = defineProps<{
+  state: FormItemState
+  rootAttrs?: Record<string, unknown>
+}>()
 const AFormItem = FormItem as Component
 </script>
 

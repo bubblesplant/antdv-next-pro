@@ -5,7 +5,47 @@ import { EllipsisOutlined } from '@antdv-next/icons'
 import RenderNode from '../table/RenderNode.vue'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<TableDropdownProps>(), { text: undefined })
+const {
+  menus,
+  options,
+  onSelect,
+  text = undefined,
+  disabled,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<TableDropdownProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get menus() {
+    return menus
+  },
+  get options() {
+    return options
+  },
+  get onSelect() {
+    return onSelect
+  },
+  get text() {
+    return text
+  },
+  get disabled() {
+    return disabled
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { prefix, direction, intl, classes, styles, themeVars } = useAuxiliaryStyle(
   props,
   'table-dropdown',

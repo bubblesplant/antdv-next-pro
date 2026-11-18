@@ -8,7 +8,7 @@ import AdaptiveProTableDemo from '../../examples/AdaptiveProTableDemo.vue'
 
 # AdaptiveProTable
 
-`AdaptiveProTable` is a separately maintained wrapper around [ProTable](./pro-table). It only adds the `adaptive-table` class and layout styles, forwarding all other props, events, slots and instance methods. The search form, toolbar and pagination keep their natural height, while the table body fills the remaining container space.
+`AdaptiveProTable` is a separately maintained wrapper around [ProTable](./pro-table). It adds the `adaptive-table` class and layout styles and defaults `scroll.y` to `'auto'` when omitted. It forwards all other props, events, slots and instance methods. The search form, toolbar and pagination keep their natural height, while the table body fills the remaining container space.
 
 ## Example
 
@@ -55,7 +55,7 @@ The parent must have a definite available height: a fixed height, `calc(100vh - 
 
 ## API and forwarding
 
-This wrapper adds no public business properties. Generic parameters, defaults, controlled behavior and precedence match ProTable; only the `adaptive-table` class and layout styles are added.
+This wrapper adds no public props. Except for the default `scroll.y` value, generic parameters, defaults, controlled behavior and precedence match ProTable.
 
 ### Properties {#props}
 
@@ -65,7 +65,7 @@ This wrapper adds no public business properties. Generic parameters, defaults, c
 | `style`                       | `StyleValue`               | —                 | Passed to the ProTable root.                                                                                                                                                                                                |
 | `columns`                     | `ProColumns<T>[]`          | required          | Every column property is listed in [ProTable columns](./pro-table#columns).                                                                                                                                                 |
 | `scroll.x`                    | `number \| string \| true` | —                 | Forwards horizontal scroll width.                                                                                                                                                                                           |
-| `scroll.y`                    | `number \| string`         | —                 | Forwards scroll-body height; explicitly set it, e.g. `'100%'`, for internal scrolling.                                                                                                                                      |
+| `scroll.y`                    | `number \| string`         | `'auto'`          | Scroll-body height follows the container by default. An explicit value is forwarded unchanged.                                                                                                                              |
 | All ProTable properties       | `ProTableProps<T, P>`      | ProTable defaults | See [ProTable properties](./pro-table#props), and nested [search](./pro-table#search), [form](./pro-table#form), [toolbar](./pro-table#toolbar), [pagination](./pro-table#pagination) and [editable](./pro-table#editable). |
 | Other native Table properties | `TableProps<T>`            | native defaults   | Forwarded through ProTable; see [antdv-next Table API](https://www.antdv-next.com/components/table).                                                                                                                        |
 

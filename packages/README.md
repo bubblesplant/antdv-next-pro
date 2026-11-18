@@ -6,6 +6,8 @@ The current alignment references `@ant-design/pro-components@3.1.15-7` at commit
 
 ## Install
 
+Requires **Vue 3.5.0 or later**. Component sources use `<script setup>` and reactive props destructuring. If consuming source files directly, use a matching Vue SFC compiler version of 3.5.0 or later.
+
 ```bash
 pnpm add @bubblesjs/antdv-next-pro antdv-next vue
 ```

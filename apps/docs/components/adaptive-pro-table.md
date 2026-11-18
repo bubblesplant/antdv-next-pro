@@ -8,7 +8,7 @@ import AdaptiveProTableDemo from '../examples/AdaptiveProTableDemo.vue'
 
 # AdaptiveProTable 自适应表格
 
-`AdaptiveProTable` 是本项目在 [ProTable](./pro-table) 之上维护的独立二次封装，只追加 `adaptive-table` 类名和布局样式，其余属性、事件、插槽和实例方法均透传。查询区、工具栏和分页保留自身高度，表体占满容器的剩余空间。
+`AdaptiveProTable` 是本项目在 [ProTable](./pro-table) 之上维护的独立二次封装。它追加 `adaptive-table` 类名和布局样式，并在未指定 `scroll.y` 时使用 `'auto'`；其余属性、事件、插槽和实例方法均透传。查询区、工具栏和分页保留自身高度，表体占满容器的剩余空间。
 
 ## 示例
 
@@ -76,7 +76,7 @@ const rows: User[] = [{ id: 1, name: '林默' }]
 
 ## API 与透传
 
-本组件没有新增公开业务属性；全部泛型、默认值、受控行为及覆盖优先级与 ProTable 一致。只追加 `adaptive-table` 类名及布局样式。
+本组件没有新增公开属性。除 `scroll.y` 的默认值外，泛型、默认值、受控行为及覆盖优先级均与 ProTable 一致。
 
 ### 属性 {#props}
 
@@ -86,7 +86,7 @@ const rows: User[] = [{ id: 1, name: '林默' }]
 | `style`             | `StyleValue`               | —                | 原样传给 ProTable 外层根节点。                                                                                                                                                                                           |
 | `columns`           | `ProColumns<T>[]`          | 必填             | 列属性逐项见 [ProTable 列表](./pro-table#columns)。                                                                                                                                                                      |
 | `scroll.x`          | `number \| string \| true` | —                | 透传横向滚动宽度。                                                                                                                                                                                                       |
-| `scroll.y`          | `number \| string`         | —                | 透传表体滚动高度；固定表头和内部滚动需显式设置，例如 `'100%'`。                                                                                                                                                          |
+| `scroll.y`          | `number \| string`         | `'auto'`         | 表体滚动高度，默认随容器自适应；显式设置的值会原样透传。                                                                                                                                                                 |
 | 全部 ProTable 属性  | `ProTableProps<T, P>`      | 与 ProTable 一致 | 逐项见 [ProTable 属性表](./pro-table#props)，嵌套配置见 [search](./pro-table#search)、[form](./pro-table#form)、[toolbar](./pro-table#toolbar)、[pagination](./pro-table#pagination)、[editable](./pro-table#editable)。 |
 | 其他原生 Table 属性 | `TableProps<T>`            | 原生默认值       | 经 ProTable 透传，完整来源为 [antdv-next Table API](https://www.antdv-next.com/components/table-cn)。                                                                                                                    |
 

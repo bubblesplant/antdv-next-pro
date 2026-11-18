@@ -1,5 +1,6 @@
-import { computed, toValue, type CSSProperties, type MaybeRefOrGetter } from 'vue'
+import type { CSSProperties, MaybeRefOrGetter } from 'vue'
 import type { ProSemanticClasses, ProSemanticSource, ProSemanticStyles } from '../provider/types'
+import { computed, toValue } from 'vue'
 
 // Reinsert overwritten keys so later shorthand declarations follow earlier longhands.
 export function mergeStyle(...sources: (CSSProperties | undefined)[]): CSSProperties {
@@ -23,7 +24,7 @@ export function resolveSemantic<Value, Props>(
 }
 
 export function useSemanticStyles<Props extends object, Key extends string = string>(
-  props: Props,
+  props: MaybeRefOrGetter<Props>,
   sources: {
     classes?: MaybeRefOrGetter<ProSemanticSource<ProSemanticClasses<Key>, Props> | undefined>
     classNames?: MaybeRefOrGetter<ProSemanticSource<ProSemanticClasses<Key>, Props> | undefined>
@@ -32,8 +33,8 @@ export function useSemanticStyles<Props extends object, Key extends string = str
   defaults?: { classes?: ProSemanticClasses<Key>; styles?: ProSemanticStyles<Key> },
 ) {
   const classes = computed(() => {
-    const legacy = resolveSemantic(toValue(sources.classNames), props) ?? {}
-    const current = resolveSemantic(toValue(sources.classes), props) ?? {}
+    const legacy = resolveSemantic(toValue(sources.classNames), toValue(props)) ?? {}
+    const current = resolveSemantic(toValue(sources.classes), toValue(props)) ?? {}
     const own = { ...legacy, ...current } as ProSemanticClasses<Key>
     const result: ProSemanticClasses<Key> = { ...defaults?.classes }
     for (const key of Object.keys(own) as Key[])
@@ -41,7 +42,8 @@ export function useSemanticStyles<Props extends object, Key extends string = str
     return result
   })
   const styles = computed(() => {
-    const own: ProSemanticStyles<Key> = resolveSemantic(toValue(sources.styles), props) ?? {}
+    const own: ProSemanticStyles<Key> =
+      resolveSemantic(toValue(sources.styles), toValue(props)) ?? {}
     const result: ProSemanticStyles<Key> = { ...defaults?.styles }
     for (const key of Object.keys(own) as Key[])
       result[key] = { ...result[key], ...own[key] } as CSSProperties

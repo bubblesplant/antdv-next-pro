@@ -29,11 +29,38 @@ import RenderNode from '../table/RenderNode.vue'
 import FieldRender from './FieldRender.vue'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<ProDescriptionsProps<T, P>>(), {
-  title: undefined,
-  extra: undefined,
-  emptyText: undefined,
-})
+const {
+  prefixCls,
+  title = undefined,
+  tooltip,
+  extra = undefined,
+  columns: columnsProp,
+  dataSource,
+  request,
+  params,
+  loading,
+  editable,
+  formProps,
+  actionRef,
+  formRef,
+  emptyText = undefined,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+  onLoadingChange,
+  onRequestError,
+  onDataSourceChange,
+  onEditableError,
+  bordered,
+  size,
+  labelRender,
+  contentRender,
+  column: columnProp,
+  layout,
+  colon,
+  id: idProp,
+  rootClass,
+} = defineProps<ProDescriptionsProps<T, P>>()
 const emit = defineEmits<{
   dataSourceChange: [data: T]
   requestError: [error: unknown]
@@ -44,16 +71,109 @@ defineSlots<{
     | ((scope: { record?: T; column?: ProDescriptionsColumn<T> }) => import('vue').VNodeChild)
     | undefined
 }>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get prefixCls() {
+    return prefixCls
+  },
+  get title() {
+    return title
+  },
+  get tooltip() {
+    return tooltip
+  },
+  get extra() {
+    return extra
+  },
+  get columns() {
+    return columnsProp
+  },
+  get dataSource() {
+    return dataSource
+  },
+  get request() {
+    return request
+  },
+  get params() {
+    return params
+  },
+  get loading() {
+    return loading
+  },
+  get editable() {
+    return editable
+  },
+  get formProps() {
+    return formProps
+  },
+  get actionRef() {
+    return actionRef
+  },
+  get formRef() {
+    return formRef
+  },
+  get emptyText() {
+    return emptyText
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+  get onLoadingChange() {
+    return onLoadingChange
+  },
+  get onRequestError() {
+    return onRequestError
+  },
+  get onDataSourceChange() {
+    return onDataSourceChange
+  },
+  get onEditableError() {
+    return onEditableError
+  },
+  get bordered() {
+    return bordered
+  },
+  get size() {
+    return size
+  },
+  get labelRender() {
+    return labelRender
+  },
+  get contentRender() {
+    return contentRender
+  },
+  get column() {
+    return columnProp
+  },
+  get layout() {
+    return layout
+  },
+  get colon() {
+    return colon
+  },
+  get id() {
+    return idProp
+  },
+  get rootClass() {
+    return rootClass
+  },
+}
 const intl = useIntl()
-const prefix = useProPrefix('descriptions', () => props.prefixCls)
+const prefix = useProPrefix('descriptions', () => prefixCls)
 const { direction } = useProConfig()
 const themeVars = useThemeVars()
 const { classes, styles } = useSemanticStyles(
   props,
   {
-    classes: () => props.classes,
-    classNames: () => props.classNames,
-    styles: () => props.styles,
+    classes: () => classesProp,
+    classNames: () => classNames,
+    styles: () => stylesProp,
   },
   { styles: { content: { minWidth: 0 } } },
 )
@@ -90,25 +210,23 @@ const bindings = computed(() => {
     ),
   )
 })
-const data = shallowRef<T>(cloneRecord((props.dataSource ?? {}) as T))
+const data = shallowRef<T>(cloneRecord((dataSource ?? {}) as T))
 const draft = shallowRef<T>(cloneRecord(data.value))
 const internalEditing = ref<string[]>([])
 const editing = computed<string[]>(
-  () =>
-    (props.editable ? props.editable.editableKeys : undefined)?.map(String) ??
-    internalEditing.value,
+  () => (editable ? editable.editableKeys : undefined)?.map(String) ?? internalEditing.value,
 )
 const busy = ref(false)
 const saving = ref<string>()
 const form = ref<FormInstance>()
 let sequence = 0
 const columns = computed(() =>
-  [...(props.columns ?? [])]
+  [...(columnsProp ?? [])]
     .filter((column) => !column.hide && !column.hideInDescriptions)
     .sort((a, b) => (b.order ?? 0) - (a.order ?? 0)),
 )
 watch(
-  () => props.dataSource,
+  () => dataSource,
   (value) => {
     if (value) {
       data.value = cloneRecord(value)
@@ -133,13 +251,13 @@ watch(
   },
   { flush: 'sync' },
 )
-watch(busy, (value) => props.onLoadingChange?.(value))
+watch(busy, (value) => onLoadingChange?.(value))
 async function reload() {
-  if (!props.request) return
+  if (!request) return
   const id = ++sequence
   busy.value = true
   try {
-    const result = await props.request((props.params ?? {}) as P)
+    const result = await request((params ?? {}) as P)
     if (id !== sequence) return
     if (result.success !== false) {
       data.value = cloneRecord(result.data)
@@ -152,17 +270,17 @@ async function reload() {
   }
 }
 watch(
-  () => [props.request, props.params],
+  () => [request, params],
   () => void reload(),
   { deep: true, immediate: true },
 )
 function setEditing(keys: string[]) {
   internalEditing.value = keys
-  if (props.editable) props.editable.onChange?.(keys, [draft.value])
+  if (editable) editable.onChange?.(keys, [draft.value])
 }
 function canEdit(column: ProDescriptionsColumn<T>, index = columns.value.indexOf(column)) {
   return (
-    Boolean(props.editable) &&
+    Boolean(editable) &&
     !column.readonly &&
     (typeof column.editable === 'function'
       ? column.editable(data.value, index)
@@ -172,9 +290,9 @@ function canEdit(column: ProDescriptionsColumn<T>, index = columns.value.indexOf
 function startEditable(key: ProKey) {
   const id = String(key)
   const column = columns.value.find((item) => columnKey(item) === id)
-  if (!props.editable || !column || !canEdit(column)) return false
+  if (!editable || !column || !canEdit(column)) return false
   if (editing.value.includes(id)) return true
-  if (props.editable.type !== 'multiple' && editing.value.length) return false
+  if (editable.type !== 'multiple' && editing.value.length) return false
   if (!editing.value.length) draft.value = cloneRecord(data.value)
   setEditing([...editing.value, id])
   return true
@@ -182,9 +300,9 @@ function startEditable(key: ProKey) {
 function cancelEditable(key: ProKey) {
   const id = String(key)
   if (!editing.value.includes(id)) return
-  if (props.editable)
+  if (editable)
     Promise.resolve(
-      props.editable.onCancel?.(key, cloneRecord(draft.value), cloneRecord(data.value)),
+      editable.onCancel?.(key, cloneRecord(draft.value), cloneRecord(data.value)),
     ).catch((error) => emit('editableError', error))
   const column = columns.value.find((item) => columnKey(item) === id)
   if (column)
@@ -198,7 +316,7 @@ function cancelEditable(key: ProKey) {
 async function saveEditable(key: ProKey) {
   const id = String(key)
   const column = columns.value.find((item) => columnKey(item) === id)
-  if (!column || !props.editable || saving.value || !editing.value.includes(id)) return false
+  if (!column || !editable || saving.value || !editing.value.includes(id)) return false
   saving.value = id
   try {
     await form.value?.validateFields([name(column)])
@@ -207,7 +325,7 @@ async function saveEditable(key: ProKey) {
       column.dataIndex ?? id,
       getValue(draft.value, column.dataIndex ?? id),
     )
-    const result = await props.editable.onSave?.(key, cloneRecord(next), cloneRecord(data.value))
+    const result = await editable.onSave?.(key, cloneRecord(next), cloneRecord(data.value))
     if (result === false) return false
     data.value = next
     setEditing(editing.value.filter((item) => item !== id))
@@ -227,8 +345,7 @@ function name(column: ProDescriptionsColumn<T>) {
 }
 function update(column: ProDescriptionsColumn<T>, value: unknown) {
   draft.value = setValue(draft.value, column.dataIndex ?? columnKey(column), value)
-  if (props.editable)
-    props.editable.onValuesChange?.(cloneRecord(draft.value), [cloneRecord(draft.value)])
+  if (editable) editable.onValuesChange?.(cloneRecord(draft.value), [cloneRecord(draft.value)])
 }
 function itemProps(column: ProDescriptionsColumn<T>) {
   return typeof column.formItemProps === 'function'
@@ -252,7 +369,7 @@ const action: ProDescriptionsInstance<T> = {
   isEditable: (key) => editing.value.includes(String(key)),
 }
 watch(
-  () => props.actionRef,
+  () => actionRef,
   (value, previous) => {
     if (previous) previous.value = undefined
     if (value) value.value = action
@@ -260,7 +377,7 @@ watch(
   { immediate: true },
 )
 watch(
-  [() => props.formRef, () => (props.editable ? props.editable.formRef : undefined), form],
+  [() => formRef, () => (editable ? editable.formRef : undefined), form],
   ([target, editTarget, value], [previous, previousEdit]) => {
     if (previous && previous !== target && previous !== editTarget) previous.value = undefined
     if (previousEdit && previousEdit !== target && previousEdit !== editTarget)
@@ -271,9 +388,9 @@ watch(
 )
 onBeforeUnmount(() => {
   sequence++
-  const actionTarget = props.actionRef
-  const formTarget = props.formRef
-  const editTarget = props.editable ? props.editable.formRef : undefined
+  const actionTarget = actionRef
+  const formTarget = formRef
+  const editTarget = editable ? editable.formRef : undefined
   if (actionTarget) actionTarget.value = undefined
   if (formTarget) formTarget.value = undefined
   if (editTarget) editTarget.value = undefined
@@ -281,10 +398,10 @@ onBeforeUnmount(() => {
 defineExpose<ProDescriptionsInstance<T>>(action)
 </script>
 <template>
-  <Spin :spinning="props.loading ?? busy"
+  <Spin :spinning="loading ?? busy"
     ><Form
       ref="form"
-      v-bind="{ ...props.formProps, ...(props.editable ? props.editable.formProps : {}) }"
+      v-bind="{ ...props.formProps, ...(editable ? editable.formProps : {}) }"
       :model="draft"
       ><Descriptions
         v-bind="{ ...bindings, ...$attrs }"
@@ -295,14 +412,14 @@ defineExpose<ProDescriptionsInstance<T>>(action)
         :style="themeVars"
         data-pro-descriptions
       >
-        <template v-if="props.title !== undefined || props.tooltip || $slots.title" #title
-          ><slot name="title"><RenderNode :content="props.title" /></slot
+        <template v-if="title !== undefined || tooltip || $slots.title" #title
+          ><slot name="title"><RenderNode :content="title" /></slot
           ><Tooltip
-            v-if="props.tooltip"
-            v-bind="typeof props.tooltip === 'string' ? { title: props.tooltip } : props.tooltip"
+            v-if="tooltip"
+            v-bind="typeof tooltip === 'string' ? { title: tooltip } : tooltip"
             ><QuestionCircleOutlined /></Tooltip></template
-        ><template v-if="props.extra !== undefined || $slots.extra" #extra
-          ><slot name="extra"><RenderNode :content="props.extra" /></slot
+        ><template v-if="extra !== undefined || $slots.extra" #extra
+          ><slot name="extra"><RenderNode :content="extra" /></slot
         ></template>
         <DescriptionsItem
           v-for="(column, index) in columns"
@@ -329,7 +446,7 @@ defineExpose<ProDescriptionsInstance<T>>(action)
               :action="action"
               :form="form"
               mode="edit"
-              :empty-text="props.emptyText"
+              :empty-text="emptyText"
               @update:text="update(column, $event)"
             /><Space
               ><Button
@@ -350,7 +467,7 @@ defineExpose<ProDescriptionsInstance<T>>(action)
                 :entity="data"
                 :index="index"
                 :action="action"
-                :empty-text="props.emptyText" /></slot
+                :empty-text="emptyText" /></slot
             ><Button
               v-if="canEdit(column, index)"
               type="text"

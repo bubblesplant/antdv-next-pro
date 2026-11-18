@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormDateTimeRangePickerProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormDateTimeRangePicker', inheritAttrs: false })
-const props = defineProps<ProFormDateTimeRangePickerProps>()
+const { ...props } = defineProps<ProFormDateTimeRangePickerProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormDateTimeRangePickerProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

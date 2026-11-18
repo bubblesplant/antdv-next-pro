@@ -3,15 +3,16 @@ import type { FieldProps, FormListState } from './fieldTypes'
 import type { FormRecord } from './utils'
 import type { ProFormListProps } from '../pro-form/types'
 import { Row } from 'antdv-next'
-import { computed, defineComponent, provide } from 'vue'
+import { computed, provide } from 'vue'
 import ProForm from '../pro-form/ProForm'
 import { ProFormList } from '../pro-form/structure'
 import { proFormNamePathKey, useProFormContext } from '../pro-form/context'
 import SchemaFormChildren from './SchemaFormChildren.vue'
+import SchemaFormContainer from './SchemaFormContainer.vue'
 import { getValue, schemaChildren } from './utils'
 
 defineOptions({ inheritAttrs: false })
-const props = defineProps<{
+const { context, state } = defineProps<{
   context: FieldProps
   state: FormListState
   rootAttrs: Record<string, unknown>
@@ -21,16 +22,9 @@ provide(
   proFormNamePathKey,
   computed(() => []),
 )
-const FormContainer = form
-  ? defineComponent({
-      inheritAttrs: false,
-      setup(_props, { slots }) {
-        return () => slots.default?.()
-      },
-    })
-  : ProForm
+const FormContainer = form ? SchemaFormContainer : ProForm
 const creatorRecord = computed(() => {
-  const value = props.state.fieldProps.creatorRecord ?? props.state.fieldProps.initialValue
+  const value = state.fieldProps.creatorRecord ?? state.fieldProps.initialValue
   return typeof value === 'function'
     ? (value as () => FormRecord)
     : value && typeof value === 'object' && !Array.isArray(value)
@@ -38,20 +32,20 @@ const creatorRecord = computed(() => {
       : {}
 })
 const listProps = computed(() => {
-  const { initialValue: _initial, creatorButtonText: _text, ...rest } = props.state.fieldProps
+  const { initialValue: _initial, creatorButtonText: _text, ...rest } = state.fieldProps
   const button = rest.creatorButtonProps
   return {
     ...rest,
     creatorButtonProps: (button === false
       ? false
       : {
-          creatorButtonText: props.state.creatorText,
+          creatorButtonText: state.creatorText,
           ...(button && typeof button === 'object' ? button : {}),
         }) as ProFormListProps['creatorButtonProps'],
   }
 })
 function updateModel(values: FormRecord) {
-  if (!form) props.context.onValueChange(props.state.path, getValue(values, props.state.path))
+  if (!form) context.onValueChange(state.path, getValue(values, state.path))
 }
 </script>
 

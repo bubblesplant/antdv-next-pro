@@ -6,8 +6,10 @@ import { stripVTControlCharacters } from 'node:util'
 
 const require = createRequire(import.meta.url)
 const [command, ...args] = process.argv.slice(2)
+const vitePlus = resolve(dirname(require.resolve('vite-plus/package.json')), 'bin/vp')
 const commands = {
-  staged: [resolve(dirname(require.resolve('vite-plus/package.json')), 'bin/vp'), 'staged'],
+  staged: [vitePlus, 'staged'],
+  'format-check': [vitePlus, 'run', '--no-cache', 'format:check'],
   commitlint: [resolve(dirname(require.resolve('@commitlint/cli/package.json')), 'cli.js')],
 }
 

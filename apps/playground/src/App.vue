@@ -145,9 +145,7 @@ onBeforeUnmount(() => {
             <kbd v-if="!keyword">⌃ K</kbd>
           </label>
         </div>
-        <div class="sidebar-caption">
-          <span>组件与示例</span><span>{{ examples.length }}</span>
-        </div>
+        <div class="sidebar-caption"><span>组件与示例</span><span>{{ examples.length }}</span></div>
         <nav class="example-navigation" aria-label="选择测试场景">
           <div v-for="component in navigation" :key="component.id" class="component-group">
             <button

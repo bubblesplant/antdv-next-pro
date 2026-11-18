@@ -28,12 +28,99 @@ import RenderNode from './table/RenderNode.vue'
 import { useIntl, useProPrefix } from './provider'
 
 defineOptions({ inheritAttrs: false })
-const props = withDefaults(defineProps<EditableProTableProps<T, P>>(), {
-  editable: () => ({ type: 'single' }),
-  toolbar: undefined,
-  recordCreatorProps: undefined,
-})
-
+const {
+  columns,
+  value: valueProp,
+  defaultValue,
+  request,
+  params,
+  postData,
+  rowKey,
+  loading,
+  toolbar = undefined,
+  rowSelection,
+  polling,
+  revalidateOnFocus,
+  manualRequest,
+  columnsState,
+  editable = { type: 'single' },
+  editableKeys,
+  scroll,
+  size,
+  bordered,
+  recordCreatorProps = undefined,
+  maxLength,
+  formItemProps,
+  onValuesChange,
+  onTableChange,
+  prefixCls,
+  headerTitle,
+  tooltip,
+  form,
+  formRef,
+  onSubmit,
+  onReset,
+  onLoadingChange,
+  beforeSearchSubmit,
+  dateFormatter,
+  debounceTime,
+  toolBarRender,
+  optionsRender,
+  tableRender,
+  tableViewRender,
+  ErrorBoundary,
+  tableExtraRender,
+  searchFormRender,
+  tableAlertRender,
+  tableAlertOptionRender,
+  cardProps,
+  cardBordered,
+  tableClassName,
+  tableStyle,
+  classes,
+  styles,
+  localeText,
+  options: optionsProp,
+  dropdownPrefixCls,
+  column,
+  locale,
+  getPopupContainer,
+  sortDirections,
+  showSorterTooltip,
+  virtual,
+  rootClass,
+  tableLayout,
+  expandable,
+  indentSize,
+  rowClassName,
+  footer,
+  summary,
+  headerCell,
+  bodyCell,
+  caption,
+  id,
+  showHeader,
+  components,
+  onRow,
+  onHeaderRow,
+  direction,
+  sticky,
+  rowHoverable,
+  tailor,
+  getContainerWidth,
+  measureRowRender,
+  expandedRowKeys,
+  defaultExpandedRowKeys,
+  expandedRowRender,
+  expandRowByClick,
+  expandIcon,
+  onExpand,
+  onExpandedRowsChange,
+  defaultExpandAllRows,
+  expandIconColumnIndex,
+  expandedRowClassName,
+  childrenColumnName,
+} = defineProps<EditableProTableProps<T, P>>()
 const emit = defineEmits<{
   'update:value': [rows: T[]]
   'update:editableKeys': [keys: ProKey[]]
@@ -43,6 +130,283 @@ const emit = defineEmits<{
   editableError: [error: unknown]
 }>()
 
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get columns() {
+    return columns
+  },
+  get value() {
+    return valueProp
+  },
+  get defaultValue() {
+    return defaultValue
+  },
+  get request() {
+    return request
+  },
+  get params() {
+    return params
+  },
+  get postData() {
+    return postData
+  },
+  get rowKey() {
+    return rowKey
+  },
+  get loading() {
+    return loading
+  },
+  get toolbar() {
+    return toolbar
+  },
+  get rowSelection() {
+    return rowSelection
+  },
+  get polling() {
+    return polling
+  },
+  get revalidateOnFocus() {
+    return revalidateOnFocus
+  },
+  get manualRequest() {
+    return manualRequest
+  },
+  get columnsState() {
+    return columnsState
+  },
+  get editable() {
+    return editable
+  },
+  get editableKeys() {
+    return editableKeys
+  },
+  get scroll() {
+    return scroll
+  },
+  get size() {
+    return size
+  },
+  get bordered() {
+    return bordered
+  },
+  get recordCreatorProps() {
+    return recordCreatorProps
+  },
+  get maxLength() {
+    return maxLength
+  },
+  get formItemProps() {
+    return formItemProps
+  },
+  get onValuesChange() {
+    return onValuesChange
+  },
+  get onTableChange() {
+    return onTableChange
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get headerTitle() {
+    return headerTitle
+  },
+  get tooltip() {
+    return tooltip
+  },
+  get form() {
+    return form
+  },
+  get formRef() {
+    return formRef
+  },
+  get onSubmit() {
+    return onSubmit
+  },
+  get onReset() {
+    return onReset
+  },
+  get onLoadingChange() {
+    return onLoadingChange
+  },
+  get beforeSearchSubmit() {
+    return beforeSearchSubmit
+  },
+  get dateFormatter() {
+    return dateFormatter
+  },
+  get debounceTime() {
+    return debounceTime
+  },
+  get toolBarRender() {
+    return toolBarRender
+  },
+  get optionsRender() {
+    return optionsRender
+  },
+  get tableRender() {
+    return tableRender
+  },
+  get tableViewRender() {
+    return tableViewRender
+  },
+  get ErrorBoundary() {
+    return ErrorBoundary
+  },
+  get tableExtraRender() {
+    return tableExtraRender
+  },
+  get searchFormRender() {
+    return searchFormRender
+  },
+  get tableAlertRender() {
+    return tableAlertRender
+  },
+  get tableAlertOptionRender() {
+    return tableAlertOptionRender
+  },
+  get cardProps() {
+    return cardProps
+  },
+  get cardBordered() {
+    return cardBordered
+  },
+  get tableClassName() {
+    return tableClassName
+  },
+  get tableStyle() {
+    return tableStyle
+  },
+  get classes() {
+    return classes
+  },
+  get styles() {
+    return styles
+  },
+  get localeText() {
+    return localeText
+  },
+  get options() {
+    return optionsProp
+  },
+  get dropdownPrefixCls() {
+    return dropdownPrefixCls
+  },
+  get column() {
+    return column
+  },
+  get locale() {
+    return locale
+  },
+  get getPopupContainer() {
+    return getPopupContainer
+  },
+  get sortDirections() {
+    return sortDirections
+  },
+  get showSorterTooltip() {
+    return showSorterTooltip
+  },
+  get virtual() {
+    return virtual
+  },
+  get rootClass() {
+    return rootClass
+  },
+  get tableLayout() {
+    return tableLayout
+  },
+  get expandable() {
+    return expandable
+  },
+  get indentSize() {
+    return indentSize
+  },
+  get rowClassName() {
+    return rowClassName
+  },
+  get footer() {
+    return footer
+  },
+  get summary() {
+    return summary
+  },
+  get headerCell() {
+    return headerCell
+  },
+  get bodyCell() {
+    return bodyCell
+  },
+  get caption() {
+    return caption
+  },
+  get id() {
+    return id
+  },
+  get showHeader() {
+    return showHeader
+  },
+  get components() {
+    return components
+  },
+  get onRow() {
+    return onRow
+  },
+  get onHeaderRow() {
+    return onHeaderRow
+  },
+  get direction() {
+    return direction
+  },
+  get sticky() {
+    return sticky
+  },
+  get rowHoverable() {
+    return rowHoverable
+  },
+  get tailor() {
+    return tailor
+  },
+  get getContainerWidth() {
+    return getContainerWidth
+  },
+  get measureRowRender() {
+    return measureRowRender
+  },
+  get expandedRowKeys() {
+    return expandedRowKeys
+  },
+  get defaultExpandedRowKeys() {
+    return defaultExpandedRowKeys
+  },
+  get expandedRowRender() {
+    return expandedRowRender
+  },
+  get expandRowByClick() {
+    return expandRowByClick
+  },
+  get expandIcon() {
+    return expandIcon
+  },
+  get onExpand() {
+    return onExpand
+  },
+  get onExpandedRowsChange() {
+    return onExpandedRowsChange
+  },
+  get defaultExpandAllRows() {
+    return defaultExpandAllRows
+  },
+  get expandIconColumnIndex() {
+    return expandIconColumnIndex
+  },
+  get expandedRowClassName() {
+    return expandedRowClassName
+  },
+  get childrenColumnName() {
+    return childrenColumnName
+  },
+}
+
 type ExtendedTableInstance = ProTableInstance<T> & {
   getRowData: (indexOrKey: number | ProKey) => T | undefined
   getRowsData: () => T[]
@@ -50,7 +414,7 @@ type ExtendedTableInstance = ProTableInstance<T> & {
 }
 
 const intl = useIntl()
-const prefix = useProPrefix('table', () => props.prefixCls)
+const prefix = useProPrefix('table', () => prefixCls)
 const instance = getCurrentInstance()
 const tableBindings = computed(() => {
   Object.values(props)
@@ -77,18 +441,18 @@ const tableBindings = computed(() => {
 })
 const slots = useSlots()
 const tableRef = ref<ExtendedTableInstance>()
-const internalValue = shallowRef<T[]>([...(props.value ?? props.defaultValue ?? [])])
+const internalValue = shallowRef<T[]>([...(valueProp ?? defaultValue ?? [])])
 const activeEditableKeys = ref<ProKey[]>([
-  ...(props.editableKeys ?? (props.editable ? props.editable.editableKeys : undefined) ?? []),
+  ...(editableKeys ?? (editable ? editable.editableKeys : undefined) ?? []),
 ])
 const pendingDraftValue = shallowRef<T[]>()
 
 const effectiveEditable = computed<false | EditableConfig<T>>(() =>
-  props.editable === false ? false : { ...props.editable, type: props.editable?.type ?? 'single' },
+  editable === false ? false : { ...editable, type: editable?.type ?? 'single' },
 )
 
 const creator = computed(() =>
-  props.recordCreatorProps === false ? undefined : (props.recordCreatorProps ?? {}),
+  recordCreatorProps === false ? undefined : (recordCreatorProps ?? {}),
 )
 const creatorBindings = computed(() => {
   const { record, position, parentKey, newRecordType, creatorButtonText, ...rest } =
@@ -96,7 +460,7 @@ const creatorBindings = computed(() => {
   return rest
 })
 const reachedMaxLength = computed(
-  () => props.maxLength !== undefined && getRowsData().length >= props.maxLength,
+  () => maxLength !== undefined && getRowsData().length >= maxLength,
 )
 const showCreatorAtTop = computed(
   () => !reachedMaxLength.value && creator.value?.position === 'top',
@@ -106,7 +470,7 @@ const showCreatorAtBottom = computed(
 )
 
 watch(
-  () => props.value,
+  () => valueProp,
   (value) => {
     if (value === undefined) return
     if (pendingDraftValue.value && toRaw(value) === pendingDraftValue.value) return
@@ -116,7 +480,7 @@ watch(
 )
 
 watch(
-  () => props.editableKeys,
+  () => editableKeys,
   (keys) => {
     if (keys !== undefined) activeEditableKeys.value = [...keys]
   },
@@ -167,7 +531,7 @@ function createRecord(): boolean {
       ? config.record(getRowsData().length, getRowsData())
       : config.record
         ? { ...config.record }
-        : ({ [typeof props.rowKey === 'string' ? props.rowKey : 'id']: generatedKey } as T)
+        : ({ [typeof rowKey === 'string' ? rowKey : 'id']: generatedKey } as T)
   return (
     tableRef.value?.addEditRecord(record, {
       position: config.position,
@@ -219,7 +583,7 @@ function cancelEditable(key: ProKey): void {
 }
 
 function addEditRecord(record: T, options?: Omit<RecordCreatorProps<T>, 'record'>): boolean {
-  if (props.maxLength !== undefined && getRowsData().length >= props.maxLength) {
+  if (maxLength !== undefined && getRowsData().length >= maxLength) {
     return false
   }
   return tableRef.value?.addEditRecord(record, options) ?? false
@@ -257,26 +621,24 @@ defineExpose<EditableProTableInstance<T>>({
 
 <template>
   <component
-    :is="props.formItemProps ? FormItem : 'div'"
-    v-bind="props.formItemProps"
+    :is="formItemProps ? FormItem : 'div'"
+    v-bind="formItemProps"
     :class="`${prefix}-editable`"
     data-pro-editable-table
   >
     <!-- @vue-generic {T, P} -->
     <ProTable
       ref="tableRef"
-      :columns="props.columns"
+      :columns="columns"
       v-bind="{ ...tableBindings, ...$attrs }"
       :data-source="internalValue"
       :editable="effectiveEditable"
       :editable-keys="
-        props.editableKeys ??
-        (props.editable ? props.editable.editableKeys : undefined) ??
-        activeEditableKeys
+        editableKeys ?? (editable ? editable.editableKeys : undefined) ?? activeEditableKeys
       "
       :search="false"
       :pagination="false"
-      :options="props.options ?? false"
+      :options="optionsProp ?? false"
       @update:data-source="handleValueUpdate"
       @update:editable-keys="handleEditableKeysUpdate"
       @data-source-change="handleValuesChange"

@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormCheckboxProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormCheckbox', inheritAttrs: false })
-const props = defineProps<ProFormCheckboxProps>()
+const { ...props } = defineProps<ProFormCheckboxProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormCheckboxProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

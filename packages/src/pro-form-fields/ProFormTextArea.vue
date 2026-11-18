@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormTextAreaProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormTextArea', inheritAttrs: false })
-const props = defineProps<ProFormTextAreaProps>()
+const { ...props } = defineProps<ProFormTextAreaProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormTextAreaProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void

@@ -4,10 +4,43 @@ import { Tooltip } from 'antdv-next'
 import { QuestionCircleOutlined } from '@antdv-next/icons'
 import RenderNode from '../table/RenderNode.vue'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
-const props = withDefaults(defineProps<LabelIconTipProps>(), {
-  label: undefined,
-  subTitle: undefined,
-})
+const {
+  label = undefined,
+  tooltip,
+  subTitle = undefined,
+  ellipsis,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<LabelIconTipProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get label() {
+    return label
+  },
+  get tooltip() {
+    return tooltip
+  },
+  get subTitle() {
+    return subTitle
+  },
+  get ellipsis() {
+    return ellipsis
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { prefix, direction, classes, styles, themeVars } = useAuxiliaryStyle(props, 'core-label-tip')
 </script>
 <template>

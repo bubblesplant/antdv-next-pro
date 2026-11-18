@@ -4,7 +4,39 @@ import { ref, onErrorCaptured, watch } from 'vue'
 import { Result, Button } from 'antdv-next'
 import { useAuxiliaryStyle } from './useAuxiliaryStyle'
 import RenderNode from '../table/RenderNode.vue'
-const props = withDefaults(defineProps<ErrorBoundaryProps>(), { fallback: undefined })
+const {
+  fallback = undefined,
+  resetKeys,
+  onError,
+  prefixCls,
+  classes: classesProp,
+  classNames,
+  styles: stylesProp,
+} = defineProps<ErrorBoundaryProps>()
+// 保留整体 props 接口，getter 持续读取响应式解构值。
+const props = {
+  get fallback() {
+    return fallback
+  },
+  get resetKeys() {
+    return resetKeys
+  },
+  get onError() {
+    return onError
+  },
+  get prefixCls() {
+    return prefixCls
+  },
+  get classes() {
+    return classesProp
+  },
+  get classNames() {
+    return classNames
+  },
+  get styles() {
+    return stylesProp
+  },
+}
 const { intl, prefix, direction, classes, styles, themeVars } = useAuxiliaryStyle(
   props,
   'error-boundary',
@@ -15,10 +47,10 @@ function reset() {
 }
 onErrorCaptured((cause, _instance, info) => {
   error.value = cause
-  props.onError?.(cause, info)
+  onError?.(cause, info)
   return false
 })
-watch(() => props.resetKeys, reset, { deep: true })
+watch(() => resetKeys, reset, { deep: true })
 defineExpose({ reset })
 </script>
 <template>

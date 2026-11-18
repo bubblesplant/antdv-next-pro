@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ProColumns, ProTableInstance, ProTableProps } from '@bubblesjs/antdv-next-pro'
-import { ProTable, ErrorBoundary } from '@bubblesjs/antdv-next-pro'
-import { computed, defineComponent, h, markRaw, nextTick, ref } from 'vue'
+import { ProTable } from '@bubblesjs/antdv-next-pro'
+import { computed, h, nextTick, ref, type FunctionalComponent } from 'vue'
+import DemoErrorBoundaryView from './DemoErrorBoundary.vue'
 import { createDemoRequest, type DemoQuery, type DemoRow } from './demoData'
 const emit = defineEmits<{
   event: [message: string]
@@ -103,37 +104,18 @@ const optionsConfig: ProTableProps<DemoRow, DemoQuery>['options'] = {
   setting: true,
 }
 // The table owns the boundary; this component customizes its fallback and reset behavior.
-const DemoErrorBoundary = markRaw(
-  defineComponent({
-    name: 'DemoErrorBoundary',
-    setup(_props, { slots }) {
-      return () =>
-        h(
-          ErrorBoundary,
-          {
-            resetKeys: [errorResetKey.value],
-            onError: handleCaughtError,
-            fallback: (error, reset) =>
-              h('div', { class: 'inline-error', role: 'alert' }, [
-                h('strong', error.message),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    onClick: () => {
-                      errorTriggered.value = false
-                      reset()
-                    },
-                  },
-                  '恢复表格',
-                ),
-              ]),
-          },
-          slots,
-        )
+const DemoErrorBoundary: FunctionalComponent = (_, { slots }) =>
+  h(
+    DemoErrorBoundaryView,
+    {
+      resetKey: errorResetKey.value,
+      onCaught: handleCaughtError,
+      onRecover: () => {
+        errorTriggered.value = false
+      },
     },
-  }),
-)
+    slots,
+  )
 const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
   columns: tableColumns.value,
   request,
@@ -165,12 +147,8 @@ function handleCaughtError(error: Error) {
 <template>
   <div class="scenario-demo mode-custom-error-boundary" data-scenario-mode="custom-error-boundary">
     <div class="request-monitor">
-      <span
-        ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-      >
-      <span
-        ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-      >
+      <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+      <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
       <code :title="lastRequest || requestLabels.waiting">{{
         lastRequest || requestLabels.waiting
       }}</code>

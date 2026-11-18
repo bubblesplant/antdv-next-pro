@@ -5,7 +5,7 @@ import { pickExplicitProps } from './fieldRegistry'
 import type { ProFormSliderProps } from './types'
 
 defineOptions({ name: 'AntdvNextProFormSlider', inheritAttrs: false })
-const props = defineProps<ProFormSliderProps>()
+const { ...props } = defineProps<ProFormSliderProps>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ProFormSliderProps['modelValue']): void
   (event: 'change', ...args: unknown[]): void
