@@ -184,7 +184,8 @@ describe('ProTable browser capabilities', () => {
     expect(getComputedStyle(card).boxShadow).toBe('none')
     expect(
       getComputedStyle(wrapper.get('[data-pro-table-search] .ant-pro-card-body').element).padding,
-    ).toBe('24px')
+    ).toBe('0px')
+    expect(getComputedStyle(wrapper.get('[data-pro-query-filter]').element).padding).toBe('24px')
     expect(
       getComputedStyle(wrapper.get('[data-pro-table-container] .ant-pro-card-body').element)
         .paddingTop,
@@ -379,6 +380,81 @@ describe('ProTable browser capabilities', () => {
     expect(wrapper.get('.ant-table-tbody').text()).toContain('Grace')
   })
 
+  it('stacks the default search labels and aligns the action row inside a narrow table', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      attrs: { style: { width: '346px' } },
+      props: {
+        columns: [
+          { title: '服务', dataIndex: 'service' },
+          { title: '状态', dataIndex: 'status', valueType: 'select', valueEnum: { open: '开启' } },
+        ],
+        dataSource: [],
+        pagination: false,
+        options: false,
+      },
+    })
+    const card = wrapper.get('[data-pro-table-search]')
+    const form = card.get('form')
+    await vi.waitFor(() => expect(form.classes()).toContain('ant-form-vertical'))
+    expect(card.findAll('[data-pro-query-col]').filter((field) => field.isVisible())).toHaveLength(
+      1,
+    )
+    await card.get('button[aria-expanded="false"]').trigger('click')
+
+    const input = card.get('input').element.getBoundingClientRect()
+    const select = card.get('.ant-select').element.getBoundingClientRect()
+    const submit = card.get('button[type="submit"]').element.getBoundingClientRect()
+    const collapse = card.get('button[aria-expanded="true"]').element.getBoundingClientRect()
+    const bounds = card.element.getBoundingClientRect()
+    expect(input.left - bounds.left).toBeCloseTo(24, 0)
+    expect(bounds.right - input.right).toBeCloseTo(24, 0)
+    expect(select.left).toBeCloseTo(input.left, 0)
+    expect(select.right).toBeCloseTo(input.right, 0)
+    expect(submit.top - select.top).toBeCloseTo(select.top - input.top, 0)
+    expect(collapse.right).toBeCloseTo(select.right, 0)
+
+    await wrapper.setProps({ style: { width: '576px' } })
+    await vi.waitFor(() => expect(form.classes()).toContain('ant-form-horizontal'))
+    expect(card.get('[data-pro-query-col]').element.getBoundingClientRect().width).toBeCloseTo(
+      (576 - 24) / 3,
+      0,
+    )
+
+    await wrapper.setProps({ form: { layout: 'vertical' } })
+    expect(form.classes()).toContain('ant-form-vertical')
+    expect(card.get('[data-pro-query-col]').element.getBoundingClientRect().width).toBeCloseTo(
+      (576 - 24) / 2,
+      0,
+    )
+  })
+
+  it('wraps LightFilter tags instead of switching to a query grid in a narrow table', async () => {
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      attrs: { style: { width: '620px' } },
+      props: {
+        columns: ['Service name', 'Deployment state', 'Request status'].map((title, index) => ({
+          title,
+          dataIndex: `field${index}`,
+        })),
+        dataSource: [],
+        pagination: false,
+        search: { filterType: 'light' },
+      },
+    })
+    await flushPromises()
+    const container = wrapper.get('[data-pro-light-container]').element
+    const tags = [...container.children]
+    const top = (element: Element) => element.getBoundingClientRect().top
+    expect(tags).toHaveLength(3)
+    expect(top(tags[0]!)).toBeCloseTo(top(tags[2]!), 0)
+    const root = wrapper.element as HTMLElement
+    root.style.width = '230px'
+    expect(top(tags[2]!)).toBeGreaterThan(top(tags[0]!))
+    expect(wrapper.find('[data-pro-query-row]').exists()).toBe(false)
+  })
+
   it('reflows a partially configured search grid when the container resizes', async () => {
     wrapper = mount(ProTable, {
       attachTo: document.body,
@@ -390,12 +466,13 @@ describe('ProTable browser capabilities', () => {
       },
     })
     const root = wrapper.element as HTMLElement
-    root.style.width = '500px'
+    root.style.width = '650px'
     await vi.waitFor(() =>
       expect(
         wrapper!.findAll('.ant-pro-query-filter-col').filter((field) => field.isVisible()),
       ).toHaveLength(1),
     )
+    expect((wrapper.get('[data-pro-query-col]').element as HTMLElement).style.maxWidth).toBe('100%')
     root.style.width = '1100px'
     await vi.waitFor(() =>
       expect(

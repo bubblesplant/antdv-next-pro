@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { VNodeChild } from 'vue'
-import { Button, Space } from 'antdv-next'
+import { Button, FormItem, Space, theme } from 'antdv-next'
 import { computed, h, onBeforeUnmount, onMounted, ref, unref, useAttrs, useSlots } from 'vue'
 import ProForm from './ProForm'
 import type { ProFormInstance } from './types'
 import { flattenChildren, resolveSemantic, useFormPrefix } from './utils'
 import { defaultCollapseRender } from './query-filter/Actions'
+import { resolveQueryFilterLayout } from './query-filter/layout'
 import { useFormThemeVars } from './useFormThemeVars'
 
 import VNodeContent from '../shared/VNodeContent'
@@ -154,33 +155,41 @@ const local = ref(propDefaultCollapsed)
 const collapsed = computed(() => propCollapsed ?? local.value)
 const { prefix, t } = useFormPrefix('query-filter', () => propPrefixCls)
 const themeVars = useFormThemeVars()
-const breakpoint = computed(() =>
-  width.value < 576
-    ? 'xs'
-    : width.value < 768
-      ? 'sm'
-      : width.value < 992
-        ? 'md'
-        : width.value < 1200
-          ? 'lg'
-          : 'xl',
+const { token } = theme.useToken()
+const grid = computed(() =>
+  resolveQueryFilterLayout({
+    width: width.value,
+    layout: propLayout,
+    span: propSpan,
+    defaultColsNumber: propDefaultColsNumber,
+    token: token.value,
+  }),
 )
-const span = computed(() =>
-  typeof propSpan === 'number'
-    ? propSpan
-    : (propSpan?.[breakpoint.value] ??
-      (width.value < 576 ? 24 : width.value < 768 ? 12 : 24 / propDefaultColsNumber)),
-)
+const columnWidth = computed(() => `${(grid.value.span / 24) * 100}%`)
 let observer: ResizeObserver | undefined
+let frame: number | undefined
 onMounted(() => {
-  if (typeof ResizeObserver !== 'undefined' && root.value) {
-    observer = new ResizeObserver(([entry]) => {
-      if (entry) width.value = entry.contentRect.width || 1024
-    })
-    observer.observe(root.value)
+  const container = root.value
+  if (!container) return
+  const measure = () => {
+    const nextWidth = container.offsetWidth
+    if (nextWidth > 17) width.value = nextWidth
   }
+  measure()
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver(() => {
+    if (frame !== undefined) return
+    frame = requestAnimationFrame(() => {
+      frame = undefined
+      measure()
+    })
+  })
+  observer.observe(container, { box: 'border-box' })
 })
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  if (frame !== undefined) cancelAnimationFrame(frame)
+})
 defineExpose(api)
 function toggle() {
   local.value = !collapsed.value
@@ -188,7 +197,7 @@ function toggle() {
   emit('collapse', local.value)
 }
 const semantic = computed(() => resolveSemantic(props))
-const visible = computed(() => Math.max(1, Math.floor(24 / span.value) - 1))
+const visible = computed(() => Math.max(1, Math.floor(24 / grid.value.span) - 1))
 function resolveContent() {
   const children = flattenChildren(slots.default?.())
   const shouldCollapse = children.length > visible.value
@@ -246,7 +255,7 @@ function resolveContent() {
           {
             type: 'link',
             class: [`${prefix.value}-collapse-button`, semantic.value.classes.collapseButton],
-            style: semantic.value.styles.collapseButton,
+            style: [{ paddingInline: 0 }, semantic.value.styles.collapseButton],
             'aria-expanded': !collapsed.value,
             onClick: toggle,
           },
@@ -260,7 +269,21 @@ function resolveContent() {
                 ),
         )
       : null
-  return { children, custom, collapseButton }
+  const hasCustom = Array.isArray(custom) ? custom.length > 0 : Boolean(custom)
+  const actions =
+    hasCustom || collapseButton
+      ? h(
+          Space,
+          { size: [16, 8], wrap: true, style: { display: 'flex', justifyContent: 'flex-end' } },
+          () => [
+            hasCustom
+              ? h(Space, { wrap: true, style: { justifyContent: 'flex-end' } }, () => custom)
+              : null,
+            collapseButton,
+          ],
+        )
+      : null
+  return { children, actions }
 }
 function formBindings() {
   return {
@@ -272,11 +295,9 @@ function formBindings() {
     classNames: undefined,
     styles: { ...semantic.value.styles, root: undefined },
     labelCol:
-      propLabelWidth === undefined
-        ? attrs.labelCol
-        : {
-            style: { width: typeof propLabelWidth === 'number' ? `${propLabelWidth}px` : 'auto' },
-          },
+      grid.value.layout === 'horizontal' && typeof propLabelWidth === 'number'
+        ? { style: { width: `${propLabelWidth}px` } }
+        : attrs.labelCol,
   }
 }
 </script>
@@ -297,7 +318,7 @@ function formBindings() {
       v-bind="formBindings()"
       ref="inner"
       :prefix-cls="prefix"
-      :layout="propLayout"
+      :layout="grid.layout"
       :submitter="false"
       @update:model-value="emit('update:modelValue', $event)"
       @reset="emit('reset', $event)"
@@ -325,8 +346,8 @@ function formBindings() {
             :class="[`${prefix}-col`, semantic.classes.item]"
             :style="[
               {
-                flex: `0 0 ${(span / 24) * 100}%`,
-                maxWidth: `${(span / 24) * 100}%`,
+                flex: `0 0 ${columnWidth}`,
+                maxWidth: columnWidth,
                 display: collapsed && index >= visible ? 'none' : undefined,
               },
               semantic.styles.item,
@@ -335,15 +356,22 @@ function formBindings() {
             <VNodeContent :content="child" />
           </div>
           <div
-            v-if="content.custom || content.collapseButton"
+            v-if="content.actions"
             data-pro-query-actions=""
             :class="[`${prefix}-actions`, semantic.classes.actions]"
             :style="[
-              { marginInlineStart: 'auto', flex: `0 0 ${(span / 24) * 100}%` },
+              { marginInlineStart: 'auto', flex: `0 0 ${columnWidth}`, maxWidth: columnWidth },
               semantic.styles.actions,
             ]"
           >
-            <Space><VNodeContent :content="[content.custom, content.collapseButton]" /></Space>
+            <FormItem
+              :label="grid.layout === 'vertical' ? ' ' : undefined"
+              :colon="false"
+              :label-col="{}"
+              :wrapper-col="{}"
+            >
+              <VNodeContent :content="content.actions" />
+            </FormItem>
           </div>
         </div>
       </template>

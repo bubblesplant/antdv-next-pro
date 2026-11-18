@@ -97,7 +97,9 @@ Use `collapsed` and `search-collapse` for controlled state:
 />
 ```
 
-Without `span`, the query form uses one, two or three columns according to its container width. A numeric span fixes the column count. Responsive objects such as `{ xs: 24, md: 12, xl: 8 }` carry the last configured value forward across omitted breakpoints, following Ant Design Col. Collapsed mode renders the first row only. `search.onCollapse(next)` is also available.
+Without `span`, the default [QueryFilter](./query-filter) uses 1–4 columns according to its container width, with labels above controls in narrow containers and actions aligned to the end. A numeric span fixes the column count. Responsive objects such as `{ xs: 24, md: 12, xl: 8 }` carry the last configured value forward. `search.onCollapse(next)` reports collapse changes.
+
+`search.filterType: 'light'` uses [LightFilter](./light-filter) instead. Tags wrap according to the available width without using `span` or the `QueryFilter` breakpoints.
 
 ### Toolbar search and card layout
 

@@ -277,6 +277,9 @@ describe('AdaptiveProTable', () => {
     await wrapper.setProps({ scroll: { x: 1200, y: 180 } })
     expect(table.props()).toHaveProperty('scroll', { x: 1200, y: 180 })
 
+    await wrapper.setProps({ scroll: { y: 0 } })
+    expect(table.props()).toHaveProperty('scroll', { y: 0 })
+
     await wrapper.setProps({ scroll: undefined })
     expect(table.props()).toHaveProperty('scroll', { y: 'auto' })
   })

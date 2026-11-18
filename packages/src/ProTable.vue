@@ -2184,6 +2184,7 @@ defineExpose<
         v-if="searchProp !== false && searchableColumns.length"
         :class="`${prefix}-search`"
         data-pro-table-search
+        :body-style="{ padding: 0 }"
         :variant="
           (typeof cardBordered === 'object' ? cardBordered.search : cardBordered)
             ? 'outlined'

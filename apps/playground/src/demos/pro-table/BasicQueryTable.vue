@@ -81,7 +81,6 @@ const commonColumns: ProColumns<DemoRow>[] = [
 const tableColumns: ProColumns<DemoRow>[] = commonColumns
 const searchConfig: ProTableProps<DemoRow, DemoQuery>['search'] = {
   labelWidth: 'auto',
-  span: 8,
   defaultCollapsed: false,
 }
 const toolbarConfig: ProTableProps<DemoRow, DemoQuery>['toolbar'] = { title: '项目清单' }

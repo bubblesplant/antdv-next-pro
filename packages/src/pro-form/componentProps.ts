@@ -156,10 +156,10 @@ export const drawerFormProps = {
 } as const
 export const queryFilterProps = {
   ...proFormProps,
-  layout: { ...proFormProps.layout, default: 'horizontal' },
+  layout: { ...proFormProps.layout, default: undefined },
   collapsed: { type: Boolean, default: undefined },
   defaultCollapsed: { type: Boolean, default: true },
-  defaultColsNumber: { type: Number, default: 3 },
+  defaultColsNumber: Number,
   span: [Number, Object] as PropType<QueryFilterProps['span']>,
   labelWidth: { type: [Number, String] as PropType<QueryFilterProps['labelWidth']>, default: 80 },
   split: Boolean,

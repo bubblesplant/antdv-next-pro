@@ -21,7 +21,6 @@ function search(values: Record<string, unknown>) {
       v-model="model"
       v-model:collapsed="collapsed"
       :initial-values="initialValues"
-      :span="8"
       :label-width="80"
       :on-finish="search"
       @reset="submitted = ''"

@@ -40,10 +40,14 @@ describe('ProForm upstream layout alignment', () => {
     )
     await tick()
     const submitter = document.querySelector('[data-pro-form-submitter]')!
-    expect(style(submitter).justifyContent).not.toBe('flex-end')
+    const actions = submitter.querySelector('.ant-space')!
+    const submitterBounds = submitter.getBoundingClientRect()
+    const actionsBounds = actions.getBoundingClientRect()
+    expect(actionsBounds.left).toBeCloseTo(submitterBounds.left, 0)
+    expect(actionsBounds.right).toBeLessThan(submitterBounds.right)
     expect(style(submitter).marginTop).toBe('0px')
     expect(style(submitter).color).toBe('rgb(1, 2, 3)')
-    expect(style(submitter.querySelector('.ant-space')!).columnGap).toBe('11px')
+    expect(style(actions).columnGap).toBe('11px')
   })
 
   it('uses QueryFilter padding and row spacing without repeating root attrs on the inner form', async () => {
@@ -108,7 +112,10 @@ describe('ProForm upstream layout alignment', () => {
       const footer = document.querySelector('[data-pro-overlay-footer]')!
       const submitter = footer.querySelector('[data-pro-form-submitter]')!
       expect(submitter).not.toBeNull()
-      expect(style(footer).justifyContent).toBe('flex-end')
+      const footerBounds = footer.getBoundingClientRect()
+      const submitterBounds = submitter.getBoundingClientRect()
+      expect(submitterBounds.left).toBeGreaterThan(footerBounds.left)
+      expect(submitterBounds.right).toBeCloseTo(footerBounds.right, 0)
       const button = footer.querySelector<HTMLButtonElement>('button[type="submit"]')!
       const form = document.querySelector('form')!
       expect(button.form).toBe(form)

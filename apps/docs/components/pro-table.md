@@ -97,7 +97,9 @@ const columns = [
 />
 ```
 
-未设置 `span` 时，查询区随容器宽度展示 1、2 或 3 列。数字跨度保持固定列数；也支持 `{ xs: 24, md: 12, xl: 8 }` 这类响应式配置，省略的断点沿用前一个已配置值，与 Ant Design Col 一致。折叠时仅保留首行。也可通过 `search.onCollapse(next)` 接收状态变化。
+未设置 `span` 时，默认的 [QueryFilter](./query-filter) 随搜索区宽度切换 1–4 列，窄时标签在上、操作区靠右。数字跨度固定列数；也支持 `{ xs: 24, md: 12, xl: 8 }`，省略的断点继承最近的较窄配置。也可通过 `search.onCollapse(next)` 接收折叠状态变化。
+
+`search.filterType: 'light'` 改用 [LightFilter](./light-filter)。标签按可用宽度自然换行，不使用 `span` 或 `QueryFilter` 的布局断点。
 
 ### 工具栏搜索与卡片布局
 

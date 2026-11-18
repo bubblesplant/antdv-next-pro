@@ -19,7 +19,7 @@ function tableProps() {
     ...attrs,
     columns: attrs.columns as ProTableProps['columns'],
     class: ['adaptive-table', attrs.class],
-    scroll: { ...scroll, x: scroll?.x || 'max-content', y: scroll?.y || 'auto' },
+    scroll: { ...scroll, y: scroll?.y ?? 'auto' },
   }
 }
 </script>

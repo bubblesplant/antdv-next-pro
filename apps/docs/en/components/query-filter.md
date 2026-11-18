@@ -38,7 +38,9 @@ Place `ProFormText`, `ProFormSelect`, and other fields in the default slot. Bind
 
 `defaultCollapsed` defaults to `true`. Use `v-model:collapsed` for controlled expansion. When fields exceed the first row's capacity, the collapse action appears with a down arrow to expand and an up arrow to collapse. Hidden fields retain their values.
 
-`span` uses a 24-column grid and accepts a number or breakpoint map, for example `{ xs: 24, sm: 12, md: 8 }`. Without an explicit span, column widths follow the container width and `defaultColsNumber`.
+When neither `span` nor `layout` is set, the default follows ProComponents and uses the **query container width**, not the viewport. Below `480px` it uses one column, and from `480–575px` it uses two; labels sit above controls in both cases. From `576–1199px` it uses three columns and at `1200px` or wider it uses four, with labels beside the controls. Breakpoints come from the theme.
+
+`span` uses a 24-column grid. A number (such as `8`) fixes the grid span; a breakpoint map (such as `{ xs: 24, md: 12, xl: 8 }`) carries the last configured value forward. A custom span uses a horizontal layout unless you specify `layout`.
 
 ## Schema fields and instance methods
 
@@ -74,12 +76,12 @@ Without columns this renders composition ProForm; with columns it renders BetaSc
 | `modelValue`        | `Partial<T>`                                                 | —                | Current v-model search values                                                   |
 | `columns`           | `SchemaFormColumn<T>[]`                                      | —                | Enables schema mode; [column options](./schema-form#columns)                    |
 | `onFinish`          | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —                | Awaitable search callback; bind with :on-finish                                 |
-| `layout`            | `FormProps['layout']`                                        | `'horizontal'`   | [Native layout](https://www.antdv-next.com/components/form), including vertical |
+| `layout`            | `FormProps['layout']`                                        | Responsive       | [Native layout](https://www.antdv-next.com/components/form), including vertical |
 | `collapsed`         | `boolean`                                                    | Uncontrolled     | Controlled v-model:collapsed state                                              |
 | `defaultCollapsed`  | `boolean`                                                    | `true`           | Initial uncontrolled state                                                      |
-| `defaultColsNumber` | `number`                                                     | `3`              | Default column count in wide containers                                         |
-| `span`              | `number \| Record<string, number>`                           | Responsive       | 24-column spans; xs/sm/md/lg/xl breakpoints                                     |
-| `labelWidth`        | `number \| 'auto'`                                           | `80`             | Label width in pixels                                                           |
+| `defaultColsNumber` | `number`                                                     | Responsive       | Overrides the default column count in wide containers                           |
+| `span`              | `number \| Record<string, number>`                           | Responsive       | 24-column spans; xs/sm/md/lg/xl/xxl breakpoints                                 |
+| `labelWidth`        | `number \| 'auto'`                                           | `80`             | Label width in pixels for horizontal layout                                     |
 | `split`             | `boolean`                                                    | `false`          | Field separators                                                                |
 | `searchText`        | `VNodeChild`                                                 | Localized Search | Overrides submitter text                                                        |
 | `resetText`         | `VNodeChild`                                                 | Localized Reset  | Overrides submitter text                                                        |

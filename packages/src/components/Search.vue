@@ -29,7 +29,8 @@ const emit = defineEmits<{
 }>()
 const { formRef: form, formApi } = useSchemaFormRef<T>()
 const formBindings = computed(() => {
-  const { initialValues, submitter, onSubmit, onReset, classes, styles, ...rest } = formProp ?? {}
+  const { initialValues, submitter, onSubmit, onReset, layout, classes, styles, ...rest } =
+    formProp ?? {}
   return {
     ...rest,
     classes: typeof classes === 'function' ? () => classes({ props: formProp ?? {} }) : classes,
@@ -93,6 +94,7 @@ defineExpose(formApi)
     :is="search?.filterType === 'light' ? LightFilter : QueryFilter"
     ref="form"
     :form-props="formBindings"
+    :layout="formProp?.layout"
     :date-formatter="false"
     :initial-values="formProp?.initialValues"
     :submitter="submitter"

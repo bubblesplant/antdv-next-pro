@@ -89,7 +89,7 @@ function switchSearchMode(next: typeof searchMode.value) {
   announce(`搜索栏切换为 ${next === 'query' ? 'QueryFilter' : 'LightFilter'}，查询条件已重置`)
 }
 const searchConfig = computed<ProTableProps<DemoRow, DemoQuery>['search']>(() => {
-  return { filterType: searchMode.value, labelWidth: 'auto', span: 8, defaultCollapsed: false }
+  return { filterType: searchMode.value, labelWidth: 'auto', defaultCollapsed: false }
 })
 const tableRenderKey = computed(() => {
   return `search-bar-type-switch-${searchMode.value}`
