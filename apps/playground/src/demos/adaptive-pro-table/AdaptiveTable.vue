@@ -99,9 +99,7 @@ async function reload() {
             取消选择（{{ selectedRows.length }}）
           </Button>
         </template>
-        <template #cell-name="{ record }"
-          ><strong>{{ record.name }}</strong></template
-        >
+        <template #cell-name="{ record }"><strong>{{ record.name }}</strong></template>
       </AdaptiveProTable>
     </div>
   </div>

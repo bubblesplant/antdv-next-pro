@@ -58,7 +58,9 @@ pnpm build
 pnpm --filter @bubblesjs/antdv-next-pro verify:package
 ```
 
-需要自动修正格式时运行 `pnpm format`。修复缺陷或新增行为时，请补充相应测试；涉及公开 API 时同步更新中英文文档。
+提交钩子先检查并修正暂存文件，再运行与 CI 相同的全仓格式检查 `pnpm format:check`。升级 Vite+ 等格式化依赖后，请先运行 `pnpm format`，并将生成的格式改动一起提交。
+
+修复缺陷或新增行为时，请补充相应测试；涉及公开 API 时同步更新中英文文档。
 
 ## 提交 Pull Request
 

@@ -133,12 +133,8 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
   <ConfigProvider :locale="providerLocale"
     ><div class="scenario-demo mode-internationalization" data-scenario-mode="internationalization">
       <div class="request-monitor">
-        <span
-          ><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span
-        >
-        <span
-          ><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span
-        >
+        <span><b>{{ requestCount }}</b> {{ requestLabels.requests }}</span>
+        <span><b>{{ loadedTotal }}</b> {{ requestLabels.matches }}</span>
         <code :title="lastRequest || requestLabels.waiting">{{
           lastRequest || requestLabels.waiting
         }}</code>
