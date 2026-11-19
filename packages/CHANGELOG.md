@@ -1,5 +1,15 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.4.0
+
+### Minor Changes
+
+- [#32](https://github.com/bubblesplant/antdv-next-pro/pull/32) [`4724cca`](https://github.com/bubblesplant/antdv-next-pro/commit/4724ccaaccf1e22a140e8816dd859669abc32323) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 对齐 ProComponents 的列表网格、Schema 步骤表单与查询区。`ProList` 网格使用内置 `CheckCard`，卡片样式前缀从 `ant-pro-card` 改为 `ant-pro-checkcard`；Schema 支持二维 `columns` 和 `steps`，保留旧式分组；`QueryFilter` 新增 `searchGutter`、`ignoreRules`，响应式 `span` 按容器宽度匹配上界断点。`ProTable` 标准搜索区默认忽略字段级校验，如需保留请设置 `search.ignoreRules: false` 或 `form.ignoreRules: false`。
+
+### Patch Changes
+
+- [#30](https://github.com/bubblesplant/antdv-next-pro/pull/30) [`2084b6b`](https://github.com/bubblesplant/antdv-next-pro/commit/2084b6b79deda7f6155dba5c04583674f2ee8ce4) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 修复 Playground 的 `ProTable` 搜索演示在窄屏下仍被撑到 `760px` 的问题，让 `QueryFilter` 随容器宽度调整列数、`LightFilter` 自然换行。移除 `AdaptiveProTable` 演示的固定列数配置，展示默认响应式搜索布局。
+
 ## 0.3.6
 
 ### Patch Changes
