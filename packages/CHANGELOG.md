@@ -1,5 +1,11 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.3.7
+
+### Patch Changes
+
+- [#30](https://github.com/bubblesplant/antdv-next-pro/pull/30) [`2084b6b`](https://github.com/bubblesplant/antdv-next-pro/commit/2084b6b79deda7f6155dba5c04583674f2ee8ce4) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 修复 Playground 的 `ProTable` 搜索演示在窄屏下仍被撑到 `760px` 的问题，让 `QueryFilter` 随容器宽度调整列数、`LightFilter` 自然换行。移除 `AdaptiveProTable` 演示的固定列数配置，展示默认响应式搜索布局。
+
 ## 0.3.6
 
 ### Patch Changes
