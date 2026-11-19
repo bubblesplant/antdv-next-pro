@@ -59,26 +59,26 @@ const metas: ProListMetas<Project> = {
 
 两个组件继承 [ProTable 属性](./pro-table#props)、[列配置](./pro-table#columns)、[事件](./pro-table#events)和[实例方法](./pro-table#instance)。表格正文替换为列表，原生表格单元格排版属性不会自动成为列表排版配置。以下是新增或语义不同的属性。
 
-| 属性               | 类型                                                               | 默认值         | 说明 / 来源                                                                                                        |
-| ------------------ | ------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `columns`          | `ProListColumn<T>[]`                                               | —              | 列表字段 Schema；优先于 metas，字段扩展见[下表](#columns)。                                                        |
-| `metas`            | `ProListMetas<T>`                                                  | —              | 按 title/subTitle/avatar/description/content/actions/extra 组织 Schema。                                           |
-| `grid`             | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`              | —              | 启用网格卡片，断点配置见下表。                                                                                     |
-| `itemCardProps`    | `ProCardProps`                                                     | —              | 传给每个网格项 [ProCard](./pro-card#props)；内部区域插槽和根 class 由列表生成，启用选择后 checked 由选择状态覆盖。 |
-| `itemLayout`       | `'horizontal' \| 'vertical'`                                       | `horizontal`   | 普通列表正文排列。                                                                                                 |
-| `split`            | `boolean`                                                          | `undefined`    | 未传：无分隔线、无行圆角；false：无分隔线、主题圆角；true：分隔线、无圆角。                                        |
-| `showActions`      | `'hover' \| 'always'`                                              | `always`       | hover 时鼠标悬浮或键盘焦点进入行才显示。                                                                           |
-| `showExtra`        | `'hover' \| 'always'`                                              | `always`       | 附加区显示时机，与 showActions 同规则。                                                                            |
-| `itemRender`       | `(record: T, index: number, defaultDom: VNodeChild) => VNodeChild` | —              | 替换整个列表项正文。                                                                                               |
-| `itemTitleRender`  | `false \| ProListItemRender<T>`                                    | —              | 替换标题或以 false 隐藏标题。                                                                                      |
-| `itemHeaderRender` | `false \| ProListItemRender<T>`                                    | —              | 替换头部或以 false 隐藏头部。                                                                                      |
-| `onItem`           | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs；在 onRow 之后合并。                                                                              |
-| `onRow`            | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs，支持事件处理器。                                                                                 |
-| `rowClassName`     | `string \| ((record: T, index: number) => string)`                 | —              | 追加到每个列表行。                                                                                                 |
-| `prefixCls`        | `string`                                                           | `ant-pro-list` | 完整列表前缀；继承原生与 ProProvider 前缀。                                                                        |
-| `classes`          | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 列表语义类名，见[样式](#styles)。                                                                                  |
-| `classNames`       | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 兼容入口；同部位 classes 优先。                                                                                    |
-| `styles`           | `SemanticStyles \| ({ props }) => SemanticStyles`                  | —              | 列表语义样式，见[样式](#styles)。                                                                                  |
+| 属性               | 类型                                                               | 默认值         | 说明 / 来源                                                                          |
+| ------------------ | ------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------ |
+| `columns`          | `ProListColumn<T>[]`                                               | —              | 列表字段 Schema；优先于 metas，字段扩展见[下表](#columns)。                          |
+| `metas`            | `ProListMetas<T>`                                                  | —              | 按 title/subTitle/avatar/description/content/actions/extra 组织 Schema。             |
+| `grid`             | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }`              | —              | 启用网格卡片，断点配置见下表。                                                       |
+| `itemCardProps`    | `CheckCardProps`                                                   | —              | 配置每个网格选项卡片；启用 `rowSelection` 后，选中状态及回调由 `rowSelection` 管理。 |
+| `itemLayout`       | `'horizontal' \| 'vertical'`                                       | `horizontal`   | 普通列表正文排列。                                                                   |
+| `split`            | `boolean`                                                          | `undefined`    | 未传：无分隔线、无行圆角；false：无分隔线、主题圆角；true：分隔线、无圆角。          |
+| `showActions`      | `'hover' \| 'always'`                                              | `always`       | hover 时鼠标悬浮或键盘焦点进入行才显示。                                             |
+| `showExtra`        | `'hover' \| 'always'`                                              | `always`       | 附加区显示时机，与 showActions 同规则。                                              |
+| `itemRender`       | `(record: T, index: number, defaultDom: VNodeChild) => VNodeChild` | —              | 替换整个列表项正文。                                                                 |
+| `itemTitleRender`  | `false \| ProListItemRender<T>`                                    | —              | 替换标题或以 false 隐藏标题。                                                        |
+| `itemHeaderRender` | `false \| ProListItemRender<T>`                                    | —              | 替换头部或以 false 隐藏头部。                                                        |
+| `onItem`           | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs；在 onRow 之后合并。                                                |
+| `onRow`            | `(record: T, index: number) => HTMLAttributes`                     | —              | 返回列表行 attrs，支持事件处理器。                                                   |
+| `rowClassName`     | `string \| ((record: T, index: number) => string)`                 | —              | 追加到每个列表行。                                                                   |
+| `prefixCls`        | `string`                                                           | `ant-pro-list` | 完整列表前缀；继承原生与 ProProvider 前缀。                                          |
+| `classes`          | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 列表语义类名，见[样式](#styles)。                                                    |
+| `classNames`       | `SemanticClasses \| ({ props }) => SemanticClasses`                | —              | 兼容入口；同部位 classes 优先。                                                      |
+| `styles`           | `SemanticStyles \| ({ props }) => SemanticStyles`                  | —              | 列表语义样式，见[样式](#styles)。                                                    |
 
 ### 共享属性及默认值
 
@@ -141,4 +141,6 @@ const metas: ProListMetas<Project> = {
 | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | `root / container / row / header / title / subTitle / description / content / extra / actions / expanded` | 列表渲染节点；classes 优先于 classNames，styles 接受对象或 ({ props }) => map。 |
 
-列表根背景透明。网格卡片保留自身背景和内边距，itemCardProps 与 cardActionProps 只用于网格卡片。语言、方向和原生 token 继承 [ConfigProvider](https://www.antdv-next.com/components/config-provider-cn)，Pro token 见 [ProConfigProvider](./pro-config-provider#props)。
+网格使用内置 `CheckCard`：点击卡片或用键盘可以选中，点击操作区不会误选。`itemCardProps` 支持 `avatar`、`description`、`cover`、`size: 'large'`、`checked`、`defaultChecked` 和 `onChange`，也保留 `styles.body`、`bodyStyle` 和 `boxShadow` 等现有配置。自定义网格卡片 CSS 时，卡片部位的默认前缀由 `ant-pro-card` 改为 `ant-pro-checkcard`；列表本身的 `classes` / `styles` 不变。
+
+列表根背景透明。语言、方向和原生 token 继承 [ConfigProvider](https://www.antdv-next.com/components/config-provider-cn)，Pro token 见 [ProConfigProvider](./pro-config-provider#props)。

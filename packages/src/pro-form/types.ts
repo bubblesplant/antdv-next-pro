@@ -5,6 +5,7 @@ import type {
   FormProps,
   ModalProps,
   PopoverProps,
+  RowProps,
   StepsProps,
 } from 'antdv-next'
 import type { Component, CSSProperties, Ref, VNodeChild } from 'vue'
@@ -109,6 +110,8 @@ export interface QueryFilterProps<T extends FormRecord = FormRecord> extends Pro
   defaultCollapsed?: boolean
   defaultColsNumber?: number
   span?: number | Record<string, number>
+  searchGutter?: RowProps['gutter']
+  ignoreRules?: boolean
   labelWidth?: number | 'auto'
   split?: boolean
   searchText?: VNodeChild

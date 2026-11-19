@@ -16,7 +16,7 @@
 - `ProList` / `ProDescriptions`：列表 meta、请求、选择、描述项及字段展示。
 - `ProConfigProvider`：继承原生 ConfigProvider 的语言、方向、前缀和主题，提供 Pro token、intl 与 valueType 注册。
 
-本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](https://bubblesplant.github.io/antdv-next-pro/guide/pro-components-v3)。本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。
+本轮固定源码参考为 `3bf43278d39f2d31489749132982488f57a9eb5e`。公开类名、列回调和部分默认行为有调整，见 [迁移说明](https://bubblesplant.github.io/antdv-next-pro/guide/pro-components-v3)。`ProList` 网格内置 `CheckCard`，不提供独立的 `CheckCard` / `CheckCard.Group`。本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout 或 StatisticCard。
 
 [中文文档](https://bubblesplant.github.io/antdv-next-pro/) · [English docs](https://bubblesplant.github.io/antdv-next-pro/en/) · [Playground](https://bubblesplant.github.io/antdv-next-pro/playground/)
 

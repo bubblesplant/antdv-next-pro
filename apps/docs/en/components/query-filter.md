@@ -11,7 +11,7 @@ import SchemaQueryFilter from '../../../playground/src/demos/query-filter/Schema
 
 `QueryFilter` is a standalone search form with responsive columns, search and reset actions, and expandable fields. `ProTable` uses the same component for its default search area. Compose `ProForm` fields or pass `columns` to generate fields from a schema.
 
-The default form layout is horizontal. Root padding and row gaps are both `24px`, without additional Form.Item bottom margins. Set `layout="vertical"` explicitly or customize the corresponding areas through `styles.root/row/item/actions`.
+Root padding and both default gaps are `24px`, without additional Form.Item bottom margins. Set `searchGutter` to adjust field spacing. For example, `:search-gutter="[16, 8]"` uses a `16px` horizontal and `8px` vertical gap; responsive gutter maps use the native grid's viewport breakpoints.
 
 ## Import
 
@@ -40,7 +40,9 @@ Place `ProFormText`, `ProFormSelect`, and other fields in the default slot. Bind
 
 When neither `span` nor `layout` is set, the default follows ProComponents and uses the **query container width**, not the viewport. Below `480px` it uses one column, and from `480–575px` it uses two; labels sit above controls in both cases. From `576–1199px` it uses three columns and at `1200px` or wider it uses four, with labels beside the controls. Breakpoints come from the theme.
 
-`span` uses a 24-column grid. A number (such as `8`) fixes the grid span; a breakpoint map (such as `{ xs: 24, md: 12, xl: 8 }`) carries the last configured value forward. A custom span uses a horizontal layout unless you specify `layout`.
+`span` uses a 24-column grid. A number such as `8` fixes the span. With a breakpoint map, missing entries inherit the previous value, and the first configured value also fills smaller entries. As in ProComponents, the selected entry is the first breakpoint strictly greater than the container width, or the last one if none is greater. For example, `{ xs: 24, md: 12, xl: 8 }` yields `24` at `575px` and `12` at `576px`. A custom span uses a horizontal layout unless you specify `layout`.
+
+Standalone `QueryFilter` validates fields by default. Set `ignoreRules` to skip field-level rules without mutating the field configuration or bypassing native form-level `rules`.
 
 ## Schema fields and instance methods
 
@@ -71,23 +73,25 @@ Without columns this renders composition ProForm; with columns it renders BetaSc
 | `formProps` with columns              | `Partial<FormProps>` | Inner native Form options: [SchemaForm props](./schema-form#props), [Form API](https://www.antdv-next.com/components/form). Model, submission, readonly and filter layout are coordinated by the wrapper; dedicated top-level settings take precedence |
 | Other schema configuration            | `SchemaFormProps<T>` | [SchemaForm props](./schema-form#props); fieldProps/formItemProps recipients follow [field API](./pro-form-fields#props)                                                                                                                               |
 
-| Prop                | Type                                                         | Default          | Description / source                                                            |
-| ------------------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------------------------- |
-| `modelValue`        | `Partial<T>`                                                 | —                | Current v-model search values                                                   |
-| `columns`           | `SchemaFormColumn<T>[]`                                      | —                | Enables schema mode; [column options](./schema-form#columns)                    |
-| `onFinish`          | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —                | Awaitable search callback; bind with :on-finish                                 |
-| `layout`            | `FormProps['layout']`                                        | Responsive       | [Native layout](https://www.antdv-next.com/components/form), including vertical |
-| `collapsed`         | `boolean`                                                    | Uncontrolled     | Controlled v-model:collapsed state                                              |
-| `defaultCollapsed`  | `boolean`                                                    | `true`           | Initial uncontrolled state                                                      |
-| `defaultColsNumber` | `number`                                                     | Responsive       | Overrides the default column count in wide containers                           |
-| `span`              | `number \| Record<string, number>`                           | Responsive       | 24-column spans; xs/sm/md/lg/xl/xxl breakpoints                                 |
-| `labelWidth`        | `number \| 'auto'`                                           | `80`             | Label width in pixels for horizontal layout                                     |
-| `split`             | `boolean`                                                    | `false`          | Field separators                                                                |
-| `searchText`        | `VNodeChild`                                                 | Localized Search | Overrides submitter text                                                        |
-| `resetText`         | `VNodeChild`                                                 | Localized Reset  | Overrides submitter text                                                        |
-| `optionRender`      | `false \| (props, form, doms) => VNodeChild`                 | Default actions  | ProFormInstance and default button VNode array                                  |
-| `collapseRender`    | `false \| (collapsed: boolean) => VNodeChild`                | Label and arrow  | Collapse button content; false hides it                                         |
-| `submitter`         | `false \| SubmitterProps`                                    | Default actions  | [Submitter options](./pro-form#submitter), including ButtonProps links          |
+| Prop                | Type                                                         | Default          | Description / source                                                                         |
+| ------------------- | ------------------------------------------------------------ | ---------------- | -------------------------------------------------------------------------------------------- |
+| `modelValue`        | `Partial<T>`                                                 | —                | Current v-model search values                                                                |
+| `columns`           | `SchemaFormColumn<T>[]`                                      | —                | Enables schema mode; [column options](./schema-form#columns)                                 |
+| `onFinish`          | `(values: T) => boolean \| void \| Promise<boolean \| void>` | —                | Awaitable search callback; bind with :on-finish                                              |
+| `layout`            | `FormProps['layout']`                                        | Responsive       | [Native layout](https://www.antdv-next.com/components/form), including vertical              |
+| `collapsed`         | `boolean`                                                    | Uncontrolled     | Controlled v-model:collapsed state                                                           |
+| `defaultCollapsed`  | `boolean`                                                    | `true`           | Initial uncontrolled state                                                                   |
+| `defaultColsNumber` | `number`                                                     | Responsive       | Overrides the default column count in wide containers                                        |
+| `span`              | `number \| Record<string, number>`                           | Responsive       | 24-column spans; xs/sm/md/lg/xl/xxl breakpoints                                              |
+| `searchGutter`      | `RowProps['gutter']`                                         | `24`             | Horizontal gap, responsive gap, or `[horizontal, vertical]`; vertical gap defaults to `24px` |
+| `ignoreRules`       | `boolean`                                                    | `false`          | Skips field-level validation rules                                                           |
+| `labelWidth`        | `number \| 'auto'`                                           | `80`             | Label width in pixels for horizontal layout                                                  |
+| `split`             | `boolean`                                                    | `false`          | Field separators                                                                             |
+| `searchText`        | `VNodeChild`                                                 | Localized Search | Overrides submitter text                                                                     |
+| `resetText`         | `VNodeChild`                                                 | Localized Reset  | Overrides submitter text                                                                     |
+| `optionRender`      | `false \| (props, form, doms) => VNodeChild`                 | Default actions  | ProFormInstance and default button VNode array                                               |
+| `collapseRender`    | `false \| (collapsed: boolean) => VNodeChild`                | Label and arrow  | Collapse button content; false hides it                                                      |
+| `submitter`         | `false \| SubmitterProps`                                    | Default actions  | [Submitter options](./pro-form#submitter), including ButtonProps links                       |
 
 optionRender=false preserves the collapse button. collapseRender=false hides it. Action precedence is optionRender → submitter.render → submitter slot → defaults. Top-level labels override submitter labels.
 

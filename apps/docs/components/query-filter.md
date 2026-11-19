@@ -11,7 +11,7 @@ import SchemaQueryFilter from '../../playground/src/demos/query-filter/SchemaQue
 
 `QueryFilter` 是可独立使用的查询表单，支持响应式栅格、查询、重置及展开收起。`ProTable` 的默认搜索区域也使用这个组件。可以组合 `ProForm` 字段，也可以传入 `columns` 生成字段。
 
-默认使用横向表单布局，根容器内边距和字段行间距均为 `24px`，字段不额外叠加 Form.Item 的底部间距。可显式设置 `layout="vertical"`；`styles.root/row/item/actions` 可定制对应区域。
+根容器内边距和默认横纵间距均为 `24px`，字段不额外叠加 Form.Item 的底部间距。用 `searchGutter` 设置字段间距，例如 `:search-gutter="[16, 8]"` 表示水平 `16px`、垂直 `8px`；响应式间距对象使用原生栅格的视口断点。
 
 ## 引入
 
@@ -40,7 +40,9 @@ import '@bubblesjs/antdv-next-pro/style.css'
 
 未指定 `span` 和 `layout` 时，按查询区的**容器宽度**而非浏览器窗口宽度，使用 ProComponents 的默认布局：小于 `480px` 为一列，`480–575px` 为两列，标签都在输入框上方；`576–1199px` 为三列，`1200px` 起为四列，标签放在输入框旁。断点取自主题。
 
-`span` 使用 24 栅格。数字（如 `8`）固定栅格占位；断点对象（如 `{ xs: 24, md: 12, xl: 8 }`）会继承较窄断点上最近的配置。自定义跨度默认使用水平布局，可显式设置 `layout`。
+`span` 使用 24 栅格。数字（如 `8`）固定占位；配置断点对象时，缺省档位沿用上一档，第一个已配置的值也会回填到更小档。与 ProComponents 一样，按**第一个大于容器宽度的断点**取值，超过最大断点则取最后一档。例如 `{ xs: 24, md: 12, xl: 8 }` 在 `575px` 时为 `24`，在 `576px` 时为 `12`。自定义跨度默认使用水平布局，可显式设置 `layout`。
+
+独立 `QueryFilter` 默认校验字段。设 `ignoreRules` 可忽略查询字段的 `rules`；不修改原字段配置，也不跳过原生 Form 层的 `rules`。
 
 ## columns 与实例方法
 
@@ -81,6 +83,8 @@ import '@bubblesjs/antdv-next-pro/style.css'
 | `defaultCollapsed`  | `boolean`                                                    | `true`         | 非受控初始状态                                                                 |
 | `defaultColsNumber` | `number`                                                     | 随容器宽度     | 覆盖默认布局在较宽容器下的列数                                                 |
 | `span`              | `number \| Record<string, number>`                           | 响应容器宽度   | 24 栅格列宽；支持 `xs/sm/md/lg/xl/xxl` 断点                                    |
+| `searchGutter`      | `RowProps['gutter']`                                         | `24`           | 水平间距、响应式间距或 `[水平, 垂直]`；未指定垂直间距时为 `24px`               |
+| `ignoreRules`       | `boolean`                                                    | `false`        | 忽略字段级校验规则                                                             |
 | `labelWidth`        | `number \| 'auto'`                                           | `80`           | 水平布局的标签宽度，数字单位 px                                                |
 | `split`             | `boolean`                                                    | `false`        | 字段分隔样式                                                                   |
 | `searchText`        | `VNodeChild`                                                 | 国际化“查询”   | 优先于 submitter 内的提交文案                                                  |

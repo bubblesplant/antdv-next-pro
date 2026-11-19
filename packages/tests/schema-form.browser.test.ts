@@ -1,19 +1,22 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { ConfigProvider, theme } from 'antdv-next'
-import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { defineComponent, h, nextTick } from 'vue'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { defineComponent, h, nextTick, type Component } from 'vue'
 
 import SchemaForm from '../src/SchemaForm.vue'
+import { StepsForm } from '../src/schema-form'
 import type { SchemaFormColumn, SchemaFormInstance } from '../src/types'
 import type { FormRecord } from '../src/schema-form/utils'
 import { resolveCssVariableColor } from './helpers/themeProbe'
 
 let wrapper: VueWrapper | undefined
+const initialUrl = window.location.href
 
 afterEach(() => {
   wrapper?.unmount()
   wrapper = undefined
   document.body.innerHTML = ''
+  window.history.replaceState(window.history.state, '', initialUrl)
 })
 
 describe('SchemaForm browser interactions', () => {
@@ -59,6 +62,57 @@ describe('SchemaForm browser interactions', () => {
     expect(form.getFieldsValue()).toEqual({ kind: 'advanced' })
     await expect(form.submit()).resolves.toEqual({ normalizedKind: 'ADVANCED' })
   })
+
+  it.each([
+    ['SchemaForm', SchemaForm],
+    ['StepsForm', StepsForm],
+  ] as const)(
+    'maps %s step metadata to matrix columns and submits all fields',
+    async (_name, component) => {
+      const onFinish = vi.fn()
+      const url = new URL(initialUrl)
+      url.searchParams.set('count', JSON.stringify('2'))
+      window.history.replaceState(window.history.state, '', url)
+      const columns: SchemaFormColumn<FormRecord>[][] = [
+        [{ dataIndex: 'name', title: 'Name', formItemProps: { rules: [{ required: true }] } }],
+        [
+          {
+            dataIndex: 'count',
+            title: 'Count',
+            convertValue: Number,
+            transform: (value) => ({ total: Number(value) * 10 }),
+          },
+        ],
+      ]
+      wrapper = mount(component as Component, {
+        attachTo: document.body,
+        props: {
+          columns,
+          steps: [
+            { name: 'account', title: 'Account', stepProps: { content: 'Create your account' } },
+            { name: 'profile', title: 'Profile' },
+          ],
+          layoutType: 'StepsForm',
+          current: 0,
+          urlSync: true,
+          onFinish,
+        },
+      })
+      await flushPromises()
+      const form = wrapper.vm as unknown as SchemaFormInstance<FormRecord>
+      expect(wrapper.get('[data-pro-steps-form-header]').text()).toContain('Create your account')
+      expect(wrapper.findAll('[data-pro-steps-form-step]')).toHaveLength(2)
+      expect(form.getFieldValue('count')).toBe(2)
+      await expect(form.next()).resolves.toBe(false)
+      const activeStep = () => wrapper!.get('[data-pro-steps-form-step][aria-hidden="false"]')
+      await activeStep().get('input').setValue('Ada')
+      await expect(form.next()).resolves.toBe(true)
+      await flushPromises()
+      expect(activeStep().text()).toContain('Count')
+      await expect(form.submit()).resolves.toEqual({ name: 'Ada', total: 20 })
+      expect(onFinish).toHaveBeenCalledExactlyOnceWith({ name: 'Ada', total: 20 })
+    },
+  )
 
   it('themes list labels and controls from Antdv dark tokens', async () => {
     const DarkThemeHost = defineComponent({

@@ -157,6 +157,6 @@ Changesets 与 GitHub Actions 属于本项目工程约定，不是 React API 的
 
 ProCard 包含 tabs、响应式分栏、Group/Divider 等保留能力；新增 ProList、BaseProList、ProDescriptions 与表格辅助组件。
 
-`ProList` 的 grid 条目复用现有 `ProCard`，可通过 `itemCardProps` 配置。`metas.actions.cardActionProps` 的 `extra`（默认）将操作放在卡片右上角，`actions` 放到底部操作区；这不引入 CheckCard。
+`ProList` 的网格条目使用内置 `CheckCard`，可通过 `itemCardProps` 配置。`metas.actions.cardActionProps` 的 `extra`（默认）将操作放在卡片右上角，`actions` 放到底部操作区。
 
-本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其组件族。网络层使用 Promise `request` 回调。
+本轮不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard，也不提供独立的 `CheckCard` / `CheckCard.Group`。网络层使用 Promise `request` 回调。

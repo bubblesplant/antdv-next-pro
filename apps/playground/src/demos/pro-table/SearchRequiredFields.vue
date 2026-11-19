@@ -93,7 +93,7 @@ const tableBindings = computed<ProTableProps<DemoRow, DemoQuery>>(() => ({
   request,
   params: externalQuery.value,
   rowKey: 'id',
-  search: { defaultCollapsed: false },
+  search: { defaultCollapsed: false, ignoreRules: false },
   pagination: { defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: [5, 10, 20] },
   options: optionsConfig,
   toolbar: toolbarConfig,

@@ -161,6 +161,11 @@ export const queryFilterProps = {
   defaultCollapsed: { type: Boolean, default: true },
   defaultColsNumber: Number,
   span: [Number, Object] as PropType<QueryFilterProps['span']>,
+  searchGutter: {
+    type: [Number, Object, Array] as PropType<QueryFilterProps['searchGutter']>,
+    default: 24,
+  },
+  ignoreRules: Boolean,
   labelWidth: { type: [Number, String] as PropType<QueryFilterProps['labelWidth']>, default: 80 },
   split: Boolean,
   searchText: null,

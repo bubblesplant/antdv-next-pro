@@ -72,4 +72,4 @@ ModalForm and DrawerForm await `onFinish`. Only `true` closes the popup; `false`
 
 ## Scope
 
-Provider, fields, composed forms, ProList, ProDescriptions, and table helpers are included. ProSkeleton, LoginForm/LoginFormPage, PageContainer/ProLayout, StatisticCard/CheckCard, and their new component families are excluded from this implementation.
+Provider, fields, composed forms, ProList, ProDescriptions, and table helpers are included. `ProList` grids use an internal `CheckCard`. A standalone `CheckCard` / `CheckCard.Group`, ProSkeleton, LoginForm/LoginFormPage, PageContainer/ProLayout, and StatisticCard are not included.

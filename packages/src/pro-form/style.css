@@ -105,13 +105,13 @@
   display: flex;
   flex-wrap: wrap;
   row-gap: 24px;
-  margin-inline: -12px;
+  margin-inline: calc(var(--pro-query-half-gutter, 12px) * -1);
 }
 [data-pro-query-col],
 [data-pro-query-actions] {
   box-sizing: border-box;
   min-width: 0;
-  padding-inline: 12px;
+  padding-inline: var(--pro-query-half-gutter, 12px);
 }
 [data-pro-light-filter] {
   box-sizing: border-box;

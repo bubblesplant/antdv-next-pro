@@ -1,5 +1,5 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { ConfigProvider } from 'antdv-next'
+import { ConfigProvider, FormItem } from 'antdv-next'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, ref, type Component } from 'vue'
 import {
@@ -13,6 +13,7 @@ import {
   ProFormText,
   QueryFilter,
   StepsForm,
+  type SchemaFormInstance,
 } from '../src'
 
 let wrapper: VueWrapper | undefined
@@ -64,6 +65,31 @@ describe('ProForm upstream layout alignment', () => {
     expect(style(root.querySelector('.ant-form-item')!).marginBottom).toBe('0px')
     expect(root.querySelector('form')!.classList.contains('ant-form-vertical')).toBe(true)
     expect(document.querySelectorAll('.query-root')).toHaveLength(1)
+  })
+
+  it('skips composition field rules only when requested', async () => {
+    const required = [{ required: true, message: 'Enter a keyword' }]
+    const onFinish = vi.fn()
+    wrapper = mount(QueryFilter, {
+      attachTo: document.body,
+      props: { onFinish, layout: 'vertical' },
+      slots: {
+        default: () => [
+          h(ProFormGroup, {}, () => h(ProFormText, { name: 'name', rules: required })),
+          h(FormItem, { name: 'keyword', rules: required }, () => h('input')),
+        ],
+      },
+    })
+    await tick()
+    const form = wrapper.vm as unknown as SchemaFormInstance
+    await expect(form.submit()).rejects.toBeDefined()
+    expect(wrapper.text()).toContain('Enter a keyword')
+    expect(onFinish).not.toHaveBeenCalled()
+    await wrapper.setProps({ ignoreRules: true })
+    await expect(form.submit()).resolves.toEqual({})
+    expect(onFinish).toHaveBeenCalledExactlyOnceWith({})
+    expect(wrapper.text()).not.toContain('Enter a keyword')
+    expect(required).toEqual([{ required: true, message: 'Enter a keyword' }])
   })
 
   it('uses group title tokens, the upstream default gap, and the twoLine content indentation', async () => {

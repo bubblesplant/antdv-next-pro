@@ -318,6 +318,8 @@ The response uses the exported [`ProRequestResult<T>`](https://github.com/bubble
 | ------------------ | ----------------------------------------------- | ------------ | --------------------------------------------------------------------------------- |
 | `labelWidth`       | `number \| 'auto'`                              | `80`         | Query label width.                                                                |
 | `span`             | `number \| Partial<Record<Breakpoint, number>>` | `Responsive` | Grid span with xs/sm/md/lg/xl/xxl breakpoints; see [QueryFilter](./query-filter). |
+| `searchGutter`     | `RowProps['gutter']`                            | `24`         | QueryFilter field spacing, for example `[16, 8]`.                                 |
+| `ignoreRules`      | `boolean`                                       | `true`       | Skips field-level QueryFilter rules. Explicit `false` restores validation.        |
 | `defaultCollapsed` | `boolean`                                       | `true`       | Initial uncontrolled collapse state.                                              |
 | `collapsed`        | `boolean`                                       | —            | Controlled collapse state.                                                        |
 | `onCollapse`       | `(collapsed: boolean) => void`                  | —            | Collapse change callback.                                                         |
@@ -333,6 +335,7 @@ The response uses the exported [`ProRequestResult<T>`](https://github.com/bubble
 | --------------- | ------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `initialValues` | `Partial<T>`              | —       | Initial search values.                                                                                                                                                                 |
 | `submitter`     | `false \| SubmitterProps` | —       | Search actions; see [ProForm submitter](./pro-form#submitter-props).                                                                                                                   |
+| `ignoreRules`   | `boolean`                 | —       | If provided, overrides `search.ignoreRules` for field-level validation in the standard search form only.                                                                               |
 | `FormProps`     | `FormProps`               | —       | Remaining properties target the native search Form, including layout/rules/labelCol/wrapperCol/validateTrigger; see [Form API](https://www.antdv-next.com/components/form#form-props). |
 
 `form.initialValues/submitter` are handled by the search adapter; other fields become SchemaForm `formProps`. The search area owns model, fields, submit and reset; observe queries through top-level `onSubmit/onReset`.

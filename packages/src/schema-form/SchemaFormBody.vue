@@ -7,6 +7,7 @@ import type {
   SchemaFormLayoutType,
   SchemaFormProps,
   SchemaFormSlots,
+  SchemaFormStep,
 } from '../types'
 import type { FormRecord } from './utils'
 import type {
@@ -50,6 +51,8 @@ interface BodyProps {
   defaultCollapsed?: boolean
   defaultColsNumber?: number
   span?: QueryFilterProps['span']
+  searchGutter?: QueryFilterProps['searchGutter']
+  ignoreRules?: boolean
   labelWidth?: QueryFilterProps['labelWidth']
   split?: boolean
   searchText?: VNodeChild
@@ -61,6 +64,7 @@ interface BodyProps {
   placement?: LightFilterProps['placement']
   footerRender?: LightFilterProps['footerRender']
   stepsProps?: import('antdv-next').StepsProps
+  schemaSteps?: SchemaFormStep<FormRecord>[]
   finish?: () => Promise<unknown>
 }
 
@@ -85,6 +89,8 @@ const {
   defaultCollapsed = undefined,
   defaultColsNumber,
   span,
+  searchGutter,
+  ignoreRules = undefined,
   labelWidth,
   split,
   searchText = undefined,
@@ -95,6 +101,7 @@ const {
   collapseLabel = undefined,
   placement,
   footerRender = undefined,
+  schemaSteps,
   finish,
 } = defineProps<BodyProps>()
 const emit = defineEmits<{
@@ -113,7 +120,7 @@ const stepForms = shallowRef<ProFormInstance[]>([])
 const rootStyle = useThemeVars()
 const { prefix, t } = useFormPrefix('form', () => prefixCls)
 const isStepLayout = computed(() => layoutType === 'StepForm' || layoutType === 'StepsForm')
-const steps = computed(() => buildSchemaSteps(columnsProp))
+const steps = computed(() => schemaSteps ?? buildSchemaSteps(columnsProp))
 const normalizedCurrent = computed(() =>
   Math.max(0, Math.min(currentProp, Math.max(steps.value.length - 1, 0))),
 )
@@ -171,6 +178,7 @@ const filterProps = computed(() => ({
   defaultCollapsed,
   defaultColsNumber,
   span,
+  ...(layoutType === 'QueryFilter' && { searchGutter, ignoreRules }),
   labelWidth,
   split,
   searchText,
@@ -194,7 +202,8 @@ const submitText = computed(
 )
 const stepItems = computed(() =>
   steps.value.map((step, index) => ({
-    key: String(index),
+    ...step.stepProps,
+    key: step.name ?? step.stepProps?.key ?? String(index),
     title: h(Fragment, null, [
       schemaSlots['step-title']?.({
         title: step.title,
@@ -395,6 +404,7 @@ defineExpose({
             <ProForm
               ref="stepForms"
               v-bind="formProps"
+              :name="step.name ?? formProps?.name"
               :model-value="model"
               :readonly="readonly"
               :label-col="labelCol"

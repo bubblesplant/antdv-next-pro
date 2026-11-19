@@ -29,8 +29,17 @@ const emit = defineEmits<{
 }>()
 const { formRef: form, formApi } = useSchemaFormRef<T>()
 const formBindings = computed(() => {
-  const { initialValues, submitter, onSubmit, onReset, layout, classes, styles, ...rest } =
-    formProp ?? {}
+  const {
+    initialValues,
+    submitter,
+    onSubmit,
+    onReset,
+    layout,
+    classes,
+    styles,
+    ignoreRules: _ignoreRules,
+    ...rest
+  } = formProp ?? {}
   return {
     ...rest,
     classes: typeof classes === 'function' ? () => classes({ props: formProp ?? {} }) : classes,
@@ -39,6 +48,14 @@ const formBindings = computed(() => {
     wrapperCol: rest.wrapperCol ? { ...rest.wrapperCol } : undefined,
   }
 })
+const queryOptions = computed(() =>
+  search?.filterType === 'light'
+    ? {}
+    : {
+        searchGutter: search?.searchGutter,
+        ignoreRules: formProp?.ignoreRules ?? search?.ignoreRules ?? true,
+      },
+)
 const formColumns = computed(() =>
   columns
     .filter((column) => !column.hideInSearch && column.search !== false)
@@ -93,6 +110,7 @@ defineExpose(formApi)
   <component
     :is="search?.filterType === 'light' ? LightFilter : QueryFilter"
     ref="form"
+    v-bind="queryOptions"
     :form-props="formBindings"
     :layout="formProp?.layout"
     :date-formatter="false"

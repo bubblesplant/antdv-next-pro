@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import type { FormItemState } from './fieldTypes'
 import { FormItem } from 'antdv-next'
+import { useProFormContext } from '../pro-form/context'
 import DirectSlotRenderer from '../shared/DirectSlotRenderer'
 import VNodeContent from '../shared/VNodeContent'
 
@@ -11,12 +12,15 @@ const { state, rootAttrs } = defineProps<{
   rootAttrs?: Record<string, unknown>
 }>()
 const AFormItem = FormItem as Component
+const form = useProFormContext()
 </script>
 
 <template>
   <DirectSlotRenderer
     :component="AFormItem"
-    :component-props="state.formItemProps"
+    :component-props="
+      form?.ignoreRules.value ? { ...state.formItemProps, rules: undefined } : state.formItemProps
+    "
     :content="state.content"
     :root-attrs="rootAttrs"
     :use-content="state.hasContent"

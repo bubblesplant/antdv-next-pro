@@ -141,7 +141,7 @@ describe('list, descriptions and editable table upstream styles', () => {
     await expect.poll(() => getComputedStyle(item.element).padding).toBe('3px 5px')
   })
 
-  it('keeps grid card spacing inside ProCard and forwards item card styles', async () => {
+  it('keeps grid card spacing inside CheckCard and forwards item card styles', async () => {
     wrapper = mount(ProList<Row>, {
       attachTo: document.body,
       props: {
@@ -158,7 +158,7 @@ describe('list, descriptions and editable table upstream styles', () => {
     expect(item.padding).toBe('0px')
     expect(item.borderBottomWidth).toBe('0px')
     expect(
-      getComputedStyle(wrapper.get('[data-pro-list-row] .ant-pro-card-body').element).padding,
+      getComputedStyle(wrapper.get('[data-pro-list-row] .ant-pro-checkcard-body').element).padding,
     ).toBe('7px')
   })
 

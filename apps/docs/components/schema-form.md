@@ -113,11 +113,13 @@ import { ModalForm, StepsForm } from '@bubblesjs/antdv-next-pro'
 
 <template>
   <ModalForm v-model="form" v-model:open="open" :columns="columns" />
-  <StepsForm v-model="form" v-model:current="current" :columns="stepColumns" />
+  <StepsForm v-model="form" v-model:current="current" :columns="stepColumns" :steps="steps" />
 </template>
 ```
 
-多步骤 Schema 要求顶层列全部是带 `children` 的 `group` 或 `formSet`；每个顶层分组成为一步，旧子级 `columns` 仍回退兼容。`next()` 会先校验当前步骤，最后一步提交完整结果。Steps 标题允许直接点击返回已访问的前序步骤；点击后续步骤只会触发一次 `next()`，校验成功后前进一步，不能绕过当前步骤校验。需要每步独立原生表单与实例时使用组合式 `StepsForm.StepForm`。
+多步骤 Schema 支持二维 `columns`：每个子数组是一整步的字段，`steps[index]` 可配置该步的 `name`、`title` 和 `stepProps`。`<SchemaForm layout-type="StepsForm">` 与 `<StepsForm>` 都支持这种写法。原有顶层 `group` / `formSet` 写法继续可用，子字段优先取 `children`，兼容旧子级 `columns`。
+
+`next()` 校验当前步骤后才前进，最后提交所有步骤的结果。点击较早的步骤可返回，点击后续步骤不能绕过当前步骤校验。需要独立管理每步的实例或提交回调时，使用组合式 `StepsForm.StepForm`。
 
 ### 组合字段与动态 Schema
 
@@ -218,7 +220,7 @@ ModalForm / DrawerForm 默认宽度为 `800px`，提交区位于原生 footer �
 
 | 属性                                 | 类型                                                                     | 默认值                                  | 说明 / 来源                                                                                  |
 | ------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `columns`                            | `SchemaFormColumn<T>[]`                                                  | 必填                                    | Schema 字段，见 [列属性](#columns)                                                           |
+| `columns`                            | `SchemaFormColumn<T>[] \| SchemaFormColumn<T>[][]`                       | 必填                                    | Schema 字段；StepsForm 可按步骤传二维数组，见 [列属性](#columns)                             |
 | `modelValue`                         | `Partial<T>`                                                             | —                                       | 原始模型，使用 v-model                                                                       |
 | `initialValues`                      | `Partial<T>`                                                             | —                                       | 初始化与重置基线                                                                             |
 | `request`                            | `(params?: Record<string, unknown>) => Promise<Partial<T>>`              | —                                       | 异步初始值，不是提交请求                                                                     |
@@ -261,6 +263,8 @@ ModalForm / DrawerForm 默认宽度为 `800px`，提交区位于原生 footer �
 | `defaultCollapsed`  | `boolean`                                                                                       | `true`          | QueryFilter 初始折叠                                                                        |
 | `defaultColsNumber` | `number`                                                                                        | `3`             | QueryFilter 默认显示列数                                                                    |
 | `span`              | `number \| Record<string, number>`                                                              | 响应式计算      | QueryFilter 字段栅格跨度，见 [QueryFilter](./query-filter#props)                            |
+| `searchGutter`      | `RowProps['gutter']`                                                                            | `24`            | QueryFilter 字段间距                                                                        |
+| `ignoreRules`       | `boolean`                                                                                       | `false`         | QueryFilter 是否忽略字段级校验规则                                                          |
 | `labelWidth`        | `number \| 'auto'`                                                                              | `80`            | QueryFilter 标签宽度                                                                        |
 | `split`             | `boolean`                                                                                       | `false`         | QueryFilter 分隔样式                                                                        |
 | `searchText`        | `VNodeChild`                                                                                    | locale 查询文案 | QueryFilter 查询按钮                                                                        |
@@ -272,6 +276,7 @@ ModalForm / DrawerForm 默认宽度为 `800px`，提交区位于原生 footer �
 | `placement`         | `PopoverProps['placement']`                                                                     | `'bottomLeft'`  | LightFilter 弹层位置，来源 [Popover API][antd-popover]                                      |
 | `footerRender`      | `false \| (({ confirm, clear }, doms: VNodeChild[]) => VNodeChild)`                             | 默认底部        | LightFilter 确认/清除区域，见 [LightFilter](./light-filter#props)                           |
 | `stepsProps`        | `StepsProps`                                                                                    | —               | StepsForm 的 [Steps API][antd-steps]；current/items 由 Schema 生成，onChange 受校验导航约束 |
+| `steps`             | `SchemaFormStepConfig[]`                                                                        | —               | 与二维 columns 按索引对应；可设置 name、title、stepProps                                    |
 
 ### formProps：原生表单配置 {#form-props}
 

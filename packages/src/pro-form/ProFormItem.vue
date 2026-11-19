@@ -24,7 +24,11 @@ const path = useProFormNamePath(() => propName)
 const renderContent = () =>
   h(
     FormItem,
-    { ...attrs, name: propName === undefined ? undefined : path.value },
+    {
+      ...attrs,
+      ...(form?.ignoreRules.value && { rules: undefined }),
+      name: propName === undefined ? undefined : path.value,
+    },
     {
       ...slots,
       default: () => {

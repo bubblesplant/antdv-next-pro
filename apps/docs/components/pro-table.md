@@ -318,6 +318,8 @@ request(params: P & { current?: number; pageSize?: number; nextToken?: string },
 | ------------------ | ----------------------------------------------- | ---------- | ----------------------------------------------------------------------- |
 | `labelWidth`       | `number \| 'auto'`                              | `80`       | 查询标签宽度。                                                          |
 | `span`             | `number \| Partial<Record<Breakpoint, number>>` | `响应式`   | 栅格占位，断点 xs/sm/md/lg/xl/xxl；详见 [QueryFilter](./query-filter)。 |
+| `searchGutter`     | `RowProps['gutter']`                            | `24`       | QueryFilter 字段间距，例如 `[16, 8]`。                                  |
+| `ignoreRules`      | `boolean`                                       | `true`     | 忽略 QueryFilter 的字段级校验；显式设为 false 可恢复。                  |
 | `defaultCollapsed` | `boolean`                                       | `true`     | 非受控折叠初值。                                                        |
 | `collapsed`        | `boolean`                                       | —          | 受控折叠状态。                                                          |
 | `onCollapse`       | `(collapsed: boolean) => void`                  | —          | 折叠变化回调。                                                          |
@@ -333,6 +335,7 @@ request(params: P & { current?: number; pageSize?: number; nextToken?: string },
 | --------------- | ------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `initialValues` | `Partial<T>`              | —      | 搜索初始值。                                                                                                                                                      |
 | `submitter`     | `false \| SubmitterProps` | —      | 查询操作区，详见 [ProForm 提交区](./pro-form#submitter-props)。                                                                                                   |
+| `ignoreRules`   | `boolean`                 | —      | 若显式设置，优先于 `search.ignoreRules`，只影响标准查询区的字段级校验。                                                                                           |
 | `FormProps`     | `FormProps`               | —      | 其余属性传给搜索的原生 Form，如 layout/rules/labelCol/wrapperCol/validateTrigger；完整表见 [Form API](https://www.antdv-next.com/components/form-cn#form-props)。 |
 
 `form` 的 `initialValues/submitter` 由搜索适配层使用，其余属性进入 SchemaForm 的 `formProps`；`model`、字段、提交/重置流程由搜索区管理，请用顶层 `onSubmit/onReset` 观察查询。

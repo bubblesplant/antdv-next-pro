@@ -98,12 +98,19 @@ describe('new data display families', () => {
       },
     })
     await flushPromises()
-    expect(wrapper.findAll('[data-pro-list-row] [data-pro-card]')).toHaveLength(2)
-    expect(wrapper.get('.ant-pro-list-row-card .ant-pro-card-extra').text()).toContain('Archive')
-    expect(wrapper.find('.ant-pro-list-row-card .ant-pro-card-actions').exists()).toBe(false)
-    ;(wrapper.get('.ant-pro-list-row-card input').element as HTMLInputElement).checked = true
-    await wrapper.get('.ant-pro-list-row-card input').trigger('change')
-    expect(selection).toHaveBeenCalledTimes(1)
+    const card = wrapper.get('[data-pro-check-card]')
+    expect(wrapper.findAll('[data-pro-list-row] [data-pro-check-card]')).toHaveLength(2)
+    expect(card.get('.ant-pro-checkcard-extra').text()).toContain('Archive')
+    expect(card.find('.ant-pro-checkcard-actions').exists()).toBe(false)
+    await card.get('button').trigger('click')
+    expect(selection).not.toHaveBeenCalled()
+    await card.get('[data-pro-list-row-title]').trigger('click')
+    expect(selection.mock.calls[0]?.[0]).toEqual([1])
+    expect(card.attributes('aria-checked')).toBe('false')
+    await wrapper.setProps({ rowSelection: { selectedRowKeys: [1], onChange: selection } })
+    expect(card.attributes('aria-checked')).toBe('true')
+    await card.trigger('keydown', { key: ' ' })
+    expect(selection.mock.calls[1]?.[0]).toEqual([])
     await wrapper.setProps({
       metas: {
         title: { dataIndex: 'name' },
@@ -111,9 +118,9 @@ describe('new data display families', () => {
         actions: { cardActionProps: 'actions', render: () => [h('button', 'Archive')] },
       },
     })
-    expect(wrapper.get('.ant-pro-list-row-card .ant-pro-card-actions').text()).toContain('Archive')
-    expect(wrapper.find('.ant-pro-list-row-card .ant-pro-card-extra').exists()).toBe(false)
-    expect(wrapper.get('.ant-pro-list-row-card').classes()).toContain('ant-pro-card-box-shadow')
+    expect(card.get('.ant-pro-checkcard-actions').text()).toContain('Archive')
+    expect(card.find('.ant-pro-checkcard-extra').exists()).toBe(false)
+    expect(card.classes()).toContain('ant-pro-checkcard-box-shadow')
     const itemHeaderRender = vi.fn((_record: Row, _index: number, dom: VNodeChild) =>
       h('section', { 'data-grid-header': '' }, [dom]),
     )
@@ -151,6 +158,44 @@ describe('new data display families', () => {
     })
     expect(wrapper.findAll('[data-grid-description-slot]')).toHaveLength(2)
     expect(wrapper.findAll('[data-grid-extra-slot]')).toHaveLength(2)
+  })
+
+  it('supports item card visuals and independent selection without rowSelection', async () => {
+    const change = vi.fn()
+    wrapper = mount(ProList<Row>, {
+      attachTo: document.body,
+      props: {
+        dataSource: rows,
+        rowKey: 'id',
+        grid: { column: 2 },
+        itemCardProps: {
+          size: 'large',
+          description: 'Select this project',
+          avatar: h('span', { 'data-project-avatar': '' }, 'P'),
+          defaultChecked: true,
+          onChange: change,
+        },
+      },
+    })
+    await flushPromises()
+    const [first, second] = wrapper.findAll('[data-pro-check-card]')
+    expect(first!.classes()).toContain('ant-pro-checkcard-lg')
+    expect(first!.get('[data-project-avatar]').text()).toBe('P')
+    expect(first!.text()).toContain('Select this project')
+    await first!.trigger('click')
+    expect(change).toHaveBeenCalledExactlyOnceWith(false)
+    expect(first!.attributes('aria-checked')).toBe('false')
+    expect(second!.attributes('aria-checked')).toBe('true')
+
+    await wrapper.setProps({
+      itemCardProps: { cover: '/cover.svg', disabled: true },
+      rowSelection: { type: 'radio', selectedRowKeys: [], onChange: change },
+    })
+    expect(first!.get('img').attributes('src')).toBe('/cover.svg')
+    expect(first!.attributes('role')).toBe('radio')
+    expect(first!.attributes('aria-disabled')).toBe('true')
+    await first!.trigger('click')
+    expect(change).toHaveBeenCalledTimes(1)
   })
 
   it('shares request/paging, controlled selection, expansion and v3 DOM rendering in ProList', async () => {

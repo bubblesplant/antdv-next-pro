@@ -155,6 +155,6 @@ Changesets and GitHub Actions are project conventions, not React APIs. Describe 
 
 [ProCard](../components/pro-card) covers theme containers, title/actions, loading, collapse, semantic styles, tabs, responsive columns, Group, and Divider. ProList/BaseProList, ProDescriptions, and table helpers extend display workflows.
 
-Grid items in `ProList` reuse the existing `ProCard` and accept `itemCardProps`. `metas.actions.cardActionProps` places actions in the top-right `extra` area by default, or in the footer with `actions`; this does not introduce CheckCard.
+Grid items in `ProList` use an internal `CheckCard` and accept `itemCardProps`. `metas.actions.cardActionProps` places actions in the top-right `extra` area by default, or in the footer with `actions`.
 
-This alignment excludes ProSkeleton, LoginForm/LoginFormPage, PageContainer/ProLayout, StatisticCard/CheckCard and their new component families. The network boundary is the Promise `request` callback.
+This alignment excludes ProSkeleton, LoginForm/LoginFormPage, PageContainer/ProLayout, StatisticCard, and a standalone `CheckCard` / `CheckCard.Group`. The network boundary is the Promise `request` callback.
