@@ -1,4 +1,10 @@
-import type { ProDataIndex, SchemaFormColumn, SchemaFormProps, SchemaFormStep } from '../types'
+import type {
+  ProDataIndex,
+  SchemaFormColumn,
+  SchemaFormProps,
+  SchemaFormStep,
+  SchemaFormStepConfig,
+} from '../types'
 import type { VNodeChild } from 'vue'
 import { resolveColumnValueType } from '../table/valueType'
 import { formatDates } from '../pro-form/utils'
@@ -127,9 +133,18 @@ export function buildSubmitValues<T extends FormRecord>(
 }
 
 export function buildSchemaSteps<T extends FormRecord>(
-  columns: SchemaFormColumn<T>[],
+  columns: SchemaFormProps<T>['columns'],
+  steps?: SchemaFormStepConfig[],
 ): SchemaFormStep<T>[] {
-  const visible = columns.filter((column) => !column.hideInForm)
+  if (columns.length && columns.every(Array.isArray)) {
+    return (columns as SchemaFormColumn<T>[][]).map((fields, index) => ({
+      ...steps?.[index],
+      title: steps?.[index]?.title ?? `Step ${index + 1}`,
+      columns: fields.filter((column) => !column.hideInForm),
+    }))
+  }
+
+  const visible = columns.flat().filter((column) => !column.hideInForm)
   const grouped = visible.filter(
     (column) =>
       (resolveColumnValueType(column.valueType, {} as T, 0).type === 'group' ||
@@ -138,11 +153,12 @@ export function buildSchemaSteps<T extends FormRecord>(
   )
 
   if (grouped.length !== visible.length || grouped.length === 0) {
-    return [{ title: '', columns: visible }]
+    return [{ ...steps?.[0], title: steps?.[0]?.title ?? '', columns: visible }]
   }
 
   return grouped.map((column, index) => ({
-    title: resolveTitle(column, index),
+    ...steps?.[index],
+    title: steps?.[index]?.title ?? resolveTitle(column, index),
     columns: schemaChildren(column),
   }))
 }

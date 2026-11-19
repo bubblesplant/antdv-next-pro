@@ -1,6 +1,12 @@
 import type { VueWrapper } from '@vue/test-utils'
 
-import type { ProCardProps, ProFilter, ProSort, ProTableInstance } from '../src/types'
+import type {
+  ProCardProps,
+  ProFilter,
+  ProSort,
+  ProTableInstance,
+  SchemaFormInstance,
+} from '../src/types'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ConfigProvider, Table, theme } from 'antdv-next'
 import enUS from 'antdv-next/locale/en_US'
@@ -466,19 +472,52 @@ describe('ProTable browser capabilities', () => {
       },
     })
     const root = wrapper.element as HTMLElement
-    root.style.width = '650px'
+    root.style.width = '575px'
     await vi.waitFor(() =>
       expect(
         wrapper!.findAll('.ant-pro-query-filter-col').filter((field) => field.isVisible()),
       ).toHaveLength(1),
     )
     expect((wrapper.get('[data-pro-query-col]').element as HTMLElement).style.maxWidth).toBe('100%')
-    root.style.width = '1100px'
+    root.style.width = '576px'
     await vi.waitFor(() =>
       expect(
         wrapper!.findAll('.ant-pro-query-filter-col').filter((field) => field.isVisible()),
       ).toHaveLength(2),
     )
+  })
+
+  it('forwards search gutter and allows opting into search field validation', async () => {
+    const form = ref<SchemaFormInstance>()
+    const rules = [{ required: true, message: 'Enter a name' }]
+    const resolveFormItemProps = () => ({ rules })
+    wrapper = mount(ProTable, {
+      attachTo: document.body,
+      props: {
+        columns: [{ title: 'Name', dataIndex: 'name', formItemProps: resolveFormItemProps }],
+        dataSource: [],
+        pagination: false,
+        formRef: form,
+        search: { searchGutter: [40, 7] },
+      },
+    })
+    await flushPromises()
+    const row = wrapper.get('[data-pro-query-row]')
+    const field = wrapper.get('[data-pro-query-col]')
+    expect(getComputedStyle(row.element).rowGap).toBe('7px')
+    expect(getComputedStyle(row.element).marginInlineStart).toBe('-20px')
+    expect(getComputedStyle(field.element).paddingInlineStart).toBe('20px')
+    await expect(form.value?.submit()).resolves.toEqual({})
+
+    await wrapper.setProps({ search: { searchGutter: [0, 0], ignoreRules: false } })
+    expect(getComputedStyle(row.element).rowGap).toBe('0px')
+    expect(getComputedStyle(field.element).paddingInlineStart).toBe('0px')
+    await expect(form.value?.submit()).rejects.toBeDefined()
+    expect(wrapper.text()).toContain('Enter a name')
+
+    await wrapper.setProps({ form: { ignoreRules: true } })
+    await expect(form.value?.submit()).resolves.toEqual({})
+    expect(resolveFormItemProps().rules).toEqual([{ required: true, message: 'Enter a name' }])
   })
 
   it('applies postData only to rendered rows and preserves the source data', async () => {

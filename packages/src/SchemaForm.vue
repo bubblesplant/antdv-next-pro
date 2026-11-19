@@ -8,6 +8,7 @@ import type {
   SchemaFormLayoutType,
   SchemaFormProps,
   SchemaFormSlots,
+  SchemaFormStep,
 } from './types'
 
 import { Drawer, Modal, type ModalProps } from 'antdv-next'
@@ -87,6 +88,8 @@ const {
   defaultCollapsed = undefined,
   defaultColsNumber,
   span,
+  searchGutter,
+  ignoreRules = undefined,
   labelWidth,
   split,
   searchText = undefined,
@@ -98,6 +101,7 @@ const {
   placement,
   footerRender = undefined,
   stepsProps,
+  steps: stepConfig,
   formRef,
   style,
 } = defineProps<SchemaFormProps<T>>()
@@ -227,6 +231,12 @@ const props = {
   get span() {
     return span
   },
+  get searchGutter() {
+    return searchGutter
+  },
+  get ignoreRules() {
+    return ignoreRules
+  },
   get labelWidth() {
     return labelWidth
   },
@@ -259,6 +269,9 @@ const props = {
   },
   get stepsProps() {
     return stepsProps
+  },
+  get steps() {
+    return stepConfig
   },
   get formRef() {
     return formRef
@@ -315,6 +328,8 @@ watch(
   { flush: 'sync' },
 )
 const effectiveUrlSync = computed(() => (syncToUrl === undefined ? urlSync : Boolean(syncToUrl)))
+const layoutType = computed<SchemaFormLayoutType>(() => layoutTypeProp ?? 'Form')
+const steps = computed(() => buildSchemaSteps(columns, stepConfig))
 const bodyOptions = computed(() => ({
   formProps: { ...formProps, layout, disabled },
   prefixCls: prefix.value,
@@ -324,6 +339,8 @@ const bodyOptions = computed(() => ({
   defaultCollapsed,
   defaultColsNumber,
   span,
+  searchGutter,
+  ignoreRules,
   labelWidth,
   split,
   optionRender,
@@ -335,15 +352,18 @@ const bodyOptions = computed(() => ({
   placement,
   footerRender,
   stepsProps,
+  schemaSteps:
+    layoutType.value === 'StepsForm' || layoutType.value === 'StepForm'
+      ? (steps.value as unknown as SchemaFormStep<FormRecord>[])
+      : undefined,
   finish: submit,
 }))
 
-const layoutType = computed<SchemaFormLayoutType>(() => layoutTypeProp ?? 'Form')
-const bodyColumns = computed(() => columns as unknown as SchemaFormColumn<FormRecord>[])
+const fieldColumns = computed(() => columns.flat())
+const bodyColumns = computed(() => fieldColumns.value as unknown as SchemaFormColumn<FormRecord>[])
 const schemaSlots = slots as unknown as RuntimeSchemaSlots
 const slotValues = computed(() => formState as unknown as Partial<T>)
-const fieldNames = computed(() => schemaFieldNames(columns))
-const steps = computed(() => buildSchemaSteps(columns))
+const fieldNames = computed(() => schemaFieldNames(fieldColumns.value))
 const isDialog = computed(
   () => layoutType.value === 'ModalForm' || layoutType.value === 'DrawerForm',
 )
@@ -450,7 +470,7 @@ watch(
   () => modelValueProp,
   (modelValue) => {
     if (!initialized.value || modelValue === undefined) return
-    const converted = convertInboundValues(columns, modelValue)
+    const converted = convertInboundValues(fieldColumns.value, modelValue)
     if (!recordsEqual(formState, converted)) replaceRecord(formState, converted)
   },
   { deep: true },
@@ -478,9 +498,9 @@ watch(
 )
 
 watch(
-  () => columns,
-  () => {
-    const converted = convertInboundValues(columns, formState)
+  fieldColumns,
+  (fields) => {
+    const converted = convertInboundValues(fields, formState)
     if (!recordsEqual(formState, converted)) replaceRecord(formState, converted)
   },
   { deep: true },
@@ -503,7 +523,7 @@ async function initialize(): Promise<void> {
           ? syncToUrl(fromUrl, 'get')
           : fromUrl
     const merged = mergeValues(initialValues, requested, hydrated, modelValueProp)
-    const converted = convertInboundValues(columns, merged)
+    const converted = convertInboundValues(fieldColumns.value, merged)
     replaceRecord(formState, converted)
     initialSnapshot.value = cloneValue(converted)
     initialized.value = true
@@ -512,7 +532,10 @@ async function initialize(): Promise<void> {
     emit('requestError', error)
     emit('error', error)
 
-    const fallback = convertInboundValues(columns, mergeValues(initialValues, modelValueProp))
+    const fallback = convertInboundValues(
+      fieldColumns.value,
+      mergeValues(initialValues, modelValueProp),
+    )
     replaceRecord(formState, fallback)
     initialSnapshot.value = cloneValue(fallback)
     initialized.value = true
@@ -568,7 +591,7 @@ function getFieldsValue(): Partial<T> {
 }
 
 function setFieldsValue(values: Partial<T>): void {
-  const converted = convertInboundValues(columns, values)
+  const converted = convertInboundValues(fieldColumns.value, values)
   replaceRecord(formState, mergeValues(formState, converted))
   const snapshot = getFieldsValue()
   emit('update:modelValue', snapshot)
@@ -587,8 +610,8 @@ async function validate(names?: ProDataIndex[]): Promise<Partial<T>> {
 }
 
 function getFieldsFormatValue(): Partial<T> {
-  const values = formatSchemaValues(columns, formState, dateFormatter)
-  return buildSubmitValues(columns, values) as Partial<T>
+  const values = formatSchemaValues(fieldColumns.value, formState, dateFormatter)
+  return buildSubmitValues(fieldColumns.value, values) as Partial<T>
 }
 
 async function performSubmit(): Promise<Partial<T>> {
@@ -711,7 +734,7 @@ function scheduleUrlWrite(): void {
 function hydrateFromUrl(): void {
   if (!effectiveUrlSync.value) return
   const fromUrl = readUrlValues(effectiveUrlSync.value, fieldNames.value)
-  const converted = convertInboundValues(columns, fromUrl)
+  const converted = convertInboundValues(fieldColumns.value, fromUrl)
   const reconciled = reconcileUrlValues(formState, converted, fieldNames.value)
   if (recordsEqual(formState, reconciled)) return
   replaceRecord(formState, reconciled)

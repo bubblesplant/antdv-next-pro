@@ -7,7 +7,7 @@ import { DownOutlined, RightOutlined } from '@antdv-next/icons'
 import { useProPrefix, useProConfig } from '../provider'
 import { useThemeVars } from '../shared/useThemeVars'
 import { ProField } from '../pro-field'
-import { ProCard } from '../pro-card'
+import CheckCard from '../pro-card/check-card.vue'
 import { resolveColumnValueType } from '../table/valueType'
 import { getValue, resolveRowKey } from '../table/utils'
 import { proTableViewKey, type ProTableViewContext } from '../table/viewContext'
@@ -162,26 +162,17 @@ function renderActions(record: T, index: number): VNodeChild {
   )
 }
 function renderGridCard(record: T, index: number): VNodeChild {
+  const showBody = needExpanded(record, index)
   const actions = meta('actions') || slots.actions ? renderActions(record, index) : undefined
   const footer = meta('actions')?.cardActionProps === 'actions'
-  const title = slots.title?.({ record, index }) ?? renderSlot(record, index, 'title')
+  const title =
+    slots.title?.({ record, index }) ?? renderSlot(record, index, 'title') ?? itemCardProps?.title
   const titleDom =
     typeof itemTitleRender === 'function'
       ? itemTitleRender(record, index, title)
       : itemTitleRender === false
         ? undefined
         : title
-  const selection = rowSelection
-    ? h('input', {
-        type: rowSelection.type === 'radio' ? 'radio' : 'checkbox',
-        checked: selectedKeys.value.includes(keyOf(record, index)),
-        'aria-label': String(value(record, 'title') ?? keyOf(record, index)),
-        disabled: rowSelection.getCheckboxProps?.(record)?.disabled,
-        onClick: (event: Event) => event.stopPropagation(),
-        onChange: (event: Event) =>
-          select(record, index, (event.target as HTMLInputElement).checked, event),
-      })
-    : undefined
   const actionDom = actions
     ? h(
         'div',
@@ -202,7 +193,6 @@ function renderGridCard(record: T, index: number): VNodeChild {
       'data-pro-list-row-header': '',
     },
     [
-      selection,
       slots.avatar?.({ record, index }) ?? renderSlot(record, index, 'avatar'),
       h(
         'span',
@@ -268,21 +258,42 @@ function renderGridCard(record: T, index: number): VNodeChild {
         )
       : undefined
   return h(
-    ProCard,
+    CheckCard,
     {
       ...itemCardProps,
-      class: `${prefix.value}-row-card`,
+      class: [`${prefix.value}-row-card`, itemCardProps?.class],
+      title: undefined,
+      subTitle: itemHeaderRender === false ? undefined : itemCardProps?.subTitle,
+      avatar:
+        itemHeaderRender === false || meta('avatar') || slots.avatar
+          ? undefined
+          : itemCardProps?.avatar,
+      disabled:
+        (rowSelection && rowSelection.getCheckboxProps?.(record)?.disabled) ||
+        itemCardProps?.disabled,
+      selectionType: rowSelection ? (rowSelection.type ?? 'checkbox') : undefined,
+      'aria-label': rowSelection
+        ? String(value(record, 'title') ?? keyOf(record, index))
+        : undefined,
       checked: rowSelection
         ? selectedKeys.value.includes(keyOf(record, index))
         : itemCardProps?.checked,
+      onChange: rowSelection ? undefined : itemCardProps?.onChange,
+      'onUpdate:checked': rowSelection ? undefined : itemCardProps?.['onUpdate:checked'],
+      onSelect: rowSelection
+        ? (checked: boolean, event: Event) => select(record, index, checked, event)
+        : undefined,
     },
     {
       ...(itemHeaderRender !== false ? { title: () => headerDom } : {}),
       ...(extraDom || (actions && !footer)
-        ? { extra: () => [extraDom, footer ? undefined : actionDom] }
+        ? { extra: () => [extraDom ?? itemCardProps?.extra, footer ? undefined : actionDom] }
         : {}),
       ...(actions && footer ? { actions: () => actionDom } : {}),
-      default: () => (needExpanded(record, index) ? [description, content] : []),
+      ...(description || !showBody
+        ? { description: () => (showBody ? description : undefined) }
+        : {}),
+      default: () => (showBody ? content : undefined),
     },
   )
 }

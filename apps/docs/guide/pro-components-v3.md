@@ -99,4 +99,4 @@ async function save(values: Record<string, unknown>) {
 
 ## 范围
 
-本轮包括 Provider、字段体系、组合表单、ProList、ProDescriptions 和表格辅助组件。ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout、StatisticCard/CheckCard 及其新组件族不在本轮建设范围。
+本轮包括 Provider、字段体系、组合表单、ProList、ProDescriptions 和表格辅助组件。`ProList` 网格内置 `CheckCard`；不提供独立的 `CheckCard` / `CheckCard.Group`，也不新增 ProSkeleton、LoginForm/LoginFormPage、PageContainer/ProLayout 或 StatisticCard。

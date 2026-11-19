@@ -458,10 +458,10 @@ function handleRootClick(event: MouseEvent): void {
     :data-pro-card-checked="checked || undefined"
     :data-pro-card-disabled="disabled || undefined"
     :tabindex="checked !== undefined ? (disabled ? -1 : 0) : attrs.tabindex"
-    :role="checked !== undefined ? 'checkbox' : attrs.role"
+    :role="attrs.role ?? (checked !== undefined ? 'checkbox' : undefined)"
     :aria-checked="checked"
     :aria-disabled="disabled || undefined"
-    @keydown="
+    @keydown.self="
       ($event.key === 'Enter' || $event.key === ' ') &&
       checked !== undefined &&
       !disabled &&

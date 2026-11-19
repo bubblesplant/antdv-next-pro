@@ -337,6 +337,7 @@ function resolveFormItemProps(): Record<string, unknown> {
   for (const name of ['name', 'label', 'rules'] as const) {
     if (hasExplicitProp(rawProps(), name)) result[name] = semanticProps.value[name]
   }
+  if (form?.ignoreRules.value) delete result.rules
   if (namePath.value.length) result.name = namePath.value
   result.class = [result.class, classes.value.root]
   const widths = { xs: 104, sm: 216, md: 328, lg: 440, xl: 552 }

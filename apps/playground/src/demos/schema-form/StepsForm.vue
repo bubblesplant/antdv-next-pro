@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SchemaForm, type SchemaFormColumn } from '@bubblesjs/antdv-next-pro'
+import {
+  SchemaForm,
+  type SchemaFormColumn,
+  type SchemaFormStepConfig,
+} from '@bubblesjs/antdv-next-pro'
 type Brief = Record<string, unknown> & {
   project?: string
   owner?: string
@@ -34,10 +38,8 @@ const fields: SchemaFormColumn<Brief>[] = [
   { title: '预算（万元）', dataIndex: 'budget', valueType: 'digit' },
   { title: '启用监测', dataIndex: 'enabled', valueType: 'switch' },
 ]
-const columns: SchemaFormColumn<Brief>[] = [
-  { title: '基本信息', valueType: 'group', columns: fields.slice(0, 2) },
-  { title: '发布设置', valueType: 'group', columns: fields.slice(2) },
-]
+const columns = [fields.slice(0, 2), fields.slice(2)]
+const steps: SchemaFormStepConfig[] = [{ title: '基本信息' }, { title: '发布设置' }]
 function onFinish(values: Partial<Brief>) {
   submitted.value = JSON.stringify(values, null, 2)
 }
@@ -49,6 +51,7 @@ function onFinish(values: Partial<Brief>) {
       v-model="model"
       v-model:current="current"
       :columns="columns"
+      :steps="steps"
       layout-type="StepsForm"
       title="创建发布计划"
       :grid="true"

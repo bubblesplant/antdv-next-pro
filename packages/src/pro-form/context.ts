@@ -18,6 +18,7 @@ export interface ProFormContextValue {
   model: FormRecord
   readonly: Ref<boolean>
   disabled: Ref<boolean>
+  ignoreRules: Ref<boolean>
   getFieldValue: (name: ProDataIndex) => unknown
   setFieldValue: (name: ProDataIndex, value: unknown) => void
   setFieldsValue: (values: FormRecord) => void

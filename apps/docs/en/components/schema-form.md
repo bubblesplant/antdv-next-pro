@@ -114,11 +114,13 @@ import { ModalForm, StepsForm } from '@bubblesjs/antdv-next-pro'
 
 <template>
   <ModalForm v-model="form" v-model:open="open" :columns="columns" />
-  <StepsForm v-model="form" v-model:current="current" :columns="stepColumns" />
+  <StepsForm v-model="form" v-model:current="current" :columns="stepColumns" :steps="steps" />
 </template>
 ```
 
-Multi-step schemas use top-level group/formSet nodes with children, one per step. Legacy nested columns is a fallback. next() validates before advancing, and final submission validates and merges the steps. Returning to an earlier step retains its values. Use composed StepsForm.StepForm when every step needs its own native form and instance.
+Multi-step schemas accept two-dimensional `columns`: each inner array contains the fields for one step. The matching `steps[index]` can set `name`, `title`, and `stepProps`. Both `<SchemaForm layout-type="StepsForm">` and `<StepsForm>` accept this format. Existing top-level `group` / `formSet` nodes still work, using `children` or falling back to nested `columns`.
+
+`next()` validates before advancing, and final submission includes values from every step. Returning to an earlier step retains its values. Use composed `StepsForm.StepForm` to manage each step's instance or finish callback independently.
 
 ### Composition and dynamic schemas
 
@@ -219,7 +221,7 @@ ModalForm and DrawerForm default to `800px` wide, with actions aligned to the en
 
 | Prop                                 | Type                                                                     | Default                                  | Description / source                                                                                      |
 | ------------------------------------ | ------------------------------------------------------------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `columns`                            | `SchemaFormColumn<T>[]`                                                  | Required                                 | Field schema; see [column properties](#columns)                                                           |
+| `columns`                            | `SchemaFormColumn<T>[] \| SchemaFormColumn<T>[][]`                       | Required                                 | Field schema; StepsForm also accepts one field array per step. See [column properties](#columns).         |
 | `modelValue`                         | `Partial<T>`                                                             | —                                        | Raw model, bound through v-model                                                                          |
 | `initialValues`                      | `Partial<T>`                                                             | —                                        | Initialization and reset baseline                                                                         |
 | `request`                            | `(params?: Record<string, unknown>) => Promise<Partial<T>>`              | —                                        | Loads initial values, rather than submitting data                                                         |
@@ -262,6 +264,8 @@ Filter and step extensions are also **top-level SchemaForm props**, active only 
 | `defaultCollapsed`  | `boolean`                                                                                       | `true`                 | QueryFilter initial collapse                                                                  |
 | `defaultColsNumber` | `number`                                                                                        | `3`                    | QueryFilter default visible columns                                                           |
 | `span`              | `number \| Record<string, number>`                                                              | Responsive calculation | QueryFilter grid span; [details](./query-filter#props)                                        |
+| `searchGutter`      | `RowProps['gutter']`                                                                            | `24`                   | QueryFilter field spacing                                                                     |
+| `ignoreRules`       | `boolean`                                                                                       | `false`                | Whether QueryFilter ignores field-level validation rules                                      |
 | `labelWidth`        | `number \| 'auto'`                                                                              | `80`                   | QueryFilter label width                                                                       |
 | `split`             | `boolean`                                                                                       | `false`                | QueryFilter separators                                                                        |
 | `searchText`        | `VNodeChild`                                                                                    | Locale search text     | QueryFilter search button                                                                     |
@@ -273,6 +277,7 @@ Filter and step extensions are also **top-level SchemaForm props**, active only 
 | `placement`         | `PopoverProps['placement']`                                                                     | `'bottomLeft'`         | LightFilter position; [Popover API][antd-popover]                                             |
 | `footerRender`      | `false \| (({ confirm, clear }, doms: VNodeChild[]) => VNodeChild)`                             | Default footer         | LightFilter confirm/clear footer; [details](./light-filter#props)                             |
 | `stepsProps`        | `StepsProps`                                                                                    | —                      | StepsForm [Steps API][antd-steps]; schema manages current/items and validation-aware onChange |
+| `steps`             | `SchemaFormStepConfig[]`                                                                        | —                      | Matches the columns matrix by index; accepts name, title and stepProps                        |
 
 ### formProps: native form configuration {#form-props}
 

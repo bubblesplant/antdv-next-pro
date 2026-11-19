@@ -1,7 +1,7 @@
 import type { VNodeChild, HTMLAttributes } from 'vue'
 import type { ProSemanticSource, ProSemanticClasses, ProSemanticStyles } from '../provider/types'
 import type {
-  ProCardProps,
+  CheckCardProps,
   ProColumns,
   ProRequest,
   ProTableProps,
@@ -44,7 +44,7 @@ export interface ProListProps<
     xl?: number
     xxl?: number
   }
-  itemCardProps?: ProCardProps
+  itemCardProps?: CheckCardProps
   itemLayout?: 'horizontal' | 'vertical'
   split?: boolean
   showActions?: 'hover' | 'always'
@@ -68,7 +68,7 @@ export interface ProListViewProps<T extends Record<string, unknown> = Record<str
   rowSelection?: ProTableProps<T>['rowSelection']
   expandable?: ProTableProps<T>['expandable']
   grid?: ProListProps<T>['grid']
-  itemCardProps?: ProCardProps
+  itemCardProps?: CheckCardProps
   itemLayout?: 'horizontal' | 'vertical'
   split?: boolean
   showActions?: 'hover' | 'always'

@@ -10,6 +10,7 @@ import type {
   FormInstance,
   FormProps,
   ButtonProps,
+  StepItem,
 } from 'antdv-next'
 import type { CSSProperties, Component, VNodeChild } from 'vue'
 
@@ -78,6 +79,19 @@ export interface ProCardSlots {
   actions?: () => VNodeChild
   loading?: () => VNodeChild
   collapsibleIcon?: (props: { collapsed: boolean }) => VNodeChild
+}
+
+export interface CheckCardProps extends Omit<ProCardProps, 'size' | 'cover'> {
+  avatar?: VNodeChild
+  description?: VNodeChild
+  cover?: ProCardProps['cover'] | VNodeChild
+  size?: 'small' | 'default' | 'large'
+  defaultChecked?: boolean
+  class?: import('vue').HTMLAttributes['class']
+  style?: CSSProperties
+  onClick?: (event: MouseEvent) => void
+  onChange?: (checked: boolean) => void
+  'onUpdate:checked'?: (checked: boolean) => void
 }
 
 export type ProKey = string | number
@@ -236,6 +250,8 @@ export type ProRequest<T, P extends Record<string, unknown>> = (
 export interface ProTableSearchConfig<T extends Record<string, unknown> = Record<string, unknown>> {
   labelWidth?: number | 'auto'
   span?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
+  searchGutter?: import('./pro-form/types').QueryFilterProps['searchGutter']
+  ignoreRules?: boolean
   defaultCollapsed?: boolean
   collapsed?: boolean
   onCollapse?: (collapsed: boolean) => void
@@ -261,6 +277,7 @@ export type ProTableSearchForm<T extends Record<string, unknown> = Record<string
   FormProps & {
     initialValues?: Partial<T>
     submitter?: false | import('./pro-form/types').SubmitterProps
+    ignoreRules?: boolean
   }
 
 export interface ProTableToolbarConfig {
@@ -587,7 +604,13 @@ export interface SchemaFormLabelSlotProps<T extends Record<string, unknown>> {
   record: Partial<T>
 }
 
-export interface SchemaFormStep<T extends Record<string, unknown>> {
+export interface SchemaFormStepConfig {
+  name?: string
+  title?: VNodeChild
+  stepProps?: Omit<StepItem, 'title'>
+}
+
+export interface SchemaFormStep<T extends Record<string, unknown>> extends SchemaFormStepConfig {
   title: VNodeChild
   columns: SchemaFormColumn<T>[]
 }
@@ -650,7 +673,7 @@ export interface SchemaFormSlots<T extends Record<string, unknown>> {
 }
 
 export interface SchemaFormProps<T extends Record<string, unknown> = Record<string, unknown>> {
-  columns: SchemaFormColumn<T>[]
+  columns: SchemaFormColumn<T>[] | SchemaFormColumn<T>[][]
   modelValue?: Partial<T>
   initialValues?: Partial<T>
   request?: (params?: Record<string, unknown>) => Promise<Partial<T>>
@@ -693,6 +716,8 @@ export interface SchemaFormProps<T extends Record<string, unknown> = Record<stri
   defaultCollapsed?: boolean
   defaultColsNumber?: number
   span?: number | Record<string, number>
+  searchGutter?: import('./pro-form/types').QueryFilterProps['searchGutter']
+  ignoreRules?: boolean
   labelWidth?: number | 'auto'
   split?: boolean
   searchText?: VNodeChild
@@ -710,6 +735,7 @@ export interface SchemaFormProps<T extends Record<string, unknown> = Record<stri
   placement?: import('antdv-next').PopoverProps['placement']
   footerRender?: import('./pro-form/types').LightFilterProps['footerRender']
   stepsProps?: import('antdv-next').StepsProps
+  steps?: SchemaFormStepConfig[]
   formRef?:
     | import('vue').Ref<SchemaFormInstance<T> | undefined>
     | ((instance: SchemaFormInstance<T> | undefined) => void)
@@ -748,7 +774,7 @@ export interface SchemaLayoutProps<
   'onUpdate:current'?: (current: number) => void
   'onUpdate:collapsed'?: (collapsed: boolean) => void
   'onUpdate:modelValue'?: (values: Partial<T>) => void
-  columns?: SchemaFormColumn<T>[]
+  columns?: SchemaFormProps<T>['columns']
   trigger?: VNodeChild
   name?: string
   stepProps?: Record<string, unknown>

@@ -67,7 +67,8 @@ const {
   styles: propStyles,
   formRef: propFormRef,
   layout: propLayout,
-} = defineProps(proFormProps)
+  ignoreRules: propIgnoreRules,
+} = defineProps({ ...proFormProps, ignoreRules: Boolean })
 const emit = defineEmits([
   'update:modelValue',
   'change',
@@ -363,6 +364,7 @@ provide(proFormContextKey, {
   model,
   readonly: computed(() => propReadonly),
   disabled: computed(() => propDisabled ?? config.value.componentDisabled ?? false),
+  ignoreRules: computed(() => propIgnoreRules),
   ...api,
   registerField(field) {
     fields.add(field)
@@ -388,6 +390,12 @@ provide(proFormContextKey, {
   },
 })
 defineExpose(api)
+watch(
+  () => propIgnoreRules,
+  (ignore) => {
+    if (ignore) api.clearValidate()
+  },
+)
 watch(
   () => propName,
   (name, _previous, onCleanup) => {

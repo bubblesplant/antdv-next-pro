@@ -340,7 +340,12 @@ function fields() {
     :class="[prefix, attrs.class, semantic.classes.root]"
     :style="[themeVars, attrs.style as any, semantic.styles.root]"
   >
-    <FormItem :name="path" :label="propLabel" :rules="propRules" :auto-link="false">
+    <FormItem
+      :name="path"
+      :label="propLabel"
+      :rules="form?.ignoreRules.value ? undefined : propRules"
+      :auto-link="false"
+    >
       <template v-for="(content, contentIndex) in [resolveRows()]" :key="contentIndex">
         <VNodeContent v-if="content.creatorPosition === 'top'" :content="content.creator" />
         <div

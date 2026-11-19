@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import type { VNodeChild } from 'vue'
-import { Button, FormItem, Space, theme } from 'antdv-next'
-import { computed, h, onBeforeUnmount, onMounted, ref, unref, useAttrs, useSlots } from 'vue'
+import { Button, FormItem, Space, theme, useBreakpoint } from 'antdv-next'
+import {
+  cloneVNode,
+  computed,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  unref,
+  useAttrs,
+  useSlots,
+} from 'vue'
 import ProForm from './ProForm'
 import type { ProFormInstance } from './types'
 import { flattenChildren, resolveSemantic, useFormPrefix } from './utils'
 import { defaultCollapseRender } from './query-filter/Actions'
-import { resolveQueryFilterLayout } from './query-filter/layout'
+import { resolveQueryFilterGutter, resolveQueryFilterLayout } from './query-filter/layout'
 import { useFormThemeVars } from './useFormThemeVars'
 
 import VNodeContent from '../shared/VNodeContent'
@@ -38,6 +48,8 @@ const {
   defaultCollapsed: propDefaultCollapsed,
   defaultColsNumber: propDefaultColsNumber,
   span: propSpan,
+  searchGutter: propSearchGutter,
+  ignoreRules: propIgnoreRules,
   labelWidth: propLabelWidth,
   split: propSplit,
   searchText: propSearchText,
@@ -127,6 +139,12 @@ const props = {
   get span() {
     return propSpan
   },
+  get searchGutter() {
+    return propSearchGutter
+  },
+  get ignoreRules() {
+    return propIgnoreRules
+  },
   get labelWidth() {
     return propLabelWidth
   },
@@ -156,6 +174,20 @@ const collapsed = computed(() => propCollapsed ?? local.value)
 const { prefix, t } = useFormPrefix('query-filter', () => propPrefixCls)
 const themeVars = useFormThemeVars()
 const { token } = theme.useToken()
+const screens =
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? useBreakpoint()
+    : undefined
+const gutterStyles = computed(() => {
+  const { horizontal, vertical } = resolveQueryFilterGutter(
+    propSearchGutter,
+    screens?.value ?? null,
+  )
+  return {
+    '--pro-query-half-gutter': `${horizontal / 2}px`,
+    rowGap: `${vertical}px`,
+  }
+})
 const grid = computed(() =>
   resolveQueryFilterLayout({
     width: width.value,
@@ -200,6 +232,11 @@ const semantic = computed(() => resolveSemantic(props))
 const visible = computed(() => Math.max(1, Math.floor(24 / grid.value.span) - 1))
 function resolveContent() {
   const children = flattenChildren(slots.default?.())
+  const items = propIgnoreRules
+    ? children.map((child) =>
+        child.type === FormItem ? cloneVNode(child, { rules: undefined }) : child,
+      )
+    : children
   const shouldCollapse = children.length > visible.value
   const submitter = propSubmitter === false ? undefined : propSubmitter
   const defaults: VNodeChild[] = submitter
@@ -283,12 +320,13 @@ function resolveContent() {
           ],
         )
       : null
-  return { children, actions }
+  return { children: items, actions }
 }
 function formBindings() {
   return {
     ...attrs,
     ...pickFormProps(props),
+    ignoreRules: propIgnoreRules,
     class: undefined,
     style: undefined,
     classes: { ...semantic.value.classes, root: undefined },
@@ -337,7 +375,7 @@ function formBindings() {
         <div
           data-pro-query-row=""
           :class="[`${prefix}-row`, semantic.classes.row]"
-          :style="semantic.styles.row"
+          :style="[gutterStyles, semantic.styles.row]"
         >
           <div
             v-for="(child, index) in content.children"
