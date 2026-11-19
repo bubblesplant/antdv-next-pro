@@ -81,7 +81,7 @@ async function reload() {
         :loading="loading"
         row-key="id"
         header-title="项目清单"
-        :search="showSearch ? { defaultCollapsed: true, span: 8 } : false"
+        :search="showSearch ? { defaultCollapsed: true } : false"
         :pagination="
           showPagination
             ? { defaultPageSize: 20, pageSizeOptions: [10, 20, 50], showSizeChanger: true }

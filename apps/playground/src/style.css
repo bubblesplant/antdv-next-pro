@@ -903,7 +903,9 @@ a {
   .heading-title h1 {
     font-size: 25px;
   }
-  .example-workbench .preview-panel .scenario-demo {
+  .example-workbench
+    .preview-panel
+    .scenario-demo:not(.mode-query-table, .mode-search-bar-type-switch, .mode-light-filter) {
     min-width: 760px;
   }
   .toast {
