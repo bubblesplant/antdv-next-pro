@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { Button, Space } from 'antdv-next'
 import { AdaptiveProTable, type ProColumns, type ProTableInstance } from '@bubblesjs/antdv-next-pro'
 
-interface Project extends Record<string, unknown> {
+interface Project {
   id: number
   name: string
   owner: string

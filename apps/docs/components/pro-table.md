@@ -47,6 +47,15 @@ import ProTableDemo from '../examples/ProTableDemo.vue'
 ```ts
 import type { ProRequest } from '@bubblesjs/antdv-next-pro'
 
+interface User {
+  id: number
+  name: string
+}
+
+interface Query {
+  name?: string
+}
+
 const request: ProRequest<User, Query> = async (params, sort, filter) => {
   const result = await api.list({ ...params, sort, filter })
   return {
@@ -56,6 +65,8 @@ const request: ProRequest<User, Query> = async (params, sort, filter) => {
   }
 }
 ```
+
+行数据和查询参数都可以直接使用普通 TypeScript 接口，无需继承 `Record<string, unknown>`。`AdaptiveProTable` 沿用同样的类型。
 
 搜索、分页、排序、筛选和外部 `params` 变化都会进入同一请求。并发请求只接纳最后发起的结果；请求抛错时保留当前数据、结束 loading，并触发 `request-error`。返回 `success: false` 的结果不会覆盖数据。
 

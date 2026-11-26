@@ -12,23 +12,23 @@ catalog:
   '@commitlint/cli': ^21.2.4
   '@commitlint/config-conventional': ^21.2.4
   '@types/node': ^26.6.6
-  '@vitejs/plugin-vue': ^6.0.10
+  '@vitejs/plugin-vue': ^6.0.11
   '@vitest/browser-playwright': 5.1.0
   '@vitest/coverage-v8': 5.1.0
-  '@vue/test-utils': ^2.5.1
-  antdv-next: ^1.8.1
+  '@vue/test-utils': ^2.6.0
+  antdv-next: ^1.8.2
   dayjs: ^1.11.23
-  eslint: ^10.14.0
+  eslint: ^10.15.0
   fflate: ^0.8.3
-  jsdom: ^31.0.0
-  playwright: ^1.65.0
+  jsdom: ^31.0.1
+  playwright: ^1.65.1
   typescript: ^6.0.3
-  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
-  vite-plus: 1.6.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vite-plus: 1.7.0
   vitepress: ^2.0.0-alpha.21
   vitest: 5.1.0
-  vue: ^3.5.45
-  vue-router: ^5.5.0
+  vue: ^3.5.46
+  vue-router: ^5.5.1
   vue-tsc: ^3.3.14
 
 overrides:
@@ -44,27 +44,27 @@ allowBuilds:
   esbuild: true
 
 minimumReleaseAgeExclude:
-  - '@oxlint/binding-darwin-x64@1.93.0'
-  - '@oxlint/binding-freebsd-x64@1.93.0'
-  - '@oxlint/binding-linux-arm-gnueabihf@1.93.0'
-  - '@oxlint/binding-linux-arm-musleabihf@1.93.0'
-  - '@oxlint/binding-linux-ppc64-gnu@1.93.0'
-  - '@oxlint/binding-linux-riscv64-gnu@1.93.0'
-  - '@oxlint/binding-linux-riscv64-musl@1.93.0'
-  - '@oxlint/binding-linux-s390x-gnu@1.93.0'
-  - '@oxlint/binding-linux-x64-gnu@1.93.0'
-  - '@oxlint/binding-linux-x64-musl@1.93.0'
-  - '@oxlint/binding-win32-ia32-msvc@1.93.0'
-  - '@oxlint/binding-win32-x64-msvc@1.93.0'
-  - '@oxlint/plugins@1.93.0'
-  - '@voidzero-dev/vite-plus-core@1.6.0'
-  - '@voidzero-dev/vite-plus-darwin-arm64@1.6.0'
-  - '@voidzero-dev/vite-plus-darwin-x64@1.6.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.6.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.6.0'
-  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.6.0'
-  - '@voidzero-dev/vite-plus-linux-x64-musl@1.6.0'
-  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.6.0'
-  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.6.0'
-  - oxlint@1.93.0
-  - vite-plus@1.6.0
+  - '@oxlint/binding-darwin-x64@1.94.0'
+  - '@oxlint/binding-freebsd-x64@1.94.0'
+  - '@oxlint/binding-linux-arm-gnueabihf@1.94.0'
+  - '@oxlint/binding-linux-arm-musleabihf@1.94.0'
+  - '@oxlint/binding-linux-ppc64-gnu@1.94.0'
+  - '@oxlint/binding-linux-riscv64-gnu@1.94.0'
+  - '@oxlint/binding-linux-riscv64-musl@1.94.0'
+  - '@oxlint/binding-linux-s390x-gnu@1.94.0'
+  - '@oxlint/binding-linux-x64-gnu@1.94.0'
+  - '@oxlint/binding-linux-x64-musl@1.94.0'
+  - '@oxlint/binding-win32-ia32-msvc@1.94.0'
+  - '@oxlint/binding-win32-x64-msvc@1.94.0'
+  - '@oxlint/plugins@1.94.0'
+  - '@voidzero-dev/vite-plus-core@8.3.8000'
+  - '@voidzero-dev/vite-plus-darwin-arm64@1.7.0'
+  - '@voidzero-dev/vite-plus-darwin-x64@1.7.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.7.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.7.0'
+  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.7.0'
+  - '@voidzero-dev/vite-plus-linux-x64-musl@1.7.0'
+  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.7.0'
+  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.7.0'
+  - oxlint@1.94.0
+  - vite-plus@1.7.0

@@ -31,7 +31,11 @@ import { ref } from 'vue'
 import { AdaptiveProTable, type ProColumns, type ProTableInstance } from '@bubblesjs/antdv-next-pro'
 import '@bubblesjs/antdv-next-pro/style.css'
 
-type User = { id: number; name: string }
+interface User {
+  id: number
+  name: string
+}
+
 const table = ref<ProTableInstance<User>>()
 const columns: ProColumns<User>[] = [{ title: '姓名', dataIndex: 'name' }]
 const rows: User[] = [{ id: 1, name: '林默' }]

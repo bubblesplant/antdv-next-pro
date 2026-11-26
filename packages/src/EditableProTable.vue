@@ -2,10 +2,11 @@
   setup
   lang="ts"
   generic="
-    T extends Record<string, unknown> = Record<string, unknown>,
-    P extends Record<string, unknown> = Record<string, unknown>
+    T extends ProTableRecord = Record<string, unknown>,
+    P extends ProTableRecord = Record<string, unknown>
   "
 >
+import type { ProTableRecord } from './table/record'
 import type {
   EditableConfig,
   EditableProTableInstance,
