@@ -1,5 +1,11 @@
 # @bubblesjs/antdv-next-pro
 
+## 0.4.1
+
+### Patch Changes
+
+- [#34](https://github.com/bubblesplant/antdv-next-pro/pull/34) [`90f5113`](https://github.com/bubblesplant/antdv-next-pro/commit/90f51136451036b161759f9fefa1463bcc1fbc87) Thanks [@bubblesplant](https://github.com/bubblesplant)! - 对齐 ProComponents 的表格泛型约束，允许直接使用普通 TypeScript 接口作为行数据和查询参数，保留列、请求回调、事件、插槽和实例方法的具体类型推断。
+
 ## 0.4.0
 
 ### Minor Changes
