@@ -2,12 +2,13 @@
   setup
   lang="ts"
   generic="
-    T extends Record<string, unknown> = Record<string, unknown>,
-    P extends Record<string, unknown> = Record<string, unknown>
+    T extends ProTableRecord = Record<string, unknown>,
+    P extends ProTableRecord = Record<string, unknown>
   "
 >
 import type { TableColumnsType, FormInstance } from 'antdv-next'
 import type { CSSProperties, VNodeChild, VNode } from 'vue'
+import type { ProTableRecord } from './table/record'
 import type {
   EditableAction,
   ProCardProps,

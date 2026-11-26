@@ -1,4 +1,5 @@
-<script setup lang="ts" generic="T extends Record<string, unknown> = Record<string, unknown>">
+<script setup lang="ts" generic="T extends ProTableRecord = Record<string, unknown>">
+import type { ProTableRecord } from '../table/record'
 import type {
   ProColumns,
   ProTableSearchConfig,

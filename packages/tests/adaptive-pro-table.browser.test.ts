@@ -5,6 +5,7 @@ import { defineComponent, h, nextTick, ref, type Component } from 'vue'
 import AdaptiveProTable from '../src/adaptive-pro-table/AdaptiveProTable'
 import ProTable from '../src/ProTable.vue'
 import type { ProColumns, ProTableInstance, ProTableProps } from '../src/types'
+import PlainInterfaceAdaptiveTable from './fixtures/PlainInterfaceAdaptiveTable.vue'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -51,6 +52,19 @@ function element(selector: string): HTMLElement {
 }
 
 describe('AdaptiveProTable', () => {
+  it('forwards loaded and selected rows when a template uses plain interfaces', async () => {
+    wrapper = mount(PlainInterfaceAdaptiveTable, { attachTo: document.body })
+    await settle()
+
+    expect(wrapper.get('[data-testid="loaded-name"]').text()).toBe('Ada')
+    expect(wrapper.get('[data-testid="selected-names"]').text()).toBe('')
+
+    await wrapper.get('tbody input[type="checkbox"]').setValue(true)
+    await settle()
+
+    expect(wrapper.get('[data-testid="selected-names"]').text()).toBe('ADA')
+  })
+
   it('keeps the header and pagination visible while resizing and expanding search', async () => {
     const height = ref(680)
     const collapsed = ref(true)

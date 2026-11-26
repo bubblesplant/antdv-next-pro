@@ -1,5 +1,7 @@
 import type { ProColumnValueType, ProValueTypeDefinitionValue } from '../types'
-export function resolveColumnValueType<T extends Record<string, unknown>>(
+import type { ProTableRecord } from './record'
+
+export function resolveColumnValueType<T extends ProTableRecord>(
   valueType: ProColumnValueType<T> | undefined,
   record: T,
   index: number,

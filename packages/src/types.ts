@@ -13,6 +13,7 @@ import type {
   StepItem,
 } from 'antdv-next'
 import type { CSSProperties, Component, VNodeChild } from 'vue'
+import type { ProTableRecord } from './table/record'
 
 export type ProCardSemanticName =
   | 'root'
@@ -159,7 +160,7 @@ export type ProValueEnum<Value = unknown> =
   | Record<ProKey, string | ProValueEnumItem<Value>>
   | ReadonlyMap<Value, string | ProValueEnumItem<Value>>
 
-export interface ProRenderContext<T extends Record<string, unknown>> {
+export interface ProRenderContext<T extends ProTableRecord> {
   record: T
   index: number
   column: ProColumns<T>
@@ -172,14 +173,12 @@ export interface ProValueTypeDefinitionValue {
   type: ProValueType
   [key: string]: unknown
 }
-export type ProColumnValueType<T extends Record<string, unknown> = Record<string, unknown>> =
+export type ProColumnValueType<T extends ProTableRecord = Record<string, unknown>> =
   | ProValueType
   | ProValueTypeDefinitionValue
   | ((record: T, index: number) => ProValueType | ProValueTypeDefinitionValue)
 
-export interface ProColumns<
-  T extends Record<string, unknown> = Record<string, unknown>,
-> extends Omit<
+export interface ProColumns<T extends ProTableRecord = Record<string, unknown>> extends Omit<
   TableColumnType<T>,
   'title' | 'dataIndex' | 'render' | 'children' | 'key' | 'filters' | 'sorter' | 'ellipsis'
 > {
@@ -241,13 +240,13 @@ export interface ProRequestResult<T> {
   success?: boolean
 }
 
-export type ProRequest<T, P extends Record<string, unknown>> = (
+export type ProRequest<T, P extends ProTableRecord> = (
   params: P & { current?: number; pageSize?: number; nextToken?: string },
   sort: ProSort,
   filter: ProFilter,
 ) => Promise<ProRequestResult<T>>
 
-export interface ProTableSearchConfig<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface ProTableSearchConfig<T extends ProTableRecord = Record<string, unknown>> {
   labelWidth?: number | 'auto'
   span?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
   searchGutter?: import('./pro-form/types').QueryFilterProps['searchGutter']
@@ -273,12 +272,11 @@ export type ProTableToolbarSearchConfig = Omit<InputSearchProps, 'onSearch'> & {
   onSearch?: (value: string) => void | false | Promise<void | false>
 }
 
-export type ProTableSearchForm<T extends Record<string, unknown> = Record<string, unknown>> =
-  FormProps & {
-    initialValues?: Partial<T>
-    submitter?: false | import('./pro-form/types').SubmitterProps
-    ignoreRules?: boolean
-  }
+export type ProTableSearchForm<T extends ProTableRecord = Record<string, unknown>> = FormProps & {
+  initialValues?: Partial<T>
+  submitter?: false | import('./pro-form/types').SubmitterProps
+  ignoreRules?: boolean
+}
 
 export interface ProTableToolbarConfig {
   title?: VNodeChild
@@ -323,9 +321,7 @@ export interface ProTableLocaleText {
 
 export type ProTableScrollTarget = ProKey | { key: ProKey } | { top: number }
 
-export interface ProTableRowSelection<
-  T extends Record<string, unknown>,
-> extends TableRowSelection<T> {
+export interface ProTableRowSelection<T extends ProTableRecord> extends TableRowSelection<T> {
   alwaysShowAlert?: boolean
 }
 
@@ -344,7 +340,7 @@ export interface ProTablePagination extends Omit<
   pageSizeOptions?: Array<number | string>
 }
 
-export interface ProTableOptions<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface ProTableOptions<T extends ProTableRecord = Record<string, unknown>> {
   search?: boolean | ProTableToolbarSearchConfig
   density?: boolean
   fullScreen?: boolean | ((event: MouseEvent, action: ProTableInstance<T>) => void)
@@ -378,7 +374,7 @@ export interface ProColumnsStateConfig {
   onChange?: (state: Record<string, ProColumnsState>) => void
 }
 
-export interface EditableConfig<T extends Record<string, unknown>> {
+export interface EditableConfig<T extends ProTableRecord> {
   type?: 'single' | 'multiple'
   onSave?: (key: ProKey, record: T, origin: T) => void | boolean | Promise<void | boolean>
   onCancel?: (key: ProKey, record: T, origin: T) => void | Promise<void>
@@ -403,7 +399,7 @@ export interface EditableConfig<T extends Record<string, unknown>> {
   deletePopconfirmMessage?: VNodeChild
 }
 
-export interface EditableAction<T extends Record<string, unknown>> {
+export interface EditableAction<T extends ProTableRecord> {
   start: () => boolean
   save: () => Promise<boolean>
   cancel: () => void
@@ -412,7 +408,7 @@ export interface EditableAction<T extends Record<string, unknown>> {
   editing: boolean
 }
 
-export interface RecordCreatorProps<T extends Record<string, unknown>> extends Omit<
+export interface RecordCreatorProps<T extends ProTableRecord> extends Omit<
   ButtonProps,
   'onClick' | 'position'
 > {
@@ -424,8 +420,8 @@ export interface RecordCreatorProps<T extends Record<string, unknown>> extends O
 }
 
 export interface ProTableProps<
-  T extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
+  P extends ProTableRecord = Record<string, unknown>,
 > extends Omit<
   TableProps<T>,
   | 'columns'
@@ -509,7 +505,7 @@ export interface ProTableProps<
   bordered?: boolean
 }
 
-export interface ProTableInstance<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface ProTableInstance<T extends ProTableRecord = Record<string, unknown>> {
   getSortFilter: () => { sort: ProSort; filter: ProFilter }
   reload: (resetPageIndex?: boolean) => Promise<void>
   reset: () => Promise<void>
@@ -529,8 +525,8 @@ export interface ProTableInstance<T extends Record<string, unknown> = Record<str
 }
 
 export interface EditableProTableProps<
-  T extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
+  P extends ProTableRecord = Record<string, unknown>,
 > extends Omit<ProTableProps<T, P>, 'search' | 'pagination' | 'dataSource' | 'defaultDataSource'> {
   columns: ProColumns<T>[]
   value?: T[]
@@ -559,7 +555,7 @@ export interface EditableProTableProps<
 }
 
 export interface EditableProTableInstance<
-  T extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
 > extends ProTableInstance<T> {
   /** Numeric values resolve as an exact row key before falling back to a top-level row index. */
   getRowData: (indexOrKey: number | ProKey) => T | undefined
@@ -742,7 +738,7 @@ export interface SchemaFormProps<T extends Record<string, unknown> = Record<stri
   style?: CSSProperties
 }
 
-export interface SchemaFormInstance<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface SchemaFormInstance<T extends object = Record<string, unknown>> {
   readonly nativeForm?: FormInstance
   validate: () => Promise<Partial<T>>
   validateFields: (names?: ProDataIndex[]) => Promise<Partial<T>>

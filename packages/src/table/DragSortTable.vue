@@ -2,11 +2,12 @@
   setup
   lang="ts"
   generic="
-    T extends Record<string, unknown> = Record<string, unknown>,
-    P extends Record<string, unknown> = Record<string, unknown>
+    T extends ProTableRecord = Record<string, unknown>,
+    P extends ProTableRecord = Record<string, unknown>
   "
 >
 import type { DragSortTableProps } from './enhancements'
+import type { ProTableRecord } from './record'
 import type { ProTableInstance, ProKey, ProColumns } from '../types'
 import { ref, shallowRef, computed, h, watch, getCurrentInstance, type CSSProperties } from 'vue'
 import { HolderOutlined } from '@antdv-next/icons'

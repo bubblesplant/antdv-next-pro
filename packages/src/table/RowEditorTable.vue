@@ -2,11 +2,12 @@
   setup
   lang="ts"
   generic="
-    T extends Record<string, unknown> = Record<string, unknown>,
-    P extends Record<string, unknown> = Record<string, unknown>
+    T extends ProTableRecord = Record<string, unknown>,
+    P extends ProTableRecord = Record<string, unknown>
   "
 >
 import type { RowEditorTableProps } from './enhancements'
+import type { ProTableRecord } from './record'
 import type { ProTableInstance, ProKey } from '../types'
 import { ref, computed, onBeforeUnmount, getCurrentInstance } from 'vue'
 import EditableProTable from '../EditableProTable.vue'

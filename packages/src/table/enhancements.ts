@@ -1,8 +1,9 @@
 import type { VNodeChild } from 'vue'
 import type { ProTableProps, EditableProTableProps, ProKey } from '../types'
+import type { ProTableRecord } from './record'
 export interface DragSortTableProps<
-  T extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
+  P extends ProTableRecord = Record<string, unknown>,
 > extends ProTableProps<T, P> {
   dragSortKey?: string
   dragSortHandlerRender?: (record: T, index: number) => VNodeChild
@@ -10,8 +11,8 @@ export interface DragSortTableProps<
   onDataSourceChange?: (rows: T[]) => void
 }
 export interface RowEditorTableProps<
-  T extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
+  P extends ProTableRecord = Record<string, unknown>,
 > extends EditableProTableProps<T, P> {
   dataSource?: T[]
   defaultDataSource?: T[]
@@ -19,6 +20,6 @@ export interface RowEditorTableProps<
   onRowEditEnd?: (key: ProKey, record: T) => void
 }
 export interface CellEditorTableProps<
-  T extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>,
+  T extends ProTableRecord = Record<string, unknown>,
+  P extends ProTableRecord = Record<string, unknown>,
 > extends RowEditorTableProps<T, P> {}
