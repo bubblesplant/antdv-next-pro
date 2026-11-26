@@ -1,0 +1,1 @@
+import{c as e,l as t,n,o as r,u as i}from"./RenderNode-D-7CvUlQ.js";function a(a,o){let{direction:s,token:c,nativeConfig:l}=t();return{direction:s,token:c,nativeConfig:l,prefix:i(o,()=>a.prefixCls),intl:e(),themeVars:n(),...r(a,{classes:()=>a.classes,classNames:()=>a.classNames,styles:()=>a.styles})}}export{a as t};

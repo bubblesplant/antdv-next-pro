@@ -1,0 +1,1 @@
+import{Nt as e,_t as t,ct as n,un as r}from"./framework.CO9xBJp6.js";import{t as i}from"./VNodeContent.BWovjnoh.js";var a=t({name:`AntdvNextProRenderNode`,__name:`RenderNode`,props:{content:{type:[Object,String,Number,Boolean,null,Array]}},setup(t){return(a,o)=>(e(),n(r(i),{content:t.content},null,8,[`content`]))}});export{a as t};
